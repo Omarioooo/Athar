@@ -22,5 +22,5 @@
    
 4. **Open your browser:**
    ```bash
-   https://https://localhost:7032
+   https://localhost:7032
    ```
