@@ -21,6 +21,7 @@ namespace AtharPlatform.Models
         public DateTime CreatedAt { get; set; }
 
 
+
         public List<CampaignContent> CampaignContent { get; set; }
         public List<UserContetReaction> UserContetReaction { get; set; }
        
