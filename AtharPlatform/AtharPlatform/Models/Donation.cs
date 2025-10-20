@@ -20,7 +20,7 @@ namespace AtharPlatform.Models
         public decimal NetAmountToCharity { get; set; }// Amount charity actually receives
 
 
-        public string PaymentReference { get; set; }
+        public string PaymentReference { get; set; }//strip_PaymentId
 
 
         [Required]

@@ -6,8 +6,8 @@ namespace AtharPlatform.Models
     //Weak Entity
     public class CharityVolunteer
     {
-        [ForeignKey("volunteerForm")]
-        public int VolunteerFormId { get; set; }
+        [Key,ForeignKey("volunteerForm")]
+        public int VolunteerOfferId { get; set; }
 
         public VolunteerForm volunteerForm { get; set; }
 

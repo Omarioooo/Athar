@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AtharPlatform.Models
 {
     public class CharityDonation
     {
-        [ForeignKey("Donation")]
+        [Key,ForeignKey("Donation")]
         public int DonationId { get; set; }
         public Donation Donation { get; set; }
 
@@ -16,6 +17,10 @@ namespace AtharPlatform.Models
         public int charityID { get; set; }
         public CharityCampaign CharityCampaign { get; set; }
 
+
+        [ForeignKey("user")]
+        public string DonorID { get; set; }
+        public User user { get; set; }
 
 
     }
