@@ -11,14 +11,13 @@ namespace AtharPlatform.Models
 
 
 
-        //// Verification documents stored as JSON (PostgreSQL) 
-        //public List<string> VerificationDocs { get; set; } = new List<string>();
+       
         public List<CharityVerificationDocument> VerificationDocuments { get; set; } = new List<CharityVerificationDocument>();
 
 
 
-        [ForeignKey("UserAccount")]
-        public int AccountId { get; set; }
+        [Key,ForeignKey("UserAccount")]
+        public string AccountId { get; set; }
     
         public UserAccount UserAccount { get; set; }
 
@@ -42,12 +41,6 @@ namespace AtharPlatform.Models
         public string DocumentName { get; set; }  // "License", "Certificate"
 
         public string DocumentPath { get; set; }   // Path or URL to the document
-
    
-        [Required]
-        public string CharityId { get; set; }  
-
-        [ForeignKey("CharityId")]
-        public Charity Charity { get; set; }    
     }
 }

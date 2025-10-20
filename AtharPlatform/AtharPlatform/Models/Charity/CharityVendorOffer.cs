@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AtharPlatform.Models
 {
     //Weak Entity
     public class CharityVendorOffer
     {
-        [ForeignKey("VendorForm")]
+        [Key,ForeignKey("VendorForm")]
         public int offerID { get; set; }
         public VendorForm VendorForm { get; set; }
 

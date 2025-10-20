@@ -13,12 +13,12 @@ namespace AtharPlatform.Models
         public Charity Charity { get; set; }
 
 
-        [ForeignKey("Campaign")]
+        [Key,ForeignKey("Campaign")]
         public int CampaignId { get; set; }
         public Campaign Campaign { get; set; }
 
 
         public List<CharityDonation> CharityDonations { get; set; }
-        public List<CampaignContent> campaignContents { get; set; }
+        
     }
 }
