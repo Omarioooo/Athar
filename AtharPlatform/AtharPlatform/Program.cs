@@ -16,9 +16,13 @@ namespace AtharPlatform
             builder.Services.AddOpenApi();
 
             // Inject DB
-            builder.Services.AddDbContext<Context>(op =>
+            /*builder.Services.AddDbContext<Context>(op =>
                 op.UseNpgsql(builder.Configuration.GetConnectionString("connection")
-            ));
+            ));*/
+
+            builder.Services.AddDbContext<Context>(
+              options => options.UseNpgsql(builder.Configuration.GetConnectionString("connection"))
+              );
 
             // Inject Identity
             builder.Services.AddIdentity<UserAccount, IdentityRole>();
@@ -33,6 +37,7 @@ namespace AtharPlatform
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
