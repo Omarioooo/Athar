@@ -5,7 +5,7 @@ namespace AtharPlatform.Models
 {
     public class CampaignDonation
     {
-        [Required]
+        
         [Key,ForeignKey("Donation")]
         public int DonationId { get; set; }
         public Donation Donation { get; set; }
