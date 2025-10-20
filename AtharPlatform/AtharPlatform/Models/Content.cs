@@ -15,7 +15,7 @@ namespace AtharPlatform.Models
 
         public string Description { get; set; }
 
-        public byte[] MediaUrl { get; set; }// image for the post
+        public byte[] PostImage { get; set; }// image for the post
 
 
         public DateTime CreatedAt { get; set; }
