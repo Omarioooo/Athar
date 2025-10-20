@@ -12,6 +12,9 @@ namespace AtharPlatform.Models
         public DateTime StartDate { get; set; }
 
         [Required]
+        public decimal Amount { get; set; }
+
+        [Required]
         public DateTime EndDate { get; set; }
 
         [ForeignKey("Charity")]
