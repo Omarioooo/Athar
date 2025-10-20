@@ -37,7 +37,6 @@ namespace AtharPlatform.Models
         [Range(0, double.MaxValue)]
         public decimal PriceBeAfterDiscount { get; set; }
 
-        public DateTime DonationDate { get; set; } 
 
         public List<CharityVendorOffer> CharityVendorOffer { get; set; }
 

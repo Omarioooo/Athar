@@ -45,11 +45,10 @@ namespace AtharPlatform.Models
     }
     public class DonationImage
     {
-        [Key]
-        public int Id { get; set; }
+
         public byte[] ImageData { get; set; }
 
-        [Required]
+        [Key,Required]
         public int MaterialDonationId { get; set; }
 
         [ForeignKey("MaterialDonationId")]

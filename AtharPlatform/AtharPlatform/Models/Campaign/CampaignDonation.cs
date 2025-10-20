@@ -6,7 +6,7 @@ namespace AtharPlatform.Models
     public class CampaignDonation
     {
         [Required]
-        [ForeignKey("Donation")]
+        [Key,ForeignKey("Donation")]
         public int DonationId { get; set; }
         public Donation Donation { get; set; }
 
@@ -21,7 +21,7 @@ namespace AtharPlatform.Models
 
 
         [ForeignKey("user")]
-        public int DonorId { get; set; }
+        public String DonorId { get; set; }//By default Id in Identity String
         public User user { get; set; }
 
 

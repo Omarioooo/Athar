@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AtharPlatform.Models
 {
     public class ReceiveNotification
     {
-        [ForeignKey("Notification")]
+        [Key,ForeignKey("Notification")]
         public int NotificationId { get; set; }
         public Notification Notification { get; set; }
 
@@ -13,7 +14,7 @@ namespace AtharPlatform.Models
 
 
         [ForeignKey("UserAccount")]
-        public int AccountId { get; set; }
+        public string AccountId { get; set; }
         public UserAccount UserAccount { get; set; }
     }
 }
