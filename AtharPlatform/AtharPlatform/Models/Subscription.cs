@@ -23,7 +23,7 @@ namespace AtharPlatform.Models
 
 
 
-        [ForeignKey("Charity")]
+        [ForeignKey("user")]
         public string SubscribtionID { get; set; }
         public User user { get; set; }
 
