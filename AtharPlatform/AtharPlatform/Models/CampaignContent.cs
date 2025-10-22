@@ -5,16 +5,15 @@ namespace AtharPlatform.Models
 {
     public class CampaignContent
     {
-        [ForeignKey("Campaign")]
+        [ForeignKey(nameof(Campaign))]
         public int CampaignId { get; set; }
-        public Campaign Campaign { get; set; }
+        public virtual Campaign Campaign { get; set; } = new();
 
 
 
-        [Key, ForeignKey("Content")]
+        [Key, ForeignKey(nameof(Content))]
         public int ContentId { get; set; }
-        public Content Content { get; set; }
-
+        public virtual Content Content { get; set; } = new();
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }

@@ -41,6 +41,6 @@ namespace AtharPlatform.Models
         [Required]
         [ForeignKey(nameof(CharityVendorOffer))]
         public int CharityVendorOfferId { get; set; }
-        public virtual CharityVendorOffer CharityVendorOffer { get; set; }
+        public virtual CharityVendorOffer CharityVendorOffer { get; set; } = new();
     }
 }

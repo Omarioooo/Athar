@@ -26,9 +26,9 @@ namespace AtharPlatform.Models
 
         public CampainStatusEnum Status { get; set; } = CampainStatusEnum.inProgress;
 
-        public List<CampaignDonation> CampaignDonations { get; set; }
-        public List<CharityCampaign> CharityCampaigns { get; set; }
-        public List<CampaignContent> CampaignContent { get; set; }
+        public virtual List<CampaignDonation> CampaignDonations { get; set; } = new();
+        public virtual List<CharityCampaign> CharityCampaigns { get; set; } = new();
+        public virtual List<CampaignContent> CampaignContent { get; set; } = new();
 
     }
 }

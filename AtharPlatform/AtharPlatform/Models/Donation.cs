@@ -17,19 +17,17 @@ namespace AtharPlatform.Models
 
 
         [Column(TypeName = "decimal(18,2)")]
-        public decimal NetAmountToCharity { get; set; }// Amount charity actually receives
+        public decimal NetAmountToCharity { get; set; }
 
-
-        public string PaymentReference { get; set; }//strip_PaymentId
-
+        public string PaymentReference { get; set; }
 
         [Required]
-        public string DonationStatus { get; set; }// Pending, Completed, Failed
+        public string DonationStatus { get; set; }
 
-        public DateTime CreatedAt { get; set; }
+        public virtual DateTime CreatedAt { get; set; } = new();
 
-        public List<CharityDonation> CharityDonations { get; set; }
-        public List<CampaignDonation> CampaignDonations { get; set; }
+        public virtual List<CharityDonation> CharityDonations { get; set; } = new();
+        public virtual List<CampaignDonation> CampaignDonations { get; set; } = new();
 
     }
 }

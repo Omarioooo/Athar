@@ -12,7 +12,7 @@ namespace AtharPlatform.Models
 
         public Byte[]? ProfileImage { get; set; }
 
-        public List<ReceiveNotification> ReceiveNotifications { get; set; }
+        public virtual List<NotificationReceive> ReceiveNotifications { get; set; } = new();
     }
 }
 

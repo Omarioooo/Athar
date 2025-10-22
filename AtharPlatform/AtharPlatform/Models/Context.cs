@@ -9,7 +9,7 @@ namespace AtharPlatform.Models
         public Context(DbContextOptions<Context> options) : base(options) { }
 
         // Users and Charities
-        public DbSet<Client> Users { get; set; }
+        public DbSet<Donor> Donors { get; set; }
         public DbSet<Charity> Charities { get; set; }
 
         // Subscriptions
@@ -19,7 +19,6 @@ namespace AtharPlatform.Models
         // Content & Reactions
         public DbSet<Content> Contents { get; set; }
         public DbSet<Reaction> Reactions { get; set; }
-        public DbSet<UserContetReaction> UserContentReactions { get; set; }
 
         // Campaigns
         public DbSet<Campaign> Campaigns { get; set; }
@@ -34,8 +33,8 @@ namespace AtharPlatform.Models
 
         // Notifications
         public DbSet<Notification> Notifications { get; set; }
-        public DbSet<SendNotification> SendNotifications { get; set; }
-        public DbSet<ReceiveNotification> ReceiveNotifications { get; set; }
+        public DbSet<NotificationSender> SendNotifications { get; set; }
+        public DbSet<NotificationReceive> ReceiveNotifications { get; set; }
 
         // Volunteer & Vendor
         public DbSet<VolunteerApplication> VolunteerForm { get; set; }
@@ -47,12 +46,6 @@ namespace AtharPlatform.Models
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
-            // Composite key for UserRoles
-            builder.Entity<UserRoles>()
-                   .HasIndex(ur => new { ur.AccountId, ur.RoleId })
-                   .IsUnique();
-
 
         }
     }

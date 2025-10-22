@@ -33,6 +33,6 @@ namespace AtharPlatform.Models
         [ForeignKey(nameof(CharityVolunteer))]
         public int CharityVolunteerId { get; set; }
 
-        public virtual CharityVolunteer CharityVolunteer { get; set; }
+        public virtual CharityVolunteer CharityVolunteer { get; set; } = new();
     }
 }
