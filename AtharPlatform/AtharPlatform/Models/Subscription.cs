@@ -25,7 +25,7 @@ namespace AtharPlatform.Models
 
         [ForeignKey("user")]
         public string SubscribtionID { get; set; }
-        public User user { get; set; }
+        public Client user { get; set; }
 
 
         [ForeignKey("subscribtionType")]

@@ -9,7 +9,7 @@ namespace AtharPlatform.Models
 
         [ForeignKey("user")]
         public string UserID { get; set; }
-        public User user { get; set; }
+        public Client user { get; set; }
 
 
 

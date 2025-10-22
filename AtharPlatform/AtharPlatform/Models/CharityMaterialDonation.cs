@@ -7,17 +7,19 @@ namespace AtharPlatform.Models
     //Weak Entity
     public class CharityMaterialDonation
     {
+        [Key]
+        public int MaterialDonationId { get; set; }
 
-        [Key,ForeignKey("MaterialDonation")]
-        public int MaterialDonationID { get; set; }
-        public MaterialDonation MaterialDonation { get; set; }
+        [Required]
+        public DateTime Date { get; set; } = DateTime.UtcNow;
 
-        [ForeignKey("charity")]
+        [Required]
+        [ForeignKey(nameof(Charity))]
         public int CharityId { get; set; }
-        public Charity charity { get; set; }
 
+        public virtual Charity Charity { get; set; }
 
-        public DateTime Date { get; set; }
-
+        // Navigation Property
+        public virtual List<MaterialDonation> MaterialDonations { get; set; }
     }
 }

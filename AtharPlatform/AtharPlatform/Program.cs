@@ -1,49 +1,58 @@
+using Microsoft.AspNetCore.Builder;
 
-using AtharPlatform.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+var builder = WebApplication.CreateBuilder(args);
 
-namespace AtharPlatform
+// Add services to the container.
+builder.Services.AddControllers();
+builder.Services.AddSwaggerGen();
+
+// Inject DB
+builder.Services.AddDbContext<Context>(
+  options => options.UseNpgsql(builder.Configuration.GetConnectionString("connection"))
+ );
+
+// Inject Repositories
+
+
+// Inject Services
+
+
+// Inject Identity
+builder.Services.AddIdentity<UserAccount, IdentityRole>();
+builder.Services.Configure<IdentityOptions>(op =>
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
+    op.Password.RequiredLength = 1;
+    op.Password.RequireDigit = false;
+    op.Password.RequireLowercase = false;
+    op.Password.RequireUppercase = false;
+    op.Password.RequireNonAlphanumeric = false;
+    op.Password.RequiredUniqueChars = 0;
+});
 
-            // Add services to the container.
-            builder.Services.AddControllers();
-            builder.Services.AddOpenApi();
+// Inject JWT
+builder.Services.AddAuthentication().AddJwtBearer();
 
-            // Inject DB
-            /*builder.Services.AddDbContext<Context>(op =>
-                op.UseNpgsql(builder.Configuration.GetConnectionString("connection")
-            ));*/
+// Inject SignalR
+builder.Services.AddSignalR();
 
-            builder.Services.AddDbContext<Context>(
-              options => options.UseNpgsql(builder.Configuration.GetConnectionString("connection"))
-              );
+var app = builder.Build();
 
-            // Inject Identity
-            builder.Services.AddIdentity<UserAccount, IdentityRole>();
-
-            var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.MapOpenApi();
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-
-            app.MapControllers();
-
-            app.Run();
-        }
-    }
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwagger();
 }
+
+app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+
+// Nofications
+
+app.MapControllers();
+
+app.Run();
+

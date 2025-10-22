@@ -5,20 +5,18 @@ namespace AtharPlatform.Models
 {
     public class CharityCampaign
     {
-        public DateTime StartDate { get; set; }
 
-
-        [ForeignKey("Charity")]
-        public int charityID { get; set; }
+        [ForeignKey(nameof(Charity))]
+        public int CharityID { get; set; }
         public Charity Charity { get; set; }
 
 
-        [Key,ForeignKey("Campaign")]
+        [Key, ForeignKey(nameof(Campaign))]
         public int CampaignId { get; set; }
         public Campaign Campaign { get; set; }
 
 
         public List<CharityDonation> CharityDonations { get; set; }
-        
+
     }
 }

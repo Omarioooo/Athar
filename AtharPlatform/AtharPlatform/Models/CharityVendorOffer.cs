@@ -3,17 +3,21 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AtharPlatform.Models
 {
-    //Weak Entity
     public class CharityVendorOffer
     {
-        [Key,ForeignKey("VendorForm")]
-        public int offerID { get; set; }
-        public VendorForm VendorForm { get; set; }
+        [Key]
+        public int CharityVendorOfferId { get; set; }
 
-        public DateTime Date { get; set; }
+        [Required]
+        public DateTime Date { get; set; } = DateTime.UtcNow;
 
+        [Required]
         [ForeignKey("Charity")]
-        public int CharityID { get; set; }
-        public Charity Charity { get; set; }
+        public int CharityId { get; set; }
+
+        public virtual Charity Charity { get; set; }
+
+        // Navigation Property
+        public virtual List<VendorOffers> VendorOffers { get; set; }
     }
 }
