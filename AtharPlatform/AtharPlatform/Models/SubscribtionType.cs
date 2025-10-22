@@ -6,9 +6,9 @@ namespace AtharPlatform.Models
     {
         [Key]
         public int Id { get; set; }
-    
+
         public string Type { get; set; }
 
-        public List<Subscription> subscriptions { get; set; }
+        public virtual List<Subscription> Subscriptions { get; set; } = new();
     }
 }

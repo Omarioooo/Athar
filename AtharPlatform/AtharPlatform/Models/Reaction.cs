@@ -1,26 +1,23 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AtharPlatform.Models
 {
-    public enum ReactionTypeEnum
-    { 
-        Like,
-        DisLike
-    }
     public class Reaction
 
     {
         [Key]
         public int Id { get; set; }
 
-         
-        [MaxLength(50)]
-        public ReactionTypeEnum ReactionType { get; set; }
+        [Required]
+        public DateTime ReactionDate { get; set; }
 
-        public bool IsDeleted { get; set; }
+        [ForeignKey(nameof(Donor))]
+        public string DonorID { get; set; }
+        public virtual Donor Donor { get; set; }
 
-
-        public List<UserContetReaction> UserContetReaction { get; set; }
-
+        [ForeignKey(nameof(Content))]
+        public int ContentID { get; set; }
+        public virtual Content Content { get; set; } = new();
     }
 }

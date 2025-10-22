@@ -13,9 +13,9 @@ namespace AtharPlatform.Models
 
         public string StripCustomerId { get; set; }
 
-        public List<CampaignDonation> campaignDonations { get; set; }
-        public List<UserContetReaction> userContetReaction { get; set; }
+        public virtual List<CampaignDonation> CampaignDonations { get; set; } = new();
+        public virtual List<Reaction> Reactions { get; set; } = new();
 
-        public List<Subscription> subscriptions { get; set; }
+        public virtual List<Subscription> Subscriptions { get; set; } = new();
     }
 }

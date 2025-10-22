@@ -15,9 +15,9 @@ namespace AtharPlatform.Models
 
         public bool IsDeleted { get; set; }
 
-        public DateTime Time { get; set; }
+        public DateTime Date { get; set; } = DateTime.UtcNow;
 
-        public List<SendNotification> SendNotifications { get; set; }
-        public List<ReceiveNotification> ReceiveNotifications { get; set; }
+        public NotificationSender Sender { get; set; }
+        public virtual List<NotificationReceive> ReceiveNotifications { get; set; } = new();
     }
 }
