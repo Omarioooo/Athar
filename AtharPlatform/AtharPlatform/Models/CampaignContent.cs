@@ -11,12 +11,11 @@ namespace AtharPlatform.Models
 
 
 
-        [Key,ForeignKey("Content")]
+        [Key, ForeignKey("Content")]
         public int ContentId { get; set; }
         public Content Content { get; set; }
 
 
-
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

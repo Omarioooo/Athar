@@ -9,12 +9,8 @@ namespace AtharPlatform.Models
         public Context(DbContextOptions<Context> options) : base(options) { }
 
         // Users and Charities
-        public DbSet<User> Users { get; set; }
+        public DbSet<Client> Users { get; set; }
         public DbSet<Charity> Charities { get; set; }
-
-        // Roles
-        public DbSet<Role> Roles { get; set; }
-        public DbSet<UserRoles> UserRoles { get; set; }
 
         // Subscriptions
         public DbSet<Subscription> Subscriptions { get; set; }
@@ -42,9 +38,9 @@ namespace AtharPlatform.Models
         public DbSet<ReceiveNotification> ReceiveNotifications { get; set; }
 
         // Volunteer & Vendor
-        public DbSet<VolunteerForm> VolunteerForm { get; set; }
+        public DbSet<VolunteerApplication> VolunteerForm { get; set; }
         public DbSet<CharityVolunteer> CharityVolunteers { get; set; }
-        public DbSet<VendorForm> VendorForms { get; set; }
+        public DbSet<VendorOffers> VendorForms { get; set; }
         public DbSet<CharityVendorOffer> CharityVendorOffers { get; set; }
 
 
@@ -57,7 +53,7 @@ namespace AtharPlatform.Models
                    .HasIndex(ur => new { ur.AccountId, ur.RoleId })
                    .IsUnique();
 
-         
+
         }
     }
 }

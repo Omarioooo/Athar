@@ -5,24 +5,21 @@ namespace AtharPlatform.Models
 {
     public class CampaignDonation
     {
-        
-        [Key,ForeignKey("Donation")]
+
+        [Key, ForeignKey(nameof(Donation))]
         public int DonationId { get; set; }
         public Donation Donation { get; set; }
 
+        public DateTime Date { get; set; } = DateTime.UtcNow;
 
-        public DateTime  Date { get; set; }
-
-
-
-        [ForeignKey("Campaign")]
+        [ForeignKey(nameof(Campaign))]
         public int CampaignId { get; set; }
         public Campaign Campaign { get; set; }
 
 
-        [ForeignKey("user")]
-        public String DonorId { get; set; }//By default Id in Identity String
-        public User user { get; set; }
+        [ForeignKey(nameof(Donor)]
+        public String DonorId { get; set; }
+        public Donor Donor { get; set; }
 
 
     }
