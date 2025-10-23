@@ -1,4 +1,4 @@
-﻿namespace AtharPlatform.Models
+﻿namespace AtharPlatform.Models.Enums
 {
     public enum CharityStatusEnum
     {

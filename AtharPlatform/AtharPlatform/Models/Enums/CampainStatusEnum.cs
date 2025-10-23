@@ -1,4 +1,4 @@
-﻿namespace AtharPlatform.Models
+﻿namespace AtharPlatform.Models.Enum
 {
     public enum CampainStatusEnum
     {

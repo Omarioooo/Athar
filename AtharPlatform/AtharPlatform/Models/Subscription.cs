@@ -20,12 +20,12 @@ namespace AtharPlatform.Models
 
 
         [ForeignKey(nameof(Donor))]
-        public string donornID { get; set; }
+        public int donornID { get; set; }
         public Donor Donor { get; set; }
 
 
         [ForeignKey(nameof(SubscribtionType))]
-        public string Type { get; set; }
+        public int TypeId { get; set; }
         public SubscribtionType SubscribtionType { get; set; }
 
 

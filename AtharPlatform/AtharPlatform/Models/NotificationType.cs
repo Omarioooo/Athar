@@ -2,11 +2,12 @@
 
 namespace AtharPlatform.Models
 {
-    public class SubscribtionType
+    public class NotificationType
     {
         [Key]
         public int Id { get; set; }
 
-        public string Type { get; set; }
+        [Required]
+        public string Name { get; set; }
     }
 }

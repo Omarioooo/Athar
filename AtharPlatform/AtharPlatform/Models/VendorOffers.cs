@@ -42,9 +42,5 @@ namespace AtharPlatform.Models
         [ForeignKey(nameof(CharityVendorOffer))]
         public int CharityVendorOfferId { get; set; }
         public virtual CharityVendorOffer CharityVendorOffer { get; set; } = new();
-
-        // Optional link to a specific Campaign (offer targeted to campaign)
-        public int? CampaignId { get; set; }
-        public virtual Campaign? Campaign { get; set; }
     }
 }

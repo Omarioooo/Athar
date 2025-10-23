@@ -5,7 +5,8 @@ namespace AtharPlatform.Models
 {
     public class CharityDonation
     {
-        [Key, ForeignKey(nameof(Donation))]
+        [Key]
+        [ForeignKey(nameof(Donation))]
         public int DonationId { get; set; }
         public virtual Donation Donation { get; set; } = new();
 
@@ -16,7 +17,7 @@ namespace AtharPlatform.Models
 
 
         [ForeignKey(nameof(Donor))]
-        public string DonorID { get; set; }
+        public int DonorID { get; set; }
         public virtual Donor Donor { get; set; } = new();
     }
 }

@@ -3,11 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AtharPlatform.Models
 {
-    public enum MaterialStatus
-    {
-        New,
-        Used
-    }
     public class MaterialDonation
     {
         [Key]
@@ -38,10 +33,6 @@ namespace AtharPlatform.Models
 
         [Required]
         public string MeasurementUnit { get; set; }
-
-        // Optional link to a specific Campaign (in-kind donations per campaign)
-        public int? CampaignId { get; set; }
-        public virtual Campaign? Campaign { get; set; }
 
 
         [ForeignKey(nameof(CharityMaterialDonation))]

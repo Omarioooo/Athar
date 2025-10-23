@@ -1,24 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using AtharPlatform.Models.Enum;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AtharPlatform.Models
 {
-    public enum CampaignType
-    {
-        General = 0,
-        CriticalCase = 1
-    }
-
-    public enum CampaignCategory
-    {
-        Education = 0,
-        Health = 1,
-        Orphans = 2,
-        Food = 3,
-        Shelter = 4,
-        Other = 99
-    }
-
     public class Campaign
     {
         [Key]
@@ -31,29 +16,39 @@ namespace AtharPlatform.Models
         public string Description { get; set; }
 
         [Required]
+        public byte[] Image { get; set; }
+
+        public bool isCritical { get; set; } = false;
+
+        [Required]
         public DateTime StartDate { get; set; } = DateTime.UtcNow;
-    // Computed end date from start + duration (not stored)
-    [NotMapped]
-    public DateTime EndDate => StartDate.AddDays(Duration);
+
         [Required]
         public int Duration { get; set; }
+
+        // Computed end date from start + duration (not stored)
+        [NotMapped]
+        public DateTime EndDate => StartDate.AddDays(Duration);
+
         [Required]
         public double GoalAmount { get; set; }
+
         [Required]
         public double RaisedAmount { get; set; }
 
-        // Classification
-        public CampaignType Type { get; set; } = CampaignType.General;
-        public CampaignCategory Category { get; set; } = CampaignCategory.Other;
+        public bool IsInKindDonation { get; set; } = false;
 
-        // Whether campaign accepts in-kind donations
-        public bool AcceptInKindDonations { get; set; } = false;
+        public DateTime Date { get; set; } = DateTime.UtcNow;
 
+        public CampaignCategoryEnum Category { get; set; } = CampaignCategoryEnum.Other;
         public CampainStatusEnum Status { get; set; } = CampainStatusEnum.inProgress;
 
-        public virtual List<CampaignDonation> CampaignDonations { get; set; } = new();
-        public virtual List<CharityCampaign> CharityCampaigns { get; set; } = new();
-        public virtual List<CampaignContent> CampaignContent { get; set; } = new();
 
+        [ForeignKey(nameof(Charity))]
+        public int CharityID { get; set; }
+        public virtual Charity Charity { get; set; } = new();
+        public virtual List<CampaignDonation> CampaignDonations { get; set; } = new();
+        public virtual List<Campaign> Campaigns { get; set; } = new();
+        public virtual List<CampaignContent> CampaignContent { get; set; } = new();
     }
 }
