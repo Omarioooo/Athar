@@ -12,7 +12,7 @@ namespace AtharPlatform.Models
         public DateTime Date { get; set; } = DateTime.UtcNow;
 
         [Required]
-        [ForeignKey("Charity")]
+        [ForeignKey(nameof(Charity))]
         public int CharityId { get; set; }
 
         public virtual Charity Charity { get; set; } = new();

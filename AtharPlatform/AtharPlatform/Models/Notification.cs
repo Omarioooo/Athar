@@ -9,7 +9,7 @@ namespace AtharPlatform.Models
         public int Id { get; set; }
 
         [Required]
-        public string MessageContent { get; set; }
+        public string Message { get; set; }
 
         public bool IsRead { get; set; }
 

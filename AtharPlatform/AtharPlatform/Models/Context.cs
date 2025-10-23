@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace AtharPlatform.Models
 {
-    public class Context : IdentityDbContext<UserAccount>
+    public class Context : IdentityDbContext<UserAccount, IdentityRole<int>, int>
     {
         public Context(DbContextOptions<Context> options) : base(options) { }
 
@@ -22,7 +23,6 @@ namespace AtharPlatform.Models
 
         // Campaigns
         public DbSet<Campaign> Campaigns { get; set; }
-        public DbSet<CharityCampaign> CharityCampaigns { get; set; }
         public DbSet<CampaignContent> CampaignContents { get; set; }
 
         // Donations
@@ -34,7 +34,7 @@ namespace AtharPlatform.Models
         // Notifications
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<NotificationSender> SendNotifications { get; set; }
-        public DbSet<NotificationReceive> ReceiveNotifications { get; set; }
+        public DbSet<NotificationReceiver> ReceiveNotifications { get; set; }
 
         // Volunteer & Vendor
         public DbSet<VolunteerApplication> VolunteerForm { get; set; }
@@ -42,14 +42,12 @@ namespace AtharPlatform.Models
         public DbSet<VendorOffers> VendorForms { get; set; }
         public DbSet<CharityVendorOffer> CharityVendorOffers { get; set; }
 
-    // Temporary storage used for beneficiary CSV validation before finalizing
-    public DbSet<BeneficiaryUpload> BeneficiaryUploads { get; set; }
-
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
+            builder.Entity<NotificationReceiver>()
+                .HasKey(a => new { a.NotificationId, a.ReceiverId });
         }
+
     }
 }

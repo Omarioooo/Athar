@@ -1,17 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Identity;
-
-namespace AtharPlatform.Models
+﻿namespace AtharPlatform.Models
 {
-    public class UserAccount : IdentityUser
+    public class UserAccount : IdentityUser<int>
     {
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public bool IsDeleted { get; set; } = false;
 
-        public Byte[]? ProfileImage { get; set; }
+        public byte[]? ProfileImage { get; set; }
 
-        public virtual List<NotificationReceive> ReceiveNotifications { get; set; } = new();
+        public virtual List<NotificationReceiver> Receivers { get; set; } = new();
     }
 }
 

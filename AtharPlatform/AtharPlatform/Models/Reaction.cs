@@ -13,7 +13,7 @@ namespace AtharPlatform.Models
         public DateTime ReactionDate { get; set; }
 
         [ForeignKey(nameof(Donor))]
-        public string DonorID { get; set; }
+        public int DonorID { get; set; }
         public virtual Donor Donor { get; set; }
 
         [ForeignKey(nameof(Content))]

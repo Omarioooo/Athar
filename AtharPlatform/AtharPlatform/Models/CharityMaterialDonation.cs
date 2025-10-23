@@ -3,8 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AtharPlatform.Models
 {
-
-    //Weak Entity
     public class CharityMaterialDonation
     {
         [Key]
