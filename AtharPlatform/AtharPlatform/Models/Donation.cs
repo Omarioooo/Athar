@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace AtharPlatform.Models
 {
+    [Index(nameof(StripePaymentId), IsUnique = true)]
     public class Donation
     {
         [Key]
@@ -23,6 +25,15 @@ namespace AtharPlatform.Models
 
         [Required]
         public string DonationStatus { get; set; }
+
+    // Payment provider details (Stripe, etc.)
+    public string? Provider { get; set; }
+
+    // Stripe idempotency/payment identifiers to avoid duplicate processing
+    public string? StripePaymentId { get; set; }
+
+    // Webhook processing guard
+    public bool IsWebhookProcessed { get; set; } = false;
 
         public virtual DateTime CreatedAt { get; set; } = new();
 

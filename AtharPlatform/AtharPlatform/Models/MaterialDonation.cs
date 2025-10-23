@@ -39,6 +39,10 @@ namespace AtharPlatform.Models
         [Required]
         public string MeasurementUnit { get; set; }
 
+        // Optional link to a specific Campaign (in-kind donations per campaign)
+        public int? CampaignId { get; set; }
+        public virtual Campaign? Campaign { get; set; }
+
 
         [ForeignKey(nameof(CharityMaterialDonation))]
         public int MaterialDonationId { get; set; }
