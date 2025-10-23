@@ -1,58 +1,73 @@
-using Microsoft.AspNetCore.Builder;
 
-var builder = WebApplication.CreateBuilder(args);
+using AtharPlatform.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
-// Add services to the container.
-builder.Services.AddControllers();
-builder.Services.AddSwaggerGen();
-
-// Inject DB
-builder.Services.AddDbContext<Context>(
-  options => options.UseNpgsql(builder.Configuration.GetConnectionString("connection"))
- );
-
-// Inject Repositories
-
-
-// Inject Services
-
-
-// Inject Identity
-builder.Services.AddIdentity<UserAccount, IdentityRole>();
-builder.Services.Configure<IdentityOptions>(op =>
+namespace AtharPlatform
 {
-    op.Password.RequiredLength = 1;
-    op.Password.RequireDigit = false;
-    op.Password.RequireLowercase = false;
-    op.Password.RequireUppercase = false;
-    op.Password.RequireNonAlphanumeric = false;
-    op.Password.RequiredUniqueChars = 0;
-});
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
 
-// Inject JWT
-builder.Services.AddAuthentication().AddJwtBearer();
+            // Add services to the container.
+            builder.Services.AddControllers();
+            builder.Services.AddOpenApi();
 
-// Inject SignalR
-builder.Services.AddSignalR();
+            // Inject DB
+            /*builder.Services.AddDbContext<Context>(op =>
+                op.UseNpgsql(builder.Configuration.GetConnectionString("connection")
+            ));*/
 
-var app = builder.Build();
+            builder.Services.AddDbContext<Context>(
+              options => options.UseNpgsql(builder.Configuration.GetConnectionString("connection"))
+              );
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwagger();
+            // Inject Identity with EF stores
+            builder.Services
+                .AddIdentity<UserAccount, IdentityRole>()
+                .AddEntityFrameworkStores<Context>()
+                .AddDefaultTokenProviders();
+
+            var app = builder.Build();
+
+            // Seed required Identity roles on first run
+            try
+            {
+                using var scope = app.Services.CreateScope();
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                string[] roles = new[] { "SuperAdmin", "CharityAdmin", "Donor", "Vendor" };
+                foreach (var role in roles)
+                {
+                    var exists = roleManager.RoleExistsAsync(role).GetAwaiter().GetResult();
+                    if (!exists)
+                    {
+                        roleManager.CreateAsync(new IdentityRole(role)).GetAwaiter().GetResult();
+                    }
+                }
+            }
+            catch
+            {
+                // Swallow seeding errors so dev startup doesn't crash if DB is unavailable
+                // Consider adding proper logging here.
+            }
+
+            // Configure the HTTP request pipeline.
+            if (app.Environment.IsDevelopment())
+            {
+                app.MapOpenApi();
+            }
+
+            app.UseHttpsRedirection();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+
+            app.MapControllers();
+
+            app.Run();
+        }
+    }
 }
-
-app.UseHttpsRedirection();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-
-// Nofications
-
-app.MapControllers();
-
-app.Run();
-

@@ -1,15 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
 
 namespace AtharPlatform.Models
 {
     public class Charity : UserAccount
     {
-
-        [Key]
-        [ForeignKey(nameof(CharityAccount))]
-        public string Id { get; set; }
-
         [Required]
         public String Name { get; set; }
 
@@ -18,8 +14,6 @@ namespace AtharPlatform.Models
         [Required]
         public byte[] VerificationDocuments { get; set; }
         public CharityStatusEnum Status { get; set; } = CharityStatusEnum.Pending;
-
-        public virtual UserAccount CharityAccount { get; set; } = new();
         public virtual List<CharityVolunteer> charityVolunteers { get; set; } = new();
         public virtual List<CharityVendorOffer> charityVendorOffers { get; set; } = new();
         public virtual List<CharityMaterialDonation> charityMaterialDonations { get; set; } = new();

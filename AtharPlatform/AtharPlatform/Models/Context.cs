@@ -42,6 +42,9 @@ namespace AtharPlatform.Models
         public DbSet<VendorOffers> VendorForms { get; set; }
         public DbSet<CharityVendorOffer> CharityVendorOffers { get; set; }
 
+    // Temporary storage used for beneficiary CSV validation before finalizing
+    public DbSet<BeneficiaryUpload> BeneficiaryUploads { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

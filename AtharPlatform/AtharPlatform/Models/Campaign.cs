@@ -1,7 +1,24 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AtharPlatform.Models
 {
+    public enum CampaignType
+    {
+        General = 0,
+        CriticalCase = 1
+    }
+
+    public enum CampaignCategory
+    {
+        Education = 0,
+        Health = 1,
+        Orphans = 2,
+        Food = 3,
+        Shelter = 4,
+        Other = 99
+    }
+
     public class Campaign
     {
         [Key]
@@ -15,14 +32,22 @@ namespace AtharPlatform.Models
 
         [Required]
         public DateTime StartDate { get; set; } = DateTime.UtcNow;
-        [Required]
-        public DateTime EndDate { get; set; }
+    // Computed end date from start + duration (not stored)
+    [NotMapped]
+    public DateTime EndDate => StartDate.AddDays(Duration);
         [Required]
         public int Duration { get; set; }
         [Required]
         public double GoalAmount { get; set; }
         [Required]
         public double RaisedAmount { get; set; }
+
+        // Classification
+        public CampaignType Type { get; set; } = CampaignType.General;
+        public CampaignCategory Category { get; set; } = CampaignCategory.Other;
+
+        // Whether campaign accepts in-kind donations
+        public bool AcceptInKindDonations { get; set; } = false;
 
         public CampainStatusEnum Status { get; set; } = CampainStatusEnum.inProgress;
 

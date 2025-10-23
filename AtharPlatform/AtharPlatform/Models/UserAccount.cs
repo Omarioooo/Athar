@@ -1,11 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace AtharPlatform.Models
 {
     public class UserAccount : IdentityUser
     {
-        [Key]
-        public string Id { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public bool IsDeleted { get; set; } = false;
