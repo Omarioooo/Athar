@@ -18,6 +18,6 @@ namespace AtharPlatform.Models
         public DateTime Date { get; set; } = DateTime.UtcNow;
 
         public NotificationSender Sender { get; set; }
-        public virtual List<NotificationReceive> ReceiveNotifications { get; set; } = new();
+        public virtual List<NotificationReceiver> Receivers { get; set; } = new();
     }
 }

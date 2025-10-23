@@ -1,6 +1,7 @@
 ﻿using AtharPlatform.DTO;
+using Microsoft.AspNetCore.SignalR;
 
-namespace AtharPlatform.Hub
+namespace AtharPlatform.Hubs
 {
     public class NotificationHub : Hub, INotificationHub
     {

@@ -5,13 +5,13 @@ namespace AtharPlatform.Repositories
     public class UnitOfWork : IUnitOfWork
     {
         private readonly Context _context;
-        public IDonorRepositroy Donor { get; private set; }
+        public IDonorRepository Donor { get; private set; }
         public ICharityRepository Charity { get; private set; }
         public INotificationRepository Notifications { get; private set; }
 
         public INotificationTypeRepository NotificationsTypes { get; private set; }
 
-        public UnitOfWork(Context context, IDonorRepositroy donorRepositroy,
+        public UnitOfWork(Context context, IDonorRepository donorRepositroy,
             ICharityRepository charityRepository)
         {
             _context = context;
