@@ -1,5 +1,5 @@
 ﻿using AtharPlatform.DTO;
-using AtharPlatform.Hub;
+using AtharPlatform.Hubs;
 using AtharPlatform.Models.Enum;
 using AtharPlatform.Repositories;
 using Microsoft.AspNetCore.SignalR;
@@ -20,7 +20,7 @@ namespace AtharPlatform.Services
             _hubContext = hubContext;
         }
 
-        public async Task<List<NotificationReceiver>> GetUserNotificationsAsync(string id)
+        public async Task<List<NotificationReceiver>> GetUserNotificationsAsync(int id)
         {
             var notifications = await _unitOfWork.Notifications.GetNotificationsByUserAsync(id);
 
@@ -37,7 +37,7 @@ namespace AtharPlatform.Services
             return notificationReceivers;
         }
 
-        public async Task SendNotificationAsync(string senderId, List<string> receiverIds, NotificationsTypeEnum type)
+        public async Task SendNotificationAsync(int senderId, List<int> receiverIds, NotificationsTypeEnum type)
         {
             var sender = await _userManager.FindByIdAsync(senderId.ToString());
 
@@ -58,7 +58,7 @@ namespace AtharPlatform.Services
             var notification = new Notification
             {
                 Message = messageDto.Message,
-                TypeId = notificationType.Id,
+                //TypeId = notificationType.Id,
                 Date = messageDto.CreatedAt,
                 IsRead = false,
                 IsDeleted = false,

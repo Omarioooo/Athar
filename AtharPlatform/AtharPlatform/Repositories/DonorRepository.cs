@@ -2,7 +2,7 @@
 
 namespace AtharPlatform.Repositories
 {
-    public class DonorRepository : Repository<Donor>, IDonorRepositroy
+    public class DonorRepository : Repository<Donor>, IDonorRepository
     {
         public DonorRepository(Context context) : base(context) { }
 

@@ -1,73 +1,71 @@
+using AtharPlatform.Hubs;
+using AtharPlatform.Repositories;
+using AtharPlatform.Services;
 
-using AtharPlatform.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+var builder = WebApplication.CreateBuilder(args);
 
-namespace AtharPlatform
+// Add services to the container.
+builder.Services.AddControllers();
+
+// Inject Swagger
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddDbContext<Context>(
+  options => options.UseNpgsql(builder.Configuration.GetConnectionString("connection"))
+  );
+
+
+// Inject Repositories
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<INotificationTypeRepository, NotificationTypeRepository>();
+builder.Services.AddScoped<ICharityRepository, CharityRepository>();
+builder.Services.AddScoped<IDonorRepository, DonorRepository>();
+
+// Inject Services
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+
+// Inject Hubs
+builder.Services.AddSignalR();
+builder.Services.AddScoped<INotificationHub, NotificationHub>();
+
+// Inject Identity with EF stores
+builder.Services
+    .AddIdentity<UserAccount, IdentityRole>()
+    .AddEntityFrameworkStores<Context>()
+    .AddDefaultTokenProviders();
+
+builder.Services.Configure<IdentityOptions>(options =>
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = false;
+});
 
-            // Add services to the container.
-            builder.Services.AddControllers();
-            builder.Services.AddOpenApi();
+// Inject JWT
+builder.Services.AddAuthentication().AddJwtBearer();
 
-            // Inject DB
-            /*builder.Services.AddDbContext<Context>(op =>
-                op.UseNpgsql(builder.Configuration.GetConnectionString("connection")
-            ));*/
-
-            builder.Services.AddDbContext<Context>(
-              options => options.UseNpgsql(builder.Configuration.GetConnectionString("connection"))
-              );
-
-            // Inject Identity with EF stores
-            builder.Services
-                .AddIdentity<UserAccount, IdentityRole>()
-                .AddEntityFrameworkStores<Context>()
-                .AddDefaultTokenProviders();
-
-            var app = builder.Build();
-
-            // Seed required Identity roles on first run
-            try
-            {
-                using var scope = app.Services.CreateScope();
-                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                string[] roles = new[] { "SuperAdmin", "CharityAdmin", "Donor", "Vendor" };
-                foreach (var role in roles)
-                {
-                    var exists = roleManager.RoleExistsAsync(role).GetAwaiter().GetResult();
-                    if (!exists)
-                    {
-                        roleManager.CreateAsync(new IdentityRole(role)).GetAwaiter().GetResult();
-                    }
-                }
-            }
-            catch
-            {
-                // Swallow seeding errors so dev startup doesn't crash if DB is unavailable
-                // Consider adding proper logging here.
-            }
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.MapOpenApi();
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
+var app = builder.Build();
 
 
-            app.MapControllers();
-
-            app.Run();
-        }
-    }
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
+app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+// Nofications
+app.MapHub<NotificationHub>("/notificationHub");
+
+app.MapControllers();
+
+app.Run();

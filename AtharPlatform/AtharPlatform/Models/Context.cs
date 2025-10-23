@@ -33,8 +33,8 @@ namespace AtharPlatform.Models
 
         // Notifications
         public DbSet<Notification> Notifications { get; set; }
-        public DbSet<NotificationSender> SendNotifications { get; set; }
-        public DbSet<NotificationReceiver> ReceiveNotifications { get; set; }
+        public DbSet<NotificationSender> Sender { get; set; }
+        public DbSet<NotificationReceiver> Receivers { get; set; }
 
         // Volunteer & Vendor
         public DbSet<VolunteerApplication> VolunteerForm { get; set; }

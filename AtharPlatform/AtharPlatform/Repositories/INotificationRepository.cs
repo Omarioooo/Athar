@@ -4,6 +4,6 @@
     {
         Task<bool> AddSenderAsync(NotificationSender sender);
         Task<bool> AddReceiversAsync(List<NotificationReceiver> receivers);
-        Task<List<Notification>> GetNotificationsByUserAsync(string userId);
+        Task<List<Notification>> GetNotificationsByUserAsync(int userId);
     }
 }

@@ -4,7 +4,7 @@ namespace AtharPlatform.Services
 {
     public interface INotificationService
     {
-        Task SendNotificationAsync(string senderId, List<string> receiverIds, NotificationsTypeEnum type);
-        Task<List<NotificationReceiver>> GetUserNotificationsAsync(string userId);
+        Task SendNotificationAsync(int senderId, List<int> receiverIds, NotificationsTypeEnum type);
+        Task<List<NotificationReceiver>> GetUserNotificationsAsync(int userId);
     }
 }

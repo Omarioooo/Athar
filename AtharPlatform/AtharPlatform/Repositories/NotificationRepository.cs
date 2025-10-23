@@ -57,7 +57,7 @@ namespace AtharPlatform.Repositories
             if (sender == null)
                 return await Task.FromResult(false);
 
-            _context.NotificationSenders.Add(sender);
+            _context.Sender.Add(sender);
             return await Task.FromResult(true);
         }
 
@@ -66,14 +66,13 @@ namespace AtharPlatform.Repositories
             if (receivers == null)
                 return await Task.FromResult(false);
 
-            _context.NotificationReceivers.AddRange(receivers);
+            _context.Receivers.AddRange(receivers);
             return await Task.FromResult(true);
         }
 
-        public async Task<List<Notification>> GetNotificationsByUserAsync(string userId)
+        public async Task<List<Notification>> GetNotificationsByUserAsync(int userId)
         {
             return await _context.Notifications
-                .Include(n => n.Type)
                 .Include(n => n.Receivers)
                 .Where(n => n.Receivers.Any(r => r.ReceiverId == userId))
                 .ToListAsync();

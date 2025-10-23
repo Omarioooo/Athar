@@ -2,7 +2,7 @@
 {
     public interface IUnitOfWork : IDisposable
     {
-        IDonorRepositroy Donor { get; }
+        IDonorRepository Donor { get; }
         ICharityRepository Charity { get; }
         INotificationRepository Notifications { get; }
         INotificationTypeRepository NotificationsTypes { get; }
