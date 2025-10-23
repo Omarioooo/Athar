@@ -32,27 +32,6 @@ namespace AtharPlatform
 
             var app = builder.Build();
 
-            // Seed required Identity roles on first run
-            try
-            {
-                using var scope = app.Services.CreateScope();
-                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                string[] roles = new[] { "SuperAdmin", "CharityAdmin", "Donor", "Vendor" };
-                foreach (var role in roles)
-                {
-                    var exists = roleManager.RoleExistsAsync(role).GetAwaiter().GetResult();
-                    if (!exists)
-                    {
-                        roleManager.CreateAsync(new IdentityRole(role)).GetAwaiter().GetResult();
-                    }
-                }
-            }
-            catch
-            {
-                // Swallow seeding errors so dev startup doesn't crash if DB is unavailable
-                // Consider adding proper logging here.
-            }
-
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
