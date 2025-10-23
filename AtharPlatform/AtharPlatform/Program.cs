@@ -24,8 +24,11 @@ namespace AtharPlatform
               options => options.UseNpgsql(builder.Configuration.GetConnectionString("connection"))
               );
 
-            // Inject Identity
-            builder.Services.AddIdentity<UserAccount, IdentityRole>();
+            // Inject Identity with EF stores
+            builder.Services
+                .AddIdentity<UserAccount, IdentityRole>()
+                .AddEntityFrameworkStores<Context>()
+                .AddDefaultTokenProviders();
 
             var app = builder.Build();
 
