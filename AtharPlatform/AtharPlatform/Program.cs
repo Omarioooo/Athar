@@ -30,7 +30,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<INotificationHub, NotificationHub>();
 
-// Inject Identity with EF stores
+// Inject Identity
 builder.Services
     .AddIdentity<UserAccount, IdentityRole>()
     .AddEntityFrameworkStores<Context>()
