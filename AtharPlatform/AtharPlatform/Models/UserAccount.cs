@@ -1,29 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.AspNetCore.Identity;
-
-namespace AtharPlatform.Models
+﻿namespace AtharPlatform.Models
 {
-    public class UserAccount : IdentityUser
+    public class UserAccount : IdentityUser<int>
     {
-        
-        public string FullName { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public bool IsDeleted { get; set; }
+        public bool IsDeleted { get; set; } = false;
 
-        public Byte[] ProfileImage { get; set; }
+        public byte[]? ProfileImage { get; set; }
 
-
-        [ForeignKey("charity")]
-        public string AccountId { get; set; }
-        public Charity charity { get; set; }
-
-        public List<SendNotification> SendNotifications { get; set; }
-        public List<ReceiveNotification> ReceiveNotifications { get; set; }
-
-        public List<UserRoles> UserRoles { get; set; }
-
-
+        public virtual List<NotificationReceiver> Receivers { get; set; } = new();
     }
 }
 

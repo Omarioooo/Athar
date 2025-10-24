@@ -1,52 +1,71 @@
+using AtharPlatform.Hubs;
+using AtharPlatform.Repositories;
+using AtharPlatform.Services;
 
-using AtharPlatform.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+var builder = WebApplication.CreateBuilder(args);
 
-namespace AtharPlatform
+// Add services to the container.
+builder.Services.AddControllers();
+
+// Inject Swagger
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddDbContext<Context>(
+  options => options.UseNpgsql(builder.Configuration.GetConnectionString("connection"))
+  );
+
+
+// Inject Repositories
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<INotificationTypeRepository, NotificationTypeRepository>();
+builder.Services.AddScoped<ICharityRepository, CharityRepository>();
+builder.Services.AddScoped<IDonorRepository, DonorRepository>();
+
+// Inject Services
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+
+// Inject Hubs
+builder.Services.AddSignalR();
+builder.Services.AddScoped<INotificationHub, NotificationHub>();
+
+// Inject Identity with EF stores
+builder.Services
+    .AddIdentity<UserAccount, IdentityRole>()
+    .AddEntityFrameworkStores<Context>()
+    .AddDefaultTokenProviders();
+
+builder.Services.Configure<IdentityOptions>(options =>
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = false;
+});
 
-            // Add services to the container.
-            builder.Services.AddControllers();
-            builder.Services.AddOpenApi();
+// Inject JWT
+builder.Services.AddAuthentication().AddJwtBearer();
 
-            // Inject DB
-            /*builder.Services.AddDbContext<Context>(op =>
-                op.UseNpgsql(builder.Configuration.GetConnectionString("connection")
-            ));*/
-
-            builder.Services.AddDbContext<Context>(
-              options => options.UseNpgsql(builder.Configuration.GetConnectionString("connection"))
-              );
-
-            // Inject Identity with EF stores
-            builder.Services
-                .AddIdentity<UserAccount, IdentityRole>()
-                .AddEntityFrameworkStores<Context>()
-                .AddDefaultTokenProviders();
-
-            var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.MapOpenApi();
-            }
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
+var app = builder.Build();
 
 
-            app.MapControllers();
-
-            app.Run();
-        }
-    }
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
+app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+// Nofications
+app.MapHub<NotificationHub>("/notificationHub");
+
+app.MapControllers();
+
+app.Run();

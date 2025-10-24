@@ -10,20 +10,10 @@ namespace AtharPlatform.Models
         [Required]
         [MaxLength(300)]
         public string Title { get; set; }
-
-        public bool IsDeleted { get; set; }
-
-        public string Description { get; set; }
-
-        public byte[] PostImage { get; set; }// image for the post
-
-
+        public bool IsDeleted { get; set; } = false;
+        public string? Description { get; set; }
+        public byte[]? PostImage { get; set; }
         public DateTime CreatedAt { get; set; }
-
-
-
-        public List<CampaignContent> CampaignContent { get; set; }
-        public List<UserContetReaction> UserContetReaction { get; set; }
-       
+        public virtual List<Reaction> Reactions { get; set; } = new();
     }
 }

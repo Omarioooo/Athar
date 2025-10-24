@@ -1,46 +1,32 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AtharPlatform.Models.Enums;
+using Microsoft.AspNetCore.Identity;
 
 namespace AtharPlatform.Models
 {
     public class Charity : UserAccount
     {
-        public String CharityName { get; set; }
-
-        public bool Status { get; set; }
-
-
-
-       
-        public List<CharityVerificationDocument> VerificationDocuments { get; set; } = new List<CharityVerificationDocument>();
-
-
-
-        [Key,ForeignKey("UserAccount")]
-        public string AccountId { get; set; }
-    
-        public UserAccount UserAccount { get; set; }
-
-
-        public List<CharityVolunteer> charityVolunteers { get; set; }
-        public List<CharityVendorOffer> charityVendorOffers { get; set; }
-        public List<CharityMaterialDonation> charityMaterialDonations { get; set; }
-         public List<Subscription> subscription { get; set; }
-        public List<CharityCampaign> campaigns { get; set; }
-        public List<UserAccount> userAccount { get; set; }
-
-    }
-
-
-    public class CharityVerificationDocument
-    {
         [Key]
+        [ForeignKey(nameof(Account))]
         public int Id { get; set; }
 
         [Required]
-        public string DocumentName { get; set; }  // "License", "Certificate"
+        public String Name { get; set; }
 
-        public string DocumentPath { get; set; }   // Path or URL to the document
-   
+        [Required]
+        public String Description { get; set; }
+
+        [Required]
+        public byte[] VerificationDocuments { get; set; }
+
+        public virtual UserAccount Account { get; set; }
+        public CharityStatusEnum Status { get; set; } = CharityStatusEnum.Pending;
+        public virtual List<CharityVolunteer> charityVolunteers { get; set; } = new();
+        public virtual List<CharityVendorOffer> charityVendorOffers { get; set; } = new();
+        public virtual List<CharityMaterialDonation> charityMaterialDonations { get; set; } = new();
+        public virtual List<Subscription> subscriptions { get; set; } = new();
+        public virtual List<Campaign> campaigns { get; set; } = new();
+
     }
 }
