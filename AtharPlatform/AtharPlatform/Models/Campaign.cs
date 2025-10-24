@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using AtharPlatform.Models.Enum;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AtharPlatform.Models
 {
@@ -10,24 +12,43 @@ namespace AtharPlatform.Models
         [Required]
         public string Title { get; set; }
 
+        [Required]
         public string Description { get; set; }
 
         [Required]
-        public DateTime StartDate { get; set; }
+        public byte[] Image { get; set; }
+
+        public bool isCritical { get; set; } = false;
+
         [Required]
-        public DateTime EndDate { get; set; }
+        public DateTime StartDate { get; set; } = DateTime.UtcNow;
 
-        public DateTime Duration { get; set; }
-        public decimal GoalAmount {get; set; }
+        [Required]
+        public int Duration { get; set; }
 
-        public decimal RaisedAmount { get; set; } = 0;
+        // Computed end date from start + duration (not stored)
+        [NotMapped]
+        public DateTime EndDate => StartDate.AddDays(Duration);
 
-        public bool Status { get; set; }
+        [Required]
+        public double GoalAmount { get; set; }
 
-        public List<CampaignDonation> CampaignDonations { get; set; }
-        public List<CharityCampaign> CharityCampaigns { get; set; }
-        public List<CampaignContent> CampaignContent { get; set; }
+        [Required]
+        public double RaisedAmount { get; set; }
+
+        public bool IsInKindDonation { get; set; } = false;
+
+        public DateTime Date { get; set; } = DateTime.UtcNow;
+
+        public CampaignCategoryEnum Category { get; set; } = CampaignCategoryEnum.Other;
+        public CampainStatusEnum Status { get; set; } = CampainStatusEnum.inProgress;
 
 
+        [ForeignKey(nameof(Charity))]
+        public int CharityID { get; set; }
+        public virtual Charity Charity { get; set; } = new();
+        public virtual List<CampaignDonation> CampaignDonations { get; set; } = new();
+        public virtual List<Campaign> Campaigns { get; set; } = new();
+        public virtual List<CampaignContent> CampaignContent { get; set; } = new();
     }
 }

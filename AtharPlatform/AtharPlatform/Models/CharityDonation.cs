@@ -5,23 +5,19 @@ namespace AtharPlatform.Models
 {
     public class CharityDonation
     {
-        [Key,ForeignKey("Donation")]
+        [Key]
+        [ForeignKey(nameof(Donation))]
         public int DonationId { get; set; }
-        public Donation Donation { get; set; }
+        public virtual Donation Donation { get; set; } = new();
 
 
-        public DateTime Date { get; set; }
-
-
-        [ForeignKey("CharityCampaign")]
+        [ForeignKey(nameof(Charity))]
         public int charityID { get; set; }
-        public CharityCampaign CharityCampaign { get; set; }
+        public virtual Charity Charity { get; set; } = new();
 
 
-        [ForeignKey("user")]
-        public string DonorID { get; set; }
-        public User user { get; set; }
-
-
+        [ForeignKey(nameof(Donor))]
+        public int DonorID { get; set; }
+        public virtual Donor Donor { get; set; } = new();
     }
 }

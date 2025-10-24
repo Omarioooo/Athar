@@ -1,20 +1,17 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace AtharPlatform.Models
 {
-    public class Context : IdentityDbContext<UserAccount>
+    public class Context : IdentityDbContext<UserAccount, IdentityRole<int>, int>
     {
         public Context(DbContextOptions<Context> options) : base(options) { }
 
         // Users and Charities
-        public DbSet<User> Users { get; set; }
+        public DbSet<Donor> Donors { get; set; }
         public DbSet<Charity> Charities { get; set; }
-
-        // Roles
-        public DbSet<Role> Roles { get; set; }
-        public DbSet<UserRoles> UserRoles { get; set; }
 
         // Subscriptions
         public DbSet<Subscription> Subscriptions { get; set; }
@@ -23,11 +20,9 @@ namespace AtharPlatform.Models
         // Content & Reactions
         public DbSet<Content> Contents { get; set; }
         public DbSet<Reaction> Reactions { get; set; }
-        public DbSet<UserContetReaction> UserContentReactions { get; set; }
 
         // Campaigns
         public DbSet<Campaign> Campaigns { get; set; }
-        public DbSet<CharityCampaign> CharityCampaigns { get; set; }
         public DbSet<CampaignContent> CampaignContents { get; set; }
 
         // Donations
@@ -38,26 +33,21 @@ namespace AtharPlatform.Models
 
         // Notifications
         public DbSet<Notification> Notifications { get; set; }
-        public DbSet<SendNotification> SendNotifications { get; set; }
-        public DbSet<ReceiveNotification> ReceiveNotifications { get; set; }
+        public DbSet<NotificationSender> Sender { get; set; }
+        public DbSet<NotificationReceiver> Receivers { get; set; }
 
         // Volunteer & Vendor
-        public DbSet<VolunteerForm> VolunteerForm { get; set; }
+        public DbSet<VolunteerApplication> VolunteerForm { get; set; }
         public DbSet<CharityVolunteer> CharityVolunteers { get; set; }
-        public DbSet<VendorForm> VendorForms { get; set; }
+        public DbSet<VendorOffers> VendorForms { get; set; }
         public DbSet<CharityVendorOffer> CharityVendorOffers { get; set; }
-
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
-            // Composite key for UserRoles
-            builder.Entity<UserRoles>()
-                   .HasIndex(ur => new { ur.AccountId, ur.RoleId })
-                   .IsUnique();
-
-         
+            builder.Entity<NotificationReceiver>()
+                .HasKey(a => new { a.NotificationId, a.ReceiverId });
         }
+
     }
 }

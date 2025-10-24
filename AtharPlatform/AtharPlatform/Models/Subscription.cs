@@ -9,28 +9,24 @@ namespace AtharPlatform.Models
         public int Id { get; set; }
 
         [Required]
-        public DateTime StartDate { get; set; }
+        public DateTime StartDate { get; set; } = DateTime.UtcNow;
 
         [Required]
-        public decimal Amount { get; set; }
+        public double Amount { get; set; }
 
-        [Required]
-        public DateTime EndDate { get; set; }
-
-        [ForeignKey("Charity")]
+        [ForeignKey(nameof(Charity))]
         public int charityID { get; set; }
         public Charity Charity { get; set; }
 
 
+        [ForeignKey(nameof(Donor))]
+        public int donornID { get; set; }
+        public Donor Donor { get; set; }
 
-        [ForeignKey("user")]
-        public string SubscribtionID { get; set; }
-        public User user { get; set; }
 
-
-        [ForeignKey("subscribtionType")]
-        public string SubscribtionType { get; set; }
-        public SubscribtionType subscribtionType { get; set; }
+        [ForeignKey(nameof(SubscribtionType))]
+        public int TypeId { get; set; }
+        public SubscribtionType SubscribtionType { get; set; }
 
 
     }

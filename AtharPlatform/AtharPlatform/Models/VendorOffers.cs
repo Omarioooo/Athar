@@ -1,15 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Runtime.InteropServices;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AtharPlatform.Models
 {
-    public class VendorForm
+    public class VendorOffers
     {
         [Key]
         public int Id { get; set; }
 
-        // Vendor Information
-        [Required, MaxLength(150)]
+        [Required]
         public string VendorName { get; set; }
 
         [Phone]
@@ -22,24 +21,26 @@ namespace AtharPlatform.Models
         [Required]
         public string City { get; set; }
 
-        // Offer Details
-        [Required, MaxLength(500)]
+        [Required]
         public string ItemName { get; set; }
 
+        [Required]
         public int Quantity { get; set; }
 
         [Required]
-        public string Description { get; set; }//To write message for the charity
+        public string Description { get; set; }
 
-        [Range(0, double.MaxValue)]
+        [Required]
+        [Column(TypeName = "decimal(18,2)")]
         public decimal PriceBeforDiscount { get; set; }
 
-        [Range(0, double.MaxValue)]
+        [Required]
+        [Column(TypeName = "decimal(18,2)")]
         public decimal PriceBeAfterDiscount { get; set; }
 
-
-        public List<CharityVendorOffer> CharityVendorOffer { get; set; }
-
-
+        [Required]
+        [ForeignKey(nameof(CharityVendorOffer))]
+        public int CharityVendorOfferId { get; set; }
+        public virtual CharityVendorOffer CharityVendorOffer { get; set; } = new();
     }
 }
