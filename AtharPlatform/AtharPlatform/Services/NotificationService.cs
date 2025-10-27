@@ -10,14 +10,14 @@ namespace AtharPlatform.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<UserAccount> _userManager;
-        private readonly IHubContext<NotificationHub> _hubContext;
+        private readonly INotificationHub _hub;
 
-        public NotificationService(IUnitOfWork unitOfWork, UserManager<UserAccount> userManager,
-            IHubContext<NotificationHub> hubContext)
+        public NotificationService(IUnitOfWork unitOfWork,
+            UserManager<UserAccount> userManager, INotificationHub hub)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
-            _hubContext = hubContext;
+            _hub = hub;
         }
 
         public async Task<List<NotificationReceiver>> GetUserNotificationsAsync(int id)
@@ -45,7 +45,7 @@ namespace AtharPlatform.Services
                 throw new ArgumentException("Sender not found");
 
             // Get NotificationType from DB
-            var notificationType = await _unitOfWork.NotificationsTypes.GetNotificationTypeByIdAsync((int)type);
+            var notificationType = await _unitOfWork.NotificationTypes.GetNotificationTypeByIdAsync((int)type);
 
             if (notificationType == null)
                 throw new ArgumentException($"NotificationType {(int)type} not found in database");
@@ -58,8 +58,8 @@ namespace AtharPlatform.Services
             var notification = new Notification
             {
                 Message = messageDto.Message,
-                //TypeId = notificationType.Id,
-                Date = messageDto.CreatedAt,
+                TypeId = notificationType.Id,
+                CreatedAt = messageDto.CreatedAt,
                 IsRead = false,
                 IsDeleted = false,
             };
@@ -74,51 +74,50 @@ namespace AtharPlatform.Services
             await _unitOfWork.Notifications.AddSenderAsync(notificationSender);
 
             // Add Receivers
-            var notificationReceivers = receiverIds.Select(rid => new NotificationReceiver
-            {
-                ReceiverId = rid,
-                Notification = notification
-            }).ToList();
+            var notificationReceivers =
+                receiverIds.Select(rid => new NotificationReceiver
+                {
+                    ReceiverId = rid,
+                    Notification = notification
+                }).ToList();
             await _unitOfWork.Notifications.AddReceiversAsync(notificationReceivers);
 
             // Save all changes
             await _unitOfWork.SaveAsync();
 
             // Send notification
-            await _hubContext.Clients
-                .Users(receiverIds.Select(id => id.ToString()))
-                .SendAsync("ReceiveNotification", messageDto);
+            await _hub.SendMessage(receiverIds, messageDto);
         }
 
         private Task<NotificationMessageDto> CreateMessage(NotificationsTypeEnum type, string senderName)
         {
             var time = DateTime.UtcNow;
 
-            NotificationMessageDto message = type switch
+            var message = type switch
             {
-                NotificationsTypeEnum.NewCampagin => new NotificationMessageDto
+                NotificationsTypeEnum.NewCharity => new NotificationMessageDto
                 {
-                    Message = $"New Campagin added by {senderName} at {time}. Check it out!",
+                    Message = $"A new charity ({senderName}) has signed up at {time}. Please review it.",
                     CreatedAt = time
                 },
                 NotificationsTypeEnum.AdminApproved => new NotificationMessageDto
                 {
-                    Message = $"Your Charity has been approved by admin {senderName} at {time}.",
+                    Message = $"Your charity has been approved by admin {senderName} at {time}.",
                     CreatedAt = time
                 },
                 NotificationsTypeEnum.AdminRejected => new NotificationMessageDto
                 {
-                    Message = $"Your Charity has been rejected by admin {senderName} at {time}.",
+                    Message = $"Your charity has been rejected by admin {senderName} at {time}.",
                     CreatedAt = time
                 },
-                NotificationsTypeEnum.NewCharity => new NotificationMessageDto
+                NotificationsTypeEnum.NewCampagin => new NotificationMessageDto
                 {
-                    Message = $"A new Charity {senderName} need to join at {time}.",
+                    Message = $"A new campaign has been launched by {senderName} at {time}. Check it out!",
                     CreatedAt = time
                 },
                 NotificationsTypeEnum.NewSubscriber => new NotificationMessageDto
                 {
-                    Message = $"A new subscriber: {senderName} at {time}.",
+                    Message = $"A new subscriber ({senderName}) joined at {time}.",
                     CreatedAt = time
                 },
                 _ => new NotificationMessageDto
@@ -130,5 +129,6 @@ namespace AtharPlatform.Services
 
             return Task.FromResult(message);
         }
+0
     }
 }
