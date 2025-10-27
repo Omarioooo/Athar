@@ -14,12 +14,6 @@ namespace AtharPlatform.Models
 
         public string? LastName { get; set; }
 
-        public string? Country { get; set; }
-
-        public string? City { get; set; }
-
-        public string StripCustomerId { get; set; }
-
         public virtual UserAccount Account { get; set; }
         public virtual List<CampaignDonation> Donations { get; set; } = new();
         public virtual List<Reaction> Reactions { get; set; } = new();
