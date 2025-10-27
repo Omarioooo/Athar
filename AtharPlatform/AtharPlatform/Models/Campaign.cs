@@ -48,7 +48,6 @@ namespace AtharPlatform.Models
         public int CharityID { get; set; }
         public virtual Charity Charity { get; set; } = new();
         public virtual List<CampaignDonation> CampaignDonations { get; set; } = new();
-        public virtual List<Campaign> Campaigns { get; set; } = new();
         public virtual List<CampaignContent> CampaignContent { get; set; } = new();
     }
 }

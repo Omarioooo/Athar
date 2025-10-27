@@ -1,4 +1,6 @@
 ﻿using AtharPlatform.DTO;
+using AtharPlatform.DTOs;
+using AtharPlatform.Models.Enums;
 using AtharPlatform.Repositories;
 using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel.DataAnnotations;
@@ -13,80 +15,156 @@ namespace AtharPlatform.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<UserAccount> _userManager;
-        private readonly SignInManager<UserAccount> _signInManager;
-        private readonly RoleManager<IdentityRole<int>> _roleManager;
         private readonly IConfiguration _configuration;
 
-        public AccountService(IUnitOfWork unitOfWork, UserManager<UserAccount> userManager,
-            RoleManager<IdentityRole<int>> roleManager, SignInManager<UserAccount> signInManager, IConfiguration configuration)
+        public AccountService(IUnitOfWork unitOfWork,
+            UserManager<UserAccount> userManager, IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
-            _signInManager = signInManager;
-            _roleManager = roleManager;
             _configuration = configuration;
         }
 
-        public async Task<IdentityResult> RegisterAsync(RegisterDto model)
+        public async Task<IdentityResult> CharityRegisterAsync(CharityRegisterDto model)
         {
-            var userName = new MailAddress(model.Email).User;
-            var user = new UserAccount
+            try
             {
-                Email = model.Email,
-                UserName = userName,
-                CreatedAt = DateTime.UtcNow
-            };
+                if (model == null)
+                    return IdentityResult.Failed(new IdentityError { Description = "Invalid registration data." });
 
-            var result = await _userManager.CreateAsync(user, model.Password);
+                if (string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrWhiteSpace(model.Password))
+                    return IdentityResult.Failed(new IdentityError { Description = "Email and password are required." });
 
-            if (!result.Succeeded)
+                var userName = new MailAddress(model.Email).User;
+
+                using MemoryStream stream = new MemoryStream();
+                await model.ProfileImage.CopyToAsync(stream);
+
+                var user = new UserAccount
+                {
+                    UserName = userName,
+                    Email = model.Email.ToLowerInvariant(),
+                    Country = model.Country,
+                    City = model.City,
+                    ProfileImage = stream.ToArray(),
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                var result = await _userManager.CreateAsync(user, model.Password);
+
+                if (!result.Succeeded)
+                    return result;
+
+                await _userManager.AddToRoleAsync(user, RolesEnum.Charity.ToString());
+
+                using MemoryStream docStream = new MemoryStream();
+                await model.VerificationDocument.CopyToAsync(docStream);
+
+                var Charity = new Charity
+                {
+                    Id = user.Id,
+                    Name = model.CharityName,
+                    Description = model.Description,
+                    VerificationDocument = docStream.ToArray()
+                };
+
+                await _unitOfWork.Charity.AddAsync(Charity);
+
                 return result;
-
-            if (!await _roleManager.RoleExistsAsync(model.Role))
-                return IdentityResult.Failed(new IdentityError { Description = "Role does not exist." });
-
-            await _userManager.AddToRoleAsync(user, model.Role);
-
-            if (model.Role == "Donor")
+            }
+            catch
             {
-                var donor = new Donor
+                return IdentityResult.Failed(new IdentityError
+                {
+                    Description = "Invalid registration data."
+                });
+            }
+        }
+
+        public async Task<IdentityResult> DonorRegisterAsync(DonorRegisterDto model)
+        {
+            try
+            {
+                if (model == null)
+                    return IdentityResult.Failed(new IdentityError { Description = "Invalid registration data." });
+
+                if (string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrWhiteSpace(model.Password))
+                    return IdentityResult.Failed(new IdentityError { Description = "Email and password are required." });
+
+                var userName = new MailAddress(model.Email).User;
+
+                using MemoryStream stream = new MemoryStream();
+                await model.ProfileImage.CopyToAsync(stream);
+
+                var user = new UserAccount
+                {
+                    UserName = userName,
+                    Email = model.Email.ToLowerInvariant(),
+                    Country = model.Country,
+                    City = model.City,
+                    ProfileImage = stream.ToArray(),
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                var result = await _userManager.CreateAsync(user, model.Password);
+
+                if (!result.Succeeded)
+                    return result;
+
+                await _userManager.AddToRoleAsync(user, RolesEnum.Donor.ToString());
+
+                var Donor = new Donor
                 {
                     Id = user.Id,
                     FirstName = model.FirstName,
                     LastName = model.LastName,
+                    Country = model.Country,
+                    City = model.City,
                 };
-                await _unitOfWork.Donor.AddAsync(donor);
+
+                await _unitOfWork.Donor.AddAsync(Donor);
+
+                return result;
             }
-            else if (model.Role == "Charity")
+            catch
             {
-                var charity = new Charity
+                return IdentityResult.Failed(new IdentityError
                 {
-                    Id = user.Id,
-                    Name = model.MarketName,
-                    Description = model.Description,
-
-                };
-                await _unitOfWork.Charity.AddAsync(charity);
+                    Description = "Invalid registration data."
+                });
             }
-
-            return result;
         }
 
         public async Task<object?> LogInAsync(LoginDto model)
         {
-            UserAccount? user;
+            if (model == null || string.IsNullOrWhiteSpace(model.UserNameOrEmail) || string.IsNullOrWhiteSpace(model.Password))
+                return null;
 
-            if (new EmailAddressAttribute().IsValid(model.UserNameOrEmail))
-                user = await _userManager.FindByEmailAsync(model.UserNameOrEmail);
+            UserAccount? user;
+            string userNameOrEmail = model.UserNameOrEmail.Trim();
+
+            if (new EmailAddressAttribute().IsValid(userNameOrEmail))
+            {
+                user = await _userManager.FindByEmailAsync(userNameOrEmail.ToLowerInvariant());
+            }
             else
-                user = await _userManager.FindByNameAsync(model.UserNameOrEmail);
+            {
+                user = await _userManager.FindByNameAsync(userNameOrEmail);
+            }
 
             if (user == null)
-                return null;
+                return IdentityResult.Failed(new IdentityError
+                {
+                    Description = "Invalid Username or Email."
+                });
 
             if (!await _userManager.CheckPasswordAsync(user, model.Password))
-                return null;
+                return IdentityResult.Failed(new IdentityError
+                {
+                    Description = "Invalid Password."
+                });
 
+            // Rest of the method remains unchanged
             var claims = new List<Claim>();
             claims.Add(new Claim(ClaimTypes.Name, user.UserName));
             claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
@@ -96,13 +174,21 @@ namespace AtharPlatform.Services
             foreach (var role in roles)
                 claims.Add(new Claim(ClaimTypes.Role, role));
 
-            // Create JWT Token
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]));
+            var secretKey = _configuration["Jwt:SecretKey"];
+            if (string.IsNullOrEmpty(secretKey) || Encoding.UTF8.GetBytes(secretKey).Length < 32)
+                throw new InvalidOperationException("JWT SecretKey is missing or too short. It must be at least 32 bytes.");
+
+            var issuer = _configuration["Jwt:Issuer"];
+            var audience = _configuration["Jwt:Audience"];
+            if (string.IsNullOrEmpty(issuer) || string.IsNullOrEmpty(audience))
+                throw new InvalidOperationException("JWT Issuer or Audience is missing.");
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
                 claims: claims,
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
+                issuer: issuer,
+                audience: audience,
                 expires: DateTime.UtcNow.AddMinutes(30),
                 signingCredentials: creds
             );
@@ -113,6 +199,16 @@ namespace AtharPlatform.Services
                 token = new JwtSecurityTokenHandler().WriteToken(token),
                 expiration = token.ValidTo
             };
+        }
+
+        public async Task<UserAccount> FindByEmailAsync(string mail)
+        {
+            return await _userManager.FindByEmailAsync(mail);
+        }
+
+        public async Task<UserAccount> FindByNameAsync(string userName)
+        {
+            return await _userManager.FindByNameAsync(userName);
         }
     }
 }

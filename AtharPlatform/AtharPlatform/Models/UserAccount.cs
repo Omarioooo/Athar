@@ -8,6 +8,10 @@
 
         public byte[]? ProfileImage { get; set; }
 
+        public string? Country { get; set; }
+
+        public string? City { get; set; }
+
         public virtual List<NotificationReceiver> Receivers { get; set; } = new();
     }
 }
