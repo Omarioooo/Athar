@@ -5,7 +5,8 @@
         IDonorRepository Donor { get; }
         ICharityRepository Charity { get; }
         INotificationRepository Notifications { get; }
-        INotificationTypeRepository NotificationsTypes { get; }
+        INotificationTypeRepository NotificationTypes { get; }
+        DbSet<Subscription> Subscriptions { get; }
         Task SaveAsync();
     }
 }

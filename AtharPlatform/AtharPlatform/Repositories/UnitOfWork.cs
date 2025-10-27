@@ -9,14 +9,19 @@ namespace AtharPlatform.Repositories
         public ICharityRepository Charity { get; private set; }
         public INotificationRepository Notifications { get; private set; }
 
-        public INotificationTypeRepository NotificationsTypes { get; private set; }
+        public INotificationTypeRepository NotificationTypes { get; private set; }
 
-        public UnitOfWork(Context context, IDonorRepository donorRepositroy,
-            ICharityRepository charityRepository)
+
+        // Computed Property
+        public DbSet<Subscription> Subscriptions => _context.Subscriptions;
+
+        public UnitOfWork(Context context)
         {
             _context = context;
-            Donor = donorRepositroy;
-            Charity = charityRepository;
+            Notifications = new NotificationRepository(_context);
+            Donor = new DonorRepository(_context);
+            Charity = new CharityRepository(_context);
+            NotificationTypes = new NotificationTypeRepository(_context);
         }
 
         public async Task SaveAsync()

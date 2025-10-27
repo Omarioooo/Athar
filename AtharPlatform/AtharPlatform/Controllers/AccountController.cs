@@ -12,18 +12,13 @@ namespace AtharPlatform.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly UserManager<UserAccount> _userManager;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAccountService _accountService;
-        private readonly IConfiguration _configuration;
 
-        public AccountController(UserManager<UserAccount> userManager, IUnitOfWork unitOfWork,
-            IAccountService accountService, IConfiguration configuration)
+        public AccountController(IUnitOfWork unitOfWork, IAccountService accountService)
         {
-            _userManager = userManager;
             _unitOfWork = unitOfWork;
             _accountService = accountService;
-            _configuration = configuration;
         }
 
         [HttpPost("[action]")]
