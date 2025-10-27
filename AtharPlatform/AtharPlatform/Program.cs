@@ -13,8 +13,13 @@ builder.Services.AddControllers();
 // Inject Swagger
 builder.Services.AddSwaggerGen();
 
+// PostgraSql
+//builder.Services.AddDbContext<Context>(
+//  options => options.UseNpgsql(builder.Configuration.GetConnectionString("connection"))
+//  );
+
 builder.Services.AddDbContext<Context>(
-  options => options.UseNpgsql(builder.Configuration.GetConnectionString("connection"))
+  options => options.UseSqlServer(builder.Configuration.GetConnectionString("MSSConnection"))
   );
 
 
