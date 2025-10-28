@@ -343,6 +343,21 @@ paket-files/
 **/__pycache__/
 *.pyc
 
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local environment files
+.env
+
+# Scraper outputs (large, generated)
+scrapers/**/data/**
+
 # Cake - Uncomment if you are using it
 #tools/**
 #!tools/packages.config
