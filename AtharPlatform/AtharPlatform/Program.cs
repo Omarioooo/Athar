@@ -10,9 +10,12 @@ builder.Services.AddControllers();
 // Inject Swagger
 builder.Services.AddSwaggerGen();
 
+//builder.Services.AddDbContext<Context>(
+//  options => options.UseNpgsql(builder.Configuration.GetConnectionString("connection"))
+//  );
 builder.Services.AddDbContext<Context>(
-  options => options.UseNpgsql(builder.Configuration.GetConnectionString("connection"))
-  );
+    options => options.UseSqlServer(builder.Configuration.GetConnectionString("Defaultconnection"))
+);
 
 
 // Inject Repositories
@@ -32,7 +35,7 @@ builder.Services.AddScoped<INotificationHub, NotificationHub>();
 
 // Inject Identity
 builder.Services
-    .AddIdentity<UserAccount, IdentityRole>()
+    .AddIdentity<UserAccount, IdentityRole<int>>()
     .AddEntityFrameworkStores<Context>()
     .AddDefaultTokenProviders();
 
@@ -63,7 +66,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Nofications
+//Nofications
 app.MapHub<NotificationHub>("/notificationHub");
 
 app.MapControllers();
