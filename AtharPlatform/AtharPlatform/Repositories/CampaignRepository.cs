@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using AtharPlatform.Models.Enum;
+using System.Linq.Expressions;
 namespace AtharPlatform.Repositories
 {
     public class CampaignRepository : Repository<Campaign>, ICampaignRepository
@@ -30,5 +31,15 @@ namespace AtharPlatform.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<Campaign>> GetByType(CampaignCategoryEnum type)
+        {
+            var result = await _dbSet
+               .Where(c => c.Category == type)
+               .ToListAsync();
+            if (result == null)
+                throw new InvalidOperationException("Campaign not found.");
+            return result;
+
+        }
     }
 }
