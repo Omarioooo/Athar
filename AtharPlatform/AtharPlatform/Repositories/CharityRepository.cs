@@ -31,6 +31,7 @@ namespace AtharPlatform.Repositories
                 q = q.Where(c => c.Name.Contains(term));
             }
             return await q
+                .Where(c => c.IsActive)
                 .OrderBy(c => c.Name)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -47,12 +48,13 @@ namespace AtharPlatform.Repositories
                 var term = query.Trim();
                 q = q.Where(c => c.Name.Contains(term));
             }
-            return await q.CountAsync();
+            return await q.Where(c => c.IsActive).CountAsync();
         }
 
         public async Task<Charity?> GetWithCampaignsAsync(int id)
         {
             return await _dbSet
+                .Where(c => c.IsActive)
                 .Include(c => c.campaigns)
                 .Include(c => c.ScrapedInfo)
                 .FirstOrDefaultAsync(c => c.Id == id);
