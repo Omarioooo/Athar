@@ -24,6 +24,7 @@ builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<INotificationTypeRepository, NotificationTypeRepository>();
 builder.Services.AddScoped<ICharityRepository, CharityRepository>();
 builder.Services.AddScoped<IDonorRepository, DonorRepository>();
+builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
 
 // Inject Services
 builder.Services.AddScoped<IAccountService, AccountService>();

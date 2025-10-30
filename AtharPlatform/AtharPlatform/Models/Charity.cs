@@ -17,8 +17,21 @@ namespace AtharPlatform.Models
         [Required]
         public String Description { get; set; }
 
-        [Required]
-        public byte[] VerificationDocuments { get; set; }
+    [Required]
+    public byte[] VerificationDocuments { get; set; }
+
+    // Optional presentation image/logo to show on cards
+    public byte[]? Image { get; set; }
+
+    // Optional external presentation fields (for scraped/manual links)
+    public string? ImageUrl { get; set; }
+    public string? ExternalWebsiteUrl { get; set; }
+    public string? MegaKheirUrl { get; set; }
+
+    // Distinguish whether data was imported from scraping or created manually
+    public bool IsScraped { get; set; } = false;
+    public string? ExternalId { get; set; }
+    public DateTime? ImportedAt { get; set; }
 
         public virtual UserAccount Account { get; set; }
         public CharityStatusEnum Status { get; set; } = CharityStatusEnum.Pending;
