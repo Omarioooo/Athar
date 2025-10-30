@@ -2,6 +2,7 @@ using AtharPlatform.Dtos;
 using AtharPlatform.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace AtharPlatform.Controllers
 {
@@ -20,7 +21,25 @@ namespace AtharPlatform.Controllers
         [HttpGet]
         public async Task<ActionResult<PaginatedResultDto<CharityListDto>>> GetAll([FromQuery] string? query, [FromQuery] int page = 1, [FromQuery] int pageSize = 12)
         {
+
+
+            if (page <= 0 || pageSize <= 0)
+                return BadRequest("Page and PageSize must be greater than zero.");
+
+
+
             var total = await _uow.Charity.CountAsync(query);
+
+            if (total == 0)// Handle empty data
+                return Ok(new PaginatedResultDto<CharityListDto>
+                {
+                    Items = new List<CharityListDto>(),
+                    Page = page,
+                    PageSize = pageSize,
+                    Total = 0
+                });
+
+
             var items = await _uow.Charity.GetPageAsync(query, page, pageSize);
 
             var dto = new PaginatedResultDto<CharityListDto>
@@ -63,6 +82,28 @@ namespace AtharPlatform.Controllers
                     GoalAmount = x.GoalAmount,
                     RaisedAmount = x.RaisedAmount
                 })
+            };
+            return Ok(dto);
+        }
+
+        // (GET) /api/charities/{name}
+        [HttpGet("byName/{name}")]
+        public async Task<ActionResult<CharityDetailDto>> GetByName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return BadRequest("Name is required.");
+            var normalize=name.Trim().ToLower();
+            var c = await _uow.Charity.GetAsync(x => x.Name.ToLower() == normalize);
+            if (c == null) return NotFound("Charity not found.");
+
+            var dto = new CharityDetailDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Description = c.Description,
+                Image = c.Image,
+                ImageUrl = c.ImageUrl,
+                ExternalWebsiteUrl = c.ExternalWebsiteUrl,
+                MegaKheirUrl = c.MegaKheirUrl
             };
             return Ok(dto);
         }

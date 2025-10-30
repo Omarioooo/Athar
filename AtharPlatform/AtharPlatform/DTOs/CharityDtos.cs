@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using AtharPlatform.Models;
 
 namespace AtharPlatform.Dtos
@@ -36,6 +37,7 @@ namespace AtharPlatform.Dtos
     // Used for manual creation by Charity Admins or Super Admins
     public class CharityCreateDto
     {
+        [Required]
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public byte[]? Image { get; set; }
@@ -44,6 +46,7 @@ namespace AtharPlatform.Dtos
     // Import contract for bulk-scraped charities
     public class CharityImportItemDto
     {
+         
         public string Name { get; set; } = string.Empty;
         public string? Description { get; set; }
         // accept base64 image bytes if present (optional); callers can omit
