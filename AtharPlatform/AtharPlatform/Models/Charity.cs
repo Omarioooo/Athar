@@ -31,6 +31,10 @@ namespace AtharPlatform.Models
     public string? ExternalId { get; set; }
     public DateTime? ImportedAt { get; set; }
 
+    // Soft delete / deactivate flag
+    public bool IsActive { get; set; } = true;
+    public DateTime? DeactivatedAt { get; set; }
+
         public virtual UserAccount Account { get; set; }
         public CharityStatusEnum Status { get; set; } = CharityStatusEnum.Pending;
         public virtual List<CharityVolunteer> charityVolunteers { get; set; } = new();

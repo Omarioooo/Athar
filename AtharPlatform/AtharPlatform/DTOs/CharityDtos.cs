@@ -50,6 +50,63 @@ namespace AtharPlatform.Dtos
         public double RaisedAmount { get; set; }
     }
 
+    // Update contract for Charity
+    public class CharityUpdateDto
+    {
+        [Required]
+        public string Name { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public byte[]? Image { get; set; }
+        // Optional external info updates (for scraped or curated links)
+        public string? ImageUrl { get; set; }
+        public string? ExternalWebsiteUrl { get; set; }
+        public string? MegaKheirUrl { get; set; }
+    }
+
+    // Stats contract for dashboard
+    public class CharityStatsDto
+    {
+        public int TotalCharities { get; set; }
+        public int ApprovedCharities { get; set; }
+        public int PendingCharities { get; set; }
+        public int RejectedCharities { get; set; }
+
+        public int TotalCampaigns { get; set; }
+        public int ActiveCampaigns { get; set; }
+
+        public decimal TotalCashDonations { get; set; }
+        public int TotalMaterialDonations { get; set; }
+        public decimal Last30DaysCash { get; set; }
+
+        // Extensions
+        public decimal AverageDonationAmount { get; set; }
+        public int DonationsCount { get; set; }
+        public IEnumerable<TopCampaignDto> TopCampaigns { get; set; } = Array.Empty<TopCampaignDto>();
+    }
+
+    public class TopCampaignDto
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public decimal TotalDonations { get; set; }
+        public int DonationsCount { get; set; }
+    }
+
+    public class MaterialDonationDto
+    {
+        public int Id { get; set; }
+        public string DonorFirstName { get; set; } = string.Empty;
+        public string DonorLastName { get; set; } = string.Empty;
+        public string PhoneNumber { get; set; } = string.Empty;
+        public string ItemName { get; set; } = string.Empty;
+        public int Quantity { get; set; }
+        public string MeasurementUnit { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Country { get; set; } = string.Empty;
+        public string City { get; set; } = string.Empty;
+        public DateTime Date { get; set; }
+    }
+
     // Used for manual creation by Charity Admins or Super Admins
     public class CharityCreateDto
     {
