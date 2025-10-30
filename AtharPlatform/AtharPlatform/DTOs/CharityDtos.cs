@@ -3,6 +3,22 @@ using AtharPlatform.Models;
 
 namespace AtharPlatform.Dtos
 {
+    // Unified card/detail DTO for charities (used across list/detail/search)
+    public class CharityCardDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        // Manual image bytes (for charities created inside the platform)
+        public byte[]? Image { get; set; }
+        // Scraped image URL (from external sources)
+        public string? ImageUrl { get; set; }
+        public string? ExternalWebsiteUrl { get; set; }
+        public string? MegaKheirUrl { get; set; }
+        public int CampaignsCount { get; set; }
+        public IEnumerable<MiniCampaignDto> Campaigns { get; set; } = Array.Empty<MiniCampaignDto>();
+    }
+
     // Public, lightweight card view for lists
     public class CharityListDto
     {

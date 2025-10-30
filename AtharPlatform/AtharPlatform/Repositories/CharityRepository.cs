@@ -35,6 +35,7 @@ namespace AtharPlatform.Repositories
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Include(c => c.campaigns)
+                .Include(c => c.ScrapedInfo)
                 .ToListAsync();
         }
 
@@ -53,6 +54,7 @@ namespace AtharPlatform.Repositories
         {
             return await _dbSet
                 .Include(c => c.campaigns)
+                .Include(c => c.ScrapedInfo)
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 

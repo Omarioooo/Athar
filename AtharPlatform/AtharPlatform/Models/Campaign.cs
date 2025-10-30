@@ -15,8 +15,8 @@ namespace AtharPlatform.Models
         [Required]
         public string Description { get; set; }
 
-        [Required]
-        public byte[] Image { get; set; }
+    [Required]
+    public string ImageUrl { get; set; }
 
         public bool isCritical { get; set; } = false;
 
