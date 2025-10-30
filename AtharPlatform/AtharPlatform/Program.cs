@@ -14,7 +14,7 @@ builder.Services.AddSwaggerGen();
 //  options => options.UseNpgsql(builder.Configuration.GetConnectionString("connection"))
 //  );
 builder.Services.AddDbContext<Context>(
-    options => options.UseSqlServer(builder.Configuration.GetConnectionString("Defaultconnection"))
+    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
 
@@ -24,6 +24,7 @@ builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<INotificationTypeRepository, NotificationTypeRepository>();
 builder.Services.AddScoped<ICharityRepository, CharityRepository>();
 builder.Services.AddScoped<IDonorRepository, DonorRepository>();
+builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
 
 // Inject Services
 builder.Services.AddScoped<IAccountService, AccountService>();
