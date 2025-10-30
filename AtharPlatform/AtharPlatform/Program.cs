@@ -14,7 +14,7 @@ builder.Services.AddSwaggerGen();
 //  options => options.UseNpgsql(builder.Configuration.GetConnectionString("connection"))
 //  );
 builder.Services.AddDbContext<Context>(
-    options => options.UseSqlServer(builder.Configuration.GetConnectionString("Defaultconnection"))
+    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
 

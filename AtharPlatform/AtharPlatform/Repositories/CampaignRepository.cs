@@ -1,4 +1,7 @@
 ﻿using System.Linq.Expressions;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using AtharPlatform.Models.Enum;
 namespace AtharPlatform.Repositories
 {
     public class CampaignRepository : Repository<Campaign>, ICampaignRepository
@@ -29,6 +32,14 @@ namespace AtharPlatform.Repositories
                 .Include(c => c.Charity) 
                 .ToListAsync();
         }
+
+    public async Task<List<Campaign>> GetByType(CampaignCategoryEnum type)
+    {
+        return await _dbSet
+        .Where(c => c.Category == type)
+        .Include(c => c.Charity)
+        .ToListAsync();
+    }
 
     }
 }
