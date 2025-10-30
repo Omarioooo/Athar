@@ -49,9 +49,9 @@ namespace AtharPlatform.Migrations
                     b.Property<double>("GoalAmount")
                         .HasColumnType("float");
 
-                    b.Property<byte[]>("Image")
+                    b.Property<string>("ImageUrl")
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsInKindDonation")
                         .HasColumnType("bit");
@@ -135,6 +135,25 @@ namespace AtharPlatform.Migrations
                     b.HasIndex("charityID");
 
                     b.ToTable("CharityDonations");
+                });
+
+            modelBuilder.Entity("AtharPlatform.Models.CharityExternalInfo", b =>
+                {
+                    b.Property<int>("CharityId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ExternalWebsiteUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MegaKheirUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CharityId");
+
+                    b.ToTable("CharityExternalInfos");
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.CharityMaterialDonation", b =>
@@ -787,23 +806,14 @@ namespace AtharPlatform.Migrations
                     b.Property<string>("ExternalId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ExternalWebsiteUrl")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<byte[]>("Image")
                         .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ImportedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsScraped")
                         .HasColumnType("bit");
-
-                    b.Property<string>("MegaKheirUrl")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -925,6 +935,17 @@ namespace AtharPlatform.Migrations
                     b.Navigation("Donation");
 
                     b.Navigation("Donor");
+                });
+
+            modelBuilder.Entity("AtharPlatform.Models.CharityExternalInfo", b =>
+                {
+                    b.HasOne("AtharPlatform.Models.Charity", "Charity")
+                        .WithOne("ScrapedInfo")
+                        .HasForeignKey("AtharPlatform.Models.CharityExternalInfo", "CharityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Charity");
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.CharityMaterialDonation", b =>
@@ -1199,6 +1220,8 @@ namespace AtharPlatform.Migrations
 
             modelBuilder.Entity("AtharPlatform.Models.Charity", b =>
                 {
+                    b.Navigation("ScrapedInfo");
+
                     b.Navigation("campaigns");
 
                     b.Navigation("charityMaterialDonations");

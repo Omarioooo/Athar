@@ -23,10 +23,8 @@ namespace AtharPlatform.Models
     // Optional presentation image/logo to show on cards
     public byte[]? Image { get; set; }
 
-    // Optional external presentation fields (for scraped/manual links)
-    public string? ImageUrl { get; set; }
-    public string? ExternalWebsiteUrl { get; set; }
-    public string? MegaKheirUrl { get; set; }
+    // Scraped external presentation fields moved to a 1:1 entity
+    public virtual CharityExternalInfo? ScrapedInfo { get; set; }
 
     // Distinguish whether data was imported from scraping or created manually
     public bool IsScraped { get; set; } = false;

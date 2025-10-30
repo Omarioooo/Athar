@@ -2,7 +2,7 @@ using AtharPlatform.Dtos;
 using AtharPlatform.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Microsoft.EntityFrameworkCore;
 
 namespace AtharPlatform.Controllers
 {
@@ -19,7 +19,7 @@ namespace AtharPlatform.Controllers
 
         // (GET) /api/charities?query=&page=1&pageSize=12
         [HttpGet]
-        public async Task<ActionResult<PaginatedResultDto<CharityListDto>>> GetAll([FromQuery] string? query, [FromQuery] int page = 1, [FromQuery] int pageSize = 12)
+    public async Task<ActionResult<PaginatedResultDto<CharityCardDto>>> GetAll([FromQuery] string? query, [FromQuery] int page = 1, [FromQuery] int pageSize = 12)
         {
 
 
@@ -31,9 +31,9 @@ namespace AtharPlatform.Controllers
             var total = await _uow.Charity.CountAsync(query);
 
             if (total == 0)// Handle empty data
-                return Ok(new PaginatedResultDto<CharityListDto>
+                return Ok(new PaginatedResultDto<CharityCardDto>
                 {
-                    Items = new List<CharityListDto>(),
+                    Items = new List<CharityCardDto>(),
                     Page = page,
                     PageSize = pageSize,
                     Total = 0
@@ -42,14 +42,17 @@ namespace AtharPlatform.Controllers
 
             var items = await _uow.Charity.GetPageAsync(query, page, pageSize);
 
-            var dto = new PaginatedResultDto<CharityListDto>
+            var dto = new PaginatedResultDto<CharityCardDto>
             {
-                Items = items.Select(c => new CharityListDto
+                Items = items.Select(c => new CharityCardDto
                 {
                     Id = c.Id,
                     Name = c.Name,
+                    Description = c.Description,
                     Image = c.Image,
-                    ImageUrl = c.ImageUrl,
+                    ImageUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
+                    ExternalWebsiteUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null,
+                    MegaKheirUrl = c.ScrapedInfo != null ? c.ScrapedInfo.MegaKheirUrl : null,
                     CampaignsCount = c.campaigns?.Count ?? 0
                 }),
                 Page = page,
@@ -61,20 +64,20 @@ namespace AtharPlatform.Controllers
 
         // (GET) /api/charities/{id}
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<CharityDetailDto>> GetById(int id)
+        public async Task<ActionResult<CharityCardDto>> GetById(int id)
         {
             var c = await _uow.Charity.GetWithCampaignsAsync(id);
             if (c == null) return NotFound("Charity not found.");
 
-            var dto = new CharityDetailDto
+            var dto = new CharityCardDto
             {
                 Id = c.Id,
                 Name = c.Name,
                 Description = c.Description,
                 Image = c.Image,
-                ImageUrl = c.ImageUrl,
-                ExternalWebsiteUrl = c.ExternalWebsiteUrl,
-                MegaKheirUrl = c.MegaKheirUrl,
+                ImageUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
+                ExternalWebsiteUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null,
+                MegaKheirUrl = c.ScrapedInfo != null ? c.ScrapedInfo.MegaKheirUrl : null,
                 Campaigns = (c.campaigns ?? new()).Select(x => new MiniCampaignDto
                 {
                     Id = x.Id,
@@ -88,38 +91,50 @@ namespace AtharPlatform.Controllers
 
         // (GET) /api/charities/{name}
         [HttpGet("byName/{name}")]
-        public async Task<ActionResult<CharityDetailDto>> GetByName(string name)
+        public async Task<ActionResult<CharityCardDto>> GetByName(string name)
         {
             if (string.IsNullOrWhiteSpace(name)) return BadRequest("Name is required.");
-            var normalize=name.Trim().ToLower();
-            var c = await _uow.Charity.GetAsync(x => x.Name.ToLower() == normalize);
+            var trimmed = name.Trim();
+            // Case-insensitive match without ToLower by using a CI collation
+            Charity? c = null;
+            try
+            {
+                c = await _uow.Charity.GetAsync(x => EF.Functions.Collate(x.Name, "SQL_Latin1_General_CP1_CI_AS") == trimmed);
+            }
+            catch
+            {
+                c = null;
+            }
             if (c == null) return NotFound("Charity not found.");
 
-            var dto = new CharityDetailDto
+            var dto = new CharityCardDto
             {
                 Id = c.Id,
                 Name = c.Name,
                 Description = c.Description,
                 Image = c.Image,
-                ImageUrl = c.ImageUrl,
-                ExternalWebsiteUrl = c.ExternalWebsiteUrl,
-                MegaKheirUrl = c.MegaKheirUrl
+                ImageUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
+                ExternalWebsiteUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null,
+                MegaKheirUrl = c.ScrapedInfo != null ? c.ScrapedInfo.MegaKheirUrl : null
             };
             return Ok(dto);
         }
 
         // (GET) /api/charities/search?query=
         [HttpGet("search")]
-        public async Task<ActionResult<IEnumerable<CharityListDto>>> Search([FromQuery] string query, [FromQuery] int take = 10)
+        public async Task<ActionResult<IEnumerable<CharityCardDto>>> Search([FromQuery] string query, [FromQuery] int take = 10)
         {
-            if (string.IsNullOrWhiteSpace(query)) return Ok(Array.Empty<CharityListDto>());
+            if (string.IsNullOrWhiteSpace(query)) return Ok(Array.Empty<CharityCardDto>());
             var items = await _uow.Charity.GetPageAsync(query, 1, take);
-            return Ok(items.Select(c => new CharityListDto
+            return Ok(items.Select(c => new CharityCardDto
             {
                 Id = c.Id,
                 Name = c.Name,
+                Description = c.Description,
                 Image = c.Image,
-                ImageUrl = c.ImageUrl,
+                ImageUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
+                ExternalWebsiteUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null,
+                MegaKheirUrl = c.ScrapedInfo != null ? c.ScrapedInfo.MegaKheirUrl : null,
                 CampaignsCount = c.campaigns?.Count ?? 0
             }));
         }
@@ -151,18 +166,31 @@ namespace AtharPlatform.Controllers
         {
             if (items == null) return BadRequest("No data provided");
             var now = DateTime.UtcNow;
-            var entities = items.Where(i => !string.IsNullOrWhiteSpace(i.Name)).Select(i => new Models.Charity
+            var entities = new List<Models.Charity>();
+            foreach (var i in items.Where(i => !string.IsNullOrWhiteSpace(i.Name)))
             {
-                Name = i.Name.Trim(),
-                Description = i.Description ?? string.Empty,
-                Image = i.Image, // if provided as bytes/base64 decoded by client
-                ImageUrl = i.ImageUrl,
-                ExternalWebsiteUrl = i.ExternalWebsiteUrl,
-                MegaKheirUrl = i.MegaKheirUrl,
-                IsScraped = true,
-                ExternalId = i.ExternalId,
-                ImportedAt = now
-            }).ToList();
+                var charity = new Models.Charity
+                {
+                    Name = i.Name.Trim(),
+                    Description = i.Description ?? string.Empty,
+                    Image = i.Image, // if provided as bytes/base64 decoded by client
+                    IsScraped = true,
+                    ExternalId = i.ExternalId,
+                    ImportedAt = now
+                };
+
+                if (i.ImageUrl != null || i.ExternalWebsiteUrl != null || i.MegaKheirUrl != null)
+                {
+                    charity.ScrapedInfo = new Models.CharityExternalInfo
+                    {
+                        ImageUrl = i.ImageUrl,
+                        ExternalWebsiteUrl = i.ExternalWebsiteUrl,
+                        MegaKheirUrl = i.MegaKheirUrl
+                    };
+                }
+
+                entities.Add(charity);
+            }
 
             await _uow.Charity.BulkImportAsync(entities);
             await _uow.SaveAsync();
