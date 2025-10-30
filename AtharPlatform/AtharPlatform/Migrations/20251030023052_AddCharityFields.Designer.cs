@@ -4,6 +4,7 @@ using AtharPlatform.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AtharPlatform.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20251030023052_AddCharityFields")]
+    partial class AddCharityFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -780,6 +783,9 @@ namespace AtharPlatform.Migrations
                 {
                     b.HasBaseType("AtharPlatform.Models.UserAccount");
 
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -787,23 +793,14 @@ namespace AtharPlatform.Migrations
                     b.Property<string>("ExternalId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ExternalWebsiteUrl")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<byte[]>("Image")
                         .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ImportedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsScraped")
                         .HasColumnType("bit");
-
-                    b.Property<string>("MegaKheirUrl")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -815,6 +812,12 @@ namespace AtharPlatform.Migrations
                     b.Property<byte[]>("VerificationDocuments")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
+
+                    b.ToTable("AspNetUsers", t =>
+                        {
+                            t.Property("City")
+                                .HasColumnName("Charity_City");
+                        });
 
                     b.HasDiscriminator().HasValue("Charity");
                 });
