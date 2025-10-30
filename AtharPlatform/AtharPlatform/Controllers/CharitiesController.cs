@@ -196,5 +196,18 @@ namespace AtharPlatform.Controllers
             await _uow.SaveAsync();
             return Ok(new { imported = entities.Count });
         }
+
+        // (GET) /api/charities/{id}/image - serve manual image bytes as a browser-friendly URL
+        [HttpGet("{id:int}/image")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetImage(int id)
+        {
+            var charity = await _uow.Charity.GetAsync(id);
+            if (charity == null || charity.Image == null || charity.Image.Length == 0)
+                return NotFound();
+
+            // If you later store content type, use it here. Default to JPEG.
+            return File(charity.Image, "image/jpeg");
+        }
     }
 }
