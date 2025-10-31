@@ -8,39 +8,86 @@ namespace AtharPlatform.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CampaignController : Controller
+    public class CampaignController : ControllerBase
     {
-        private readonly ICampaignRepository _icampaignrepository;
-        public CampaignController(ICampaignRepository icampaignrepository)
+        private readonly IUnitOfWork _unitOfWork;
+
+        public CampaignController(IUnitOfWork unitOfWork)
         {
-            _icampaignrepository = icampaignrepository;
+            _unitOfWork = unitOfWork;
         }
+
+
+        //public async Task<IActionResult> GetAllCampaign()
+        //{
+        //    var campaign = await _icampaignrepository.GetAllAsync();
+        //    var result = campaign.Select(c => new CampaignDto
+        //    {
+        //        Id = c.Id,
+        //        Title = c.Title,
+        //        Description = c.Description,
+        //        Image = c.Image,
+        //        GoalAmount = c.GoalAmount,
+        //        RaisedAmount = c.RaisedAmount,
+        //        StartDate = c.StartDate,
+        //        EndDate = c.EndDate,
+        //        Category = c.Category,
+        //        CharityName = c.Charity.Name
+
+
+        //    });
+        //    return Ok(result);
+
+        //}
         [HttpGet("[action]")]
-        public async Task<IActionResult> GetAllCampaign()
+        public async Task<ActionResult<PaginatedResultDto<CampaignDto>>> GetAll([FromQuery] string? query, [FromQuery] int page = 1, [FromQuery] int pageSize = 12)
         {
-            var campaign = await _icampaignrepository.GetAllAsync();
-            var result = campaign.Select(c => new CampaignDto
+            if (page <= 0 || pageSize <= 0)
+                return BadRequest("Page and PageSize must be greater than zero.");
+
+            var total = await _unitOfWork.Campaign.CountAsync(query);
+
+            if (total == 0)
             {
-                Id = c.Id,
-                Title = c.Title,
-                Description = c.Description,
-                ImageUrl = c.Image,
-                GoalAmount = c.GoalAmount,
-                RaisedAmount = c.RaisedAmount,
-                StartDate = c.StartDate,
-                EndDate = c.EndDate,
-                Category = c.Category,
-                CharityName = c.Charity.Name
+                return Ok(new PaginatedResultDto<CampaignDto>
+                {
+                    Items = new List<CampaignDto>(),
+                    Page = page,
+                    PageSize = pageSize,
+                    Total = 0
+                });
+            }
 
+            var campaigns = await _unitOfWork.Campaign.GetPageAsync(query, page, pageSize);
 
-            });
-            return Ok(result);
+            var dto = new PaginatedResultDto<CampaignDto>
+            {
+                Items = campaigns.Select(c => new CampaignDto
+                {
+                    Id = c.Id,
+                    Title = c.Title,
+                    Description = c.Description,
+                    ImageUrl = c.ImageUrl,
+                    GoalAmount = c.GoalAmount,
+                    RaisedAmount = c.RaisedAmount,
+                    StartDate = c.StartDate,
+                    EndDate = c.EndDate,
+                    Category = c.Category,
+                    CharityName = c.Charity?.Name
+                }),
+                Page = page,
+                PageSize = pageSize,
+                Total = total
+            };
 
+            return Ok(dto);
         }
+
+
         [HttpGet("[action]")]
         public async Task<IActionResult>GetCampaignById(int id)
         {
-            var campaign = await _icampaignrepository.GetAsync(id);
+            var campaign = await _unitOfWork.Campaign.GetAsync(id);
             if (campaign == null)
                 return NotFound("Campaign not found.");
             var result = new CampaignDto
@@ -48,7 +95,7 @@ namespace AtharPlatform.Controllers
                 Id = campaign.Id,
                 Title = campaign.Title,
                 Description = campaign.Description,
-                ImageUrl = campaign.Image,
+                ImageUrl = campaign.ImageUrl,
                 GoalAmount = campaign.GoalAmount,
                 RaisedAmount = campaign.RaisedAmount,
                 StartDate = campaign.StartDate,
@@ -60,29 +107,54 @@ namespace AtharPlatform.Controllers
 
         }
         [HttpGet("[action]")]
-        public async Task<IActionResult> GetByType(CampaignCategoryEnum type)  
+        public async Task<IActionResult> GetByType(CampaignCategoryEnum type)
         {
-            var campaign = await _icampaignrepository.GetByType(type);
-            if (campaign == null)
+            var campaign = await _unitOfWork.Campaign.GetByType(type);
+            if (campaign == null || !campaign.Any())// it return list so I check if list is Empty
                 return NotFound("Campaign not found.");
             var result = campaign.Select(c => new CampaignDto
             {
                 Id = c.Id,
                 Title = c.Title,
                 Description = c.Description,
-                ImageUrl = c.Image,
+                ImageUrl = c.ImageUrl,
                 GoalAmount = c.GoalAmount,
                 RaisedAmount = c.RaisedAmount,
                 StartDate = c.StartDate,
                 EndDate = c.EndDate,
                 Category = c.Category,
                 CharityName = c.Charity.Name
-
-
             });
             return Ok(result);
-            
-
         }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetByDate([FromQuery] bool latestFirst = true)
+        {
+            var campaigns = await _unitOfWork.Campaign.GetByDateAsync(latestFirst);
+
+            if (campaigns == null || !campaigns.Any())
+                return NotFound("No campaigns found.");
+
+            var result = campaigns.Select(c => new CampaignDto
+            {
+                Id = c.Id,
+                Title = c.Title,
+                Description = c.Description,
+                ImageUrl = c.ImageUrl,
+                GoalAmount = c.GoalAmount,
+                RaisedAmount = c.RaisedAmount,
+                StartDate = c.StartDate,
+                EndDate = c.EndDate,
+                Category = c.Category,
+                CharityName = c.Charity?.Name
+            });
+
+            return Ok(result);
+        }
+
+
+
+
     }
 }

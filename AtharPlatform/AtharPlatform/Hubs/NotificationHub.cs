@@ -5,12 +5,12 @@ namespace AtharPlatform.Hubs
 {
     public class NotificationHub : Hub, INotificationHub
     {
-        public async Task SendMessage(int userId, NotificationMessageDto message)
+        public async Task SendMessageToOneUser(int userId, NotificationMessageDto message)
         {
             await Clients.User(userId.ToString()).SendAsync("ReceiveNotification", message);
         }
 
-        public async Task SendMessage(List<int> userIds, NotificationMessageDto message)
+        public async Task SendMessageToListOfUseres(List<int> userIds, NotificationMessageDto message)
         {
             var tasks = userIds.Select(userId =>
                 Clients.User(userId.ToString()).SendAsync("ReceiveNotification", message)
