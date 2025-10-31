@@ -109,7 +109,10 @@ namespace AtharPlatform.Controllers
             Charity? c = null;
             try
             {
-                c = await _uow.Charity.GetAsync(x => EF.Functions.Collate(x.Name, "SQL_Latin1_General_CP1_CI_AS") == trimmed);
+                c = await _db.Charities
+                    .Include(x => x.ScrapedInfo)
+                    .Where(x => EF.Functions.Collate(x.Name, "SQL_Latin1_General_CP1_CI_AS") == trimmed)
+                    .FirstOrDefaultAsync();
             }
             catch
             {
