@@ -15,7 +15,6 @@ namespace AtharPlatform.Dtos
         // Scraped image URL (from external sources)
         public string? ImageUrl { get; set; }
         public string? ExternalWebsiteUrl { get; set; }
-        public string? MegaKheirUrl { get; set; }
         public int CampaignsCount { get; set; }
         public IEnumerable<MiniCampaignDto> Campaigns { get; set; } = Array.Empty<MiniCampaignDto>();
     }
@@ -39,7 +38,6 @@ namespace AtharPlatform.Dtos
         public byte[]? Image { get; set; }
         public string? ImageUrl { get; set; }
         public string? ExternalWebsiteUrl { get; set; }
-        public string? MegaKheirUrl { get; set; }
         public IEnumerable<MiniCampaignDto> Campaigns { get; set; } = Array.Empty<MiniCampaignDto>();
     }
 
@@ -61,7 +59,6 @@ namespace AtharPlatform.Dtos
         // Optional external info updates (for scraped or curated links)
         public string? ImageUrl { get; set; }
         public string? ExternalWebsiteUrl { get; set; }
-        public string? MegaKheirUrl { get; set; }
     }
 
     // Stats contract for dashboard
@@ -137,9 +134,6 @@ namespace AtharPlatform.Dtos
 
         [JsonPropertyName("external_website_url")]
         public string? ExternalWebsiteUrl { get; set; }
-
-        [JsonPropertyName("megakheir_url")]
-        public string? MegaKheirUrl { get; set; }
 
         // Any external id/source can be carried here for dedupe (optional)
         [JsonPropertyName("external_id")]
