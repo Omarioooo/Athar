@@ -8,6 +8,9 @@
         INotificationTypeRepository NotificationsTypes { get; }
 
         ICampaignRepository Campaign { get; }
+        IVendorOfferRepository VendorOffers { get; }
+        IVolunteerApplicationRepository VolunteerApplications { get; }
+
         Task SaveAsync();
     }
 }
