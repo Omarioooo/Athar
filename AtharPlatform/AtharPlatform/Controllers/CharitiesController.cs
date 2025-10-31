@@ -62,7 +62,6 @@ namespace AtharPlatform.Controllers
                     Image = c.Image,
                     ImageUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
                     ExternalWebsiteUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null,
-                    MegaKheirUrl = c.ScrapedInfo != null ? c.ScrapedInfo.MegaKheirUrl : null,
                     CampaignsCount = c.campaigns?.Count ?? 0
                 }),
                 Page = page,
@@ -87,7 +86,6 @@ namespace AtharPlatform.Controllers
                 Image = c.Image,
                 ImageUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
                 ExternalWebsiteUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null,
-                MegaKheirUrl = c.ScrapedInfo != null ? c.ScrapedInfo.MegaKheirUrl : null,
                 Campaigns = (c.campaigns ?? new()).Select(x => new MiniCampaignDto
                 {
                     Id = x.Id,
@@ -109,7 +107,10 @@ namespace AtharPlatform.Controllers
             Charity? c = null;
             try
             {
-                c = await _uow.Charity.GetAsync(x => EF.Functions.Collate(x.Name, "SQL_Latin1_General_CP1_CI_AS") == trimmed);
+                c = await _db.Charities
+                    .Include(x => x.ScrapedInfo)
+                    .Where(x => EF.Functions.Collate(x.Name, "SQL_Latin1_General_CP1_CI_AS") == trimmed)
+                    .FirstOrDefaultAsync();
             }
             catch
             {
@@ -124,8 +125,7 @@ namespace AtharPlatform.Controllers
                 Description = c.Description,
                 Image = c.Image,
                 ImageUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
-                ExternalWebsiteUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null,
-                MegaKheirUrl = c.ScrapedInfo != null ? c.ScrapedInfo.MegaKheirUrl : null
+                ExternalWebsiteUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null
             };
             return Ok(dto);
         }
@@ -144,7 +144,6 @@ namespace AtharPlatform.Controllers
                 Image = c.Image,
                 ImageUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
                 ExternalWebsiteUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null,
-                MegaKheirUrl = c.ScrapedInfo != null ? c.ScrapedInfo.MegaKheirUrl : null,
                 CampaignsCount = c.campaigns?.Count ?? 0
             }));
         }
@@ -189,13 +188,12 @@ namespace AtharPlatform.Controllers
                     ImportedAt = now
                 };
 
-                if (i.ImageUrl != null || i.ExternalWebsiteUrl != null || i.MegaKheirUrl != null)
+                if (i.ImageUrl != null || i.ExternalWebsiteUrl != null)
                 {
                     charity.ScrapedInfo = new Models.CharityExternalInfo
                     {
                         ImageUrl = i.ImageUrl,
-                        ExternalWebsiteUrl = i.ExternalWebsiteUrl,
-                        MegaKheirUrl = i.MegaKheirUrl
+                        ExternalWebsiteUrl = i.ExternalWebsiteUrl
                     };
                 }
 
@@ -229,13 +227,12 @@ namespace AtharPlatform.Controllers
             if (body.Description != null) charity.Description = body.Description;
             if (body.Image != null && body.Image.Length > 0) charity.Image = body.Image;
 
-            if (body.ImageUrl != null || body.ExternalWebsiteUrl != null || body.MegaKheirUrl != null)
+            if (body.ImageUrl != null || body.ExternalWebsiteUrl != null)
             {
                 if (charity.ScrapedInfo == null)
                     charity.ScrapedInfo = new CharityExternalInfo { CharityId = charity.Id };
                 if (body.ImageUrl != null) charity.ScrapedInfo.ImageUrl = body.ImageUrl;
                 if (body.ExternalWebsiteUrl != null) charity.ScrapedInfo.ExternalWebsiteUrl = body.ExternalWebsiteUrl;
-                if (body.MegaKheirUrl != null) charity.ScrapedInfo.MegaKheirUrl = body.MegaKheirUrl;
             }
 
             await _uow.SaveAsync();
