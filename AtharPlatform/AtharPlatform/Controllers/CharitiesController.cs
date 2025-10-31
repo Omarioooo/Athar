@@ -103,19 +103,21 @@ namespace AtharPlatform.Controllers
         {
             if (string.IsNullOrWhiteSpace(name)) return BadRequest("Name is required.");
             var trimmed = name.Trim();
-            // Case-insensitive match without ToLower by using a CI collation
-            Charity? c = null;
-            try
+            // Try exact match first
+            var c = await _db.Charities
+                .Include(x => x.ScrapedInfo)
+                .FirstOrDefaultAsync(x => x.Name == trimmed);
+
+            // Fallback to partial contains match (useful for inputs like "مرسال")
+            if (c == null)
             {
                 c = await _db.Charities
                     .Include(x => x.ScrapedInfo)
-                    .Where(x => EF.Functions.Collate(x.Name, "SQL_Latin1_General_CP1_CI_AS") == trimmed)
+                    .Where(x => x.Name.Contains(trimmed))
+                    .OrderBy(x => x.Name.Length)
                     .FirstOrDefaultAsync();
             }
-            catch
-            {
-                c = null;
-            }
+
             if (c == null) return NotFound("Charity not found.");
 
             var dto = new CharityCardDto
