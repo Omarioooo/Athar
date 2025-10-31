@@ -45,7 +45,7 @@ namespace AtharPlatform.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(loginRequest);
 
-            var token = _accountService.LogInAsync(loginRequest);
+            var token = await _accountService.LogInAsync(loginRequest);
             if (token == null)
                 return Unauthorized("Invalid username or password");
 
