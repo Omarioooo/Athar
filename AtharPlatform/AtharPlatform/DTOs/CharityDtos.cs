@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using AtharPlatform.Models;
 
 namespace AtharPlatform.Dtos
@@ -119,16 +120,29 @@ namespace AtharPlatform.Dtos
     // Import contract for bulk-scraped charities
     public class CharityImportItemDto
     {
-         
+        // These attributes allow binding snake_case fields from scraped JSON (e.g., image_url)
+        [JsonPropertyName("name")]
         public string Name { get; set; } = string.Empty;
+
+        [JsonPropertyName("description")]
         public string? Description { get; set; }
+
         // accept base64 image bytes if present (optional); callers can omit
+        [JsonPropertyName("image")]
         public byte[]? Image { get; set; }
+
         // Alternatively, callers can provide a remote image URL
+        [JsonPropertyName("image_url")]
         public string? ImageUrl { get; set; }
+
+        [JsonPropertyName("external_website_url")]
         public string? ExternalWebsiteUrl { get; set; }
+
+        [JsonPropertyName("megakheir_url")]
         public string? MegaKheirUrl { get; set; }
+
         // Any external id/source can be carried here for dedupe (optional)
+        [JsonPropertyName("external_id")]
         public string? ExternalId { get; set; }
     }
 
