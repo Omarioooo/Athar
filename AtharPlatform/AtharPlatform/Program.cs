@@ -28,6 +28,7 @@ builder.Services.AddScoped<IDonorRepository, DonorRepository>();
 // Inject Services
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
 
 // Inject Hubs
 builder.Services.AddSignalR();
