@@ -1,10 +1,7 @@
-<<<<<<< HEAD
+
 ﻿using AtharPlatform.Models.Enum;
 using System.Linq.Expressions;
-=======
-﻿using System.Linq.Expressions;
-using AtharPlatform.Models.Enum;
->>>>>>> master
+
 namespace AtharPlatform.Repositories
 {
     public class CampaignRepository : Repository<Campaign>, ICampaignRepository
@@ -69,19 +66,6 @@ namespace AtharPlatform.Repositories
                 .ToListAsync();
         }
 
-<<<<<<< HEAD
-
-
-        public async Task<List<Campaign>> GetByType(CampaignCategoryEnum type)
-        {
-            var result = await _dbSet
-               .Where(c => (c.Category == type))
-               .ToListAsync();
-            if (result == null)
-                throw new InvalidOperationException("Campaign not found.");
-            return result;
-
-        }
         public async Task<IEnumerable<Campaign>> Search(string keyword)
         {
             return await _context.Campaigns
@@ -126,38 +110,6 @@ namespace AtharPlatform.Repositories
                 throw new InvalidOperationException("Campaign not found.");
             return result;
         }
-=======
-        public async Task<int> CountAsync(string? query)
-        {
-            var q = _dbSet.AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(query))
-            {
-                var term = query.Trim();
-                q = q.Where(c =>
-                    c.Title.Contains(term) ||
-                    c.Description.Contains(term) ||
-                    c.Charity.Name.Contains(term));
-            }
-
-            return await q.CountAsync();
-        }
-
-        public  async Task<List<Campaign>> GetByDateAsync(bool latestFirst)
-        {
-            var query = _context.Campaigns
-                    .Include(c => c.Charity)
-                    .AsQueryable();
-
-            if (latestFirst)
-                query = query.OrderByDescending(c => c.StartDate);
-            else
-                query = query.OrderBy(c => c.StartDate);
-
-            return await query.ToListAsync();
-        }
-
-
->>>>>>> master
     }
 }

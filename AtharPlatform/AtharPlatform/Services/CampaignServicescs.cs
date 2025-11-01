@@ -23,7 +23,7 @@ public class CampaignService : ICampaignService
             Id = c.Id,
             Title = c.Title,
             Description = c.Description,
-            Image = c.Image,
+            Image = c.ImageUrl,
             GoalAmount = c.GoalAmount,
             RaisedAmount = c.RaisedAmount,
             StartDate = c.StartDate,
@@ -40,7 +40,7 @@ public class CampaignService : ICampaignService
             Id = c.Id,
             Title = c.Title,
             Description = c.Description,
-            Image = c.Image,
+            Image = c.ImageUrl,
             GoalAmount = c.GoalAmount,
             RaisedAmount = c.RaisedAmount,
             StartDate = c.StartDate,
@@ -61,7 +61,7 @@ public class CampaignService : ICampaignService
             Id = c.Id,
             Title = c.Title,
             Description = c.Description,
-            Image = c.Image,
+            Image = c.ImageUrl,
             GoalAmount = c.GoalAmount,
             RaisedAmount = c.RaisedAmount,
             StartDate = c.StartDate,
@@ -82,7 +82,7 @@ public class CampaignService : ICampaignService
             Id = c.Id,
             Title = c.Title,
             Description = c.Description,
-            Image = c.Image,
+            Image = c.ImageUrl,
             GoalAmount = c.GoalAmount,
             RaisedAmount = c.RaisedAmount,
             StartDate = c.StartDate,
@@ -113,7 +113,7 @@ public class CampaignService : ICampaignService
             Id = c.Id,
             Title = c.Title,
             Description = c.Description,
-            Image = c.Image,
+            Image = c.ImageUrl,
             GoalAmount = c.GoalAmount,
             RaisedAmount = c.RaisedAmount,
             StartDate = c.StartDate,
@@ -134,7 +134,7 @@ public class CampaignService : ICampaignService
             Id = c.Id,
             Title = c.Title,
             Description = c.Description,
-            Image = c.Image,
+            Image = c.ImageUrl,
             GoalAmount = c.GoalAmount,
             RaisedAmount = c.RaisedAmount,
             StartDate = c.StartDate,
@@ -150,7 +150,7 @@ public class CampaignService : ICampaignService
         {
             Title = model.Title,
             Description = model.Description,
-            Image = model.Image,
+            ImageUrl = model.Image,
             isCritical = model.IsCritical,
             StartDate = model.StartDate ?? DateTime.UtcNow,
             Duration = model.Duration,
@@ -176,7 +176,7 @@ public class CampaignService : ICampaignService
 
         c.Title = model.Title;
         c.Description = model.Description;
-        c.Image = model.Image;
+        c.ImageUrl = model.Image;
         c.isCritical = model.IsCritical;
         c.Duration = model.Duration;
         c.GoalAmount = model.GoalAmount;
@@ -211,7 +211,7 @@ public class CampaignService : ICampaignService
             Id = c.Id,
             Title = c.Title,
             Description = c.Description,
-            Image = c.Image,
+            Image = c.ImageUrl,
             GoalAmount = c.GoalAmount,
             RaisedAmount = c.RaisedAmount,
             StartDate = c.StartDate,
@@ -233,7 +233,7 @@ public class CampaignService : ICampaignService
             Id = c.Id,
             Title = c.Title,
             Description = c.Description,
-            Image = c.Image,
+            Image = c.ImageUrl,
             GoalAmount = c.GoalAmount,
             RaisedAmount = c.RaisedAmount,
             StartDate = c.StartDate,
