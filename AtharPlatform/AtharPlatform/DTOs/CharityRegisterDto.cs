@@ -14,9 +14,6 @@ namespace AtharPlatform.DTOs
         public string Password { get; set; }
 
         [Required]
-        public string Role { get; set; } = "Charity";
-
-        [Required]
         public string Description { get; set; }
 
         [Required]

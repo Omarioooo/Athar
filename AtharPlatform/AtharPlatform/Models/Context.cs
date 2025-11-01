@@ -9,13 +9,18 @@ namespace AtharPlatform.Models
     {
         public Context(DbContextOptions<Context> options) : base(options) { }
 
+
+        protected Context()
+        {
+        }
+
         // Users and Charities
         public DbSet<Donor> Donors { get; set; }
         public DbSet<Charity> Charities { get; set; }
 
         // Subscriptions
+        public DbSet<Follow> Follows { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
-        public DbSet<SubscribtionType> SubscriptionTypes { get; set; }
 
         // Content & Reactions
         public DbSet<Content> Contents { get; set; }

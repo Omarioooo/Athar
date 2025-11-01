@@ -4,6 +4,7 @@ using AtharPlatform.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using X.Paymob.CashIn;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,13 +28,20 @@ builder.Services.AddDbContext<Context>(
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<INotificationTypeRepository, NotificationTypeRepository>();
-builder.Services.AddScoped<ICharityRepository, CharityRepository>();
 builder.Services.AddScoped<IDonorRepository, DonorRepository>();
+builder.Services.AddScoped<ICharityRepository, CharityRepository>();
+builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
 
 // Inject Services
 builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddScoped<IUserContextService, UserContextService>();
+builder.Services.AddScoped<IPaymentService<PaymobService>, PaymobService>();
+builder.Services.AddScoped<IAccountContextService, AccountContextService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
+builder.Services.AddScoped<IFollowService, FollowService>();
+builder.Services.AddScoped<IReactService, ReactService>();
+builder.Services.AddScoped<IDonationService, DonationService>();
+builder.Services.AddScoped<IDonorService, DonorService>();
 
 // Inject Hubs
 builder.Services.AddSignalR();
@@ -41,7 +49,7 @@ builder.Services.AddScoped<INotificationHub, NotificationHub>();
 
 // Inject Identity
 builder.Services
-    .AddIdentity<UserAccount, IdentityRole>()
+    .AddIdentity<UserAccount, IdentityRole<int>>()
     .AddEntityFrameworkStores<Context>()
     .AddDefaultTokenProviders();
 
@@ -88,6 +96,15 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Inject Paymob
+builder.Services.AddPaymobCashIn(config =>
+{
+    config.ApiKey = builder.Configuration["Paymob:ApiKey"];
+    config.Hmac = builder.Configuration["Paymob:Hmac"];
+    //config.IntegrationId = int.Parse(builder.Configuration["Paymob:IntegrationId"]);
+});
+
+
 var app = builder.Build();
 
 
@@ -103,9 +120,6 @@ app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
-
-// Nofications
-app.MapHub<NotificationHub>("/notificationHub");
 
 // Map SignalR Hub
 app.MapHub<NotificationHub>("/notificationHub");

@@ -1,38 +1,41 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using AtharPlatform.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Transactions;
 
 
 namespace AtharPlatform.Models
 {
-    [Index(nameof(StripePaymentId), IsUnique = true)]
     public class Donation
     {
         [Key]
         public int Id { get; set; }
 
+        [ForeignKey(nameof(Donor))]
+        public int DonorId { get; set; }
+        public virtual Donor Donor { get; set; } = new();
+
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalAmount { get; set; }
 
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal PlatformFee { get; set; }
+        // Platform fee is 2%
+        [NotMapped]
+        public decimal PlatformFee { get; set; } = 0.02m;
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal NetAmountToCharity { get; set; }
 
-        public string PaymentReference { get; set; }
+        public string Currency { get; set; } = "EGP";
 
-        [Required]
-        public string DonationStatus { get; set; }
+        public TransactionStatusEnum DonationStatus { get; set; } = TransactionStatusEnum.PENDING;
 
-        // Payment provider details (Stripe, etc.)
-        public string? Provider { get; set; }
-        // Stripe idempotency/payment identifiers to avoid duplicate processing
-        public string? StripePaymentId { get; set; }
-        // Webhook processing guard
-        public bool IsWebhookProcessed { get; set; } = false;
+        // payment IDs from Paymob...
+        public string? PaymentID { get; set; }
+        public string? MerchantOrderId { get; set; }
+        public string? TransactionId { get; set; }
+
         public virtual DateTime CreatedAt { get; set; } = new();
         public virtual List<CharityDonation> CharityDonations { get; set; } = new();
         public virtual List<CampaignDonation> CampaignDonations { get; set; } = new();
-
     }
 }

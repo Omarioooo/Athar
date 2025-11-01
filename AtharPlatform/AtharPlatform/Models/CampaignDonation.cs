@@ -14,8 +14,5 @@ namespace AtharPlatform.Models
         public int CampaignId { get; set; }
         public virtual Campaign Campaign { get; set; } = new();
 
-        [ForeignKey(nameof(Donor))]
-        public int DonorId { get; set; }
-        public virtual Donor Donor { get; set; } = new();
     }
 }

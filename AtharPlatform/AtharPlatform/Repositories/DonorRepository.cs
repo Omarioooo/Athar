@@ -6,34 +6,20 @@ namespace AtharPlatform.Repositories
     {
         public DonorRepository(Context context) : base(context) { }
 
-        public override Task<List<Donor>> GetAllAsync()
+        public async Task<List<int>> GetFollowsAsync(int id)
         {
-            return base.GetAllAsync();
+            return await _context.Follows
+             .Where(f => f.donornID == id)
+             .Select(f => f.donornID)
+             .ToListAsync();
         }
 
-        public override Task<Donor?> GetAsync(int id)
+        public async Task<List<int>> GetSubscriptionsAsync(int id)
         {
-            return base.GetAsync(id);
-        }
-
-        public override Task<Donor?> GetAsync(Expression<Func<Donor, bool>> expression)
-        {
-            return base.GetAsync(expression);
-        }
-
-        public override Task<bool> AddAsync(Donor entity)
-        {
-            return base.AddAsync(entity);
-        }
-
-        public override Task<bool> Update(Donor entity)
-        {
-            return base.Update(entity);
-        }
-
-        public override Task<bool> DeleteAsync(int id)
-        {
-            return base.DeleteAsync(id);
+            return await _context.Subscriptions
+             .Where(s => s.DonorID == id)
+             .Select(f => f.DonorID)
+             .ToListAsync();
         }
     }
 }

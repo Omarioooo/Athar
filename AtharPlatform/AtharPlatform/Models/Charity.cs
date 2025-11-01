@@ -17,20 +17,21 @@ namespace AtharPlatform.Models
         [Required]
         public String Description { get; set; }
 
-        public string? PaymobWalletId { get; set; }
 
-        public decimal AvailableBalance { get; set; } = 0;
+        [Column(TypeName = "decimal(18, 4)")]
+        public decimal? Balance { get; set; } = 0.0m;
 
         [Required]
-        public byte[] VerificationDocument { get; set; }
+        public byte[]? VerificationDocument { get; set; }
         public CharityStatusEnum Status { get; set; } = CharityStatusEnum.Pending;
 
-        public virtual UserAccount Account { get; set; }
+        public virtual UserAccount Account { get; set; } = new();
         public virtual List<CharityVolunteer> charityVolunteers { get; set; } = new();
         public virtual List<CharityVendorOffer> charityVendorOffers { get; set; } = new();
         public virtual List<CharityMaterialDonation> charityMaterialDonations { get; set; } = new();
+        public virtual List<Follow> Follows { get; set; } = new();
         public virtual List<Subscription> subscriptions { get; set; } = new();
         public virtual List<Campaign> campaigns { get; set; } = new();
-
+        public virtual List<Donation> donations { get; set; } = new();
     }
 }

@@ -2,12 +2,11 @@
 
 namespace AtharPlatform.DTO
 {
-    public class DonorRegisterDto
+    public class PersonRegisterDto
     {
         [Required]
         public string FirstName { get; set; }
 
-        [Required]
         public string? LastName { get; set; }
 
         [Required]
@@ -16,14 +15,9 @@ namespace AtharPlatform.DTO
         [Required]
         public string Password { get; set; }
 
-        [Required]
-        public string Role { get; set; } = "Donor";
+        public string? Country { get; set; }
 
-        [Required]
-        public string Country { get; set; }
-
-        [Required]
-        public string City { get; set; }
+        public string? City { get; set; }
 
         public IFormFile? ProfileImage { get; set; }
     }

@@ -34,16 +34,16 @@ namespace AtharPlatform.Repositories
 
             _dbSet.Add(entity);
 
-            return await Task.FromResult(true);
+            return true;
         }
 
-        public virtual Task<bool> Update(T entity)
+        public virtual async Task<bool> UpdateAsync(T entity)
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
 
             _dbSet.Update(entity);
-            return Task.FromResult(true);
+            return true;
         }
 
         public virtual async Task<bool> DeleteAsync(int id)
