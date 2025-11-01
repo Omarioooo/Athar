@@ -12,6 +12,7 @@ namespace AtharPlatform.Models
         // Users and Charities
         public DbSet<Donor> Donors { get; set; }
         public DbSet<Charity> Charities { get; set; }
+    public DbSet<CharityExternalInfo> CharityExternalInfos { get; set; }
 
         // Subscriptions
         public DbSet<Subscription> Subscriptions { get; set; }
@@ -47,6 +48,13 @@ namespace AtharPlatform.Models
             base.OnModelCreating(builder);
             builder.Entity<NotificationReceiver>()
                 .HasKey(a => new { a.NotificationId, a.ReceiverId });
+
+            // Charity 1:1 external info
+            builder.Entity<Charity>()
+                .HasOne(c => c.ScrapedInfo)
+                .WithOne(e => e.Charity)
+                .HasForeignKey<CharityExternalInfo>(e => e.CharityId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
     }

@@ -4,3 +4,58 @@ GET {{AtharPlatform_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+# Login to get JWT (SuperAdmin)
+POST {{AtharPlatform_HostAddress}}/api/Account/Login
+Content-Type: application/json
+
+{
+	"UserNameOrEmail": "admin@athar.local",
+	"Password": "Admin#123"
+}
+
+###
+
+@token = {{$dotenv TOKEN}}
+
+# Import scraped charities (use file payload)
+POST {{AtharPlatform_HostAddress}}/api/charities/import
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+< ../../scrapers/megakheir/data/megakheir_ngos_slim_20251026_023532.json
+
+###
+
+# Import CLEANED charities (after running sanitizer)
+POST {{AtharPlatform_HostAddress}}/api/charities/import
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+< ../../scrapers/megakheir/data/megakheir_ngos_slim_20251026_023532_clean.json
+
+###
+
+# Get first page of charities
+GET {{AtharPlatform_HostAddress}}/api/charities?page=1&pageSize=12
+Accept: application/json
+
+###
+
+# Search charities by name
+GET {{AtharPlatform_HostAddress}}/api/charities/search?query=جمعية
+Accept: application/json
+
+###
+
+# Get charity by name (path-encoded if needed)
+GET {{AtharPlatform_HostAddress}}/api/charities/byName/%D8%AC%D9%85%D8%B9%D9%8A%D8%A9%20%D8%A7%D9%84%D8%A3%D9%88%D8%B1%D9%85%D8%A7%D9%86
+Accept: application/json
+
+###
+
+# Get charity by id (replace 1 after first import check)
+GET {{AtharPlatform_HostAddress}}/api/charities/1
+Accept: application/json
+
+###
