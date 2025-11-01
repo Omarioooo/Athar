@@ -26,66 +26,92 @@ namespace AtharPlatform.Controllers
         [HttpPost("[action]")]
         public async Task<IActionResult> DonorRegister([FromForm] PersonRegisterDto model)
         {
+
+            if (!ModelState.IsValid)
+                return BadRequest(new { message = "Invalid registration data." });
+
             try
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(model + "Model is not valid");
-
                 var registerResult = await _accountService.PersonRegisterAsync(model, RolesEnum.Donor);
 
                 if (!registerResult.Succeeded)
-                    return BadRequest(registerResult.Errors);
+                    return BadRequest(new { message = "Registration failed.", errors = registerResult.Errors });
 
                 await _unitOfWork.SaveAsync();
-                return Ok("registered Successfully");
+                return Ok(new { message = "Donor registered successfully." });
             }
-            catch (Exception ex)
+            catch (ArgumentException ex)
             {
-                return StatusCode(500, new { message = "An error occurred during Register. Please try again later." });
+                return BadRequest(new { message = ex.Message });
             }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "An unexpected error occurred during donor registration." });
+            }
+
         }
 
         [HttpPost("[action]")]
         public async Task<IActionResult> AdminRegister([FromForm] PersonRegisterDto model)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(new { message = "Invalid registration data." });
+
             try
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(model + "Model is not valid");
-
                 var registerResult = await _accountService.PersonRegisterAsync(model, RolesEnum.Admin);
 
                 if (!registerResult.Succeeded)
-                    return BadRequest(registerResult.Errors);
+                    return BadRequest(new { message = "Registration failed.", errors = registerResult.Errors });
 
                 await _unitOfWork.SaveAsync();
-                return Ok("registered Successfully");
+                return Ok(new { message = "Admin registered successfully." });
             }
-            catch (Exception ex)
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
             {
                 return StatusCode(500, new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "An unexpected error occurred during admin registration." });
             }
         }
 
         [HttpPost("[action]")]
         public async Task<IActionResult> CharityRegister([FromForm] CharityRegisterDto model)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(new { message = "Invalid registration data." });
+
             try
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(model);
-
                 var registerResult = await _accountService.CharityRegisterAsync(model);
 
                 if (!registerResult.Succeeded)
-                    return BadRequest(registerResult.Errors);
+                    return BadRequest(new { message = "Registration failed.", errors = registerResult.Errors });
 
                 await _unitOfWork.SaveAsync();
-                return Ok("registered Successfully");
+                return Ok(new { message = "Charity registered successfully." });
             }
-            catch (Exception ex)
+            catch (ArgumentException ex)
             {
-                return StatusCode(500, new { message = "An error occurred during Register. Please try again later." });
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "An unexpected error occurred during charity registration." });
             }
         }
 
@@ -93,29 +119,28 @@ namespace AtharPlatform.Controllers
         public async Task<IActionResult> Login(LoginDto model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+                return BadRequest(new { message = "Invalid login data." });
 
             try
             {
                 var loginResult = await _accountService.LogInAsync(model);
-
-                if (loginResult == null)
-                {
-                    // Differentiate between user not found and incorrect password
-                    var userExists = new EmailAddressAttribute().IsValid(model.UserNameOrEmail)
-                        ? await _accountService.FindByEmailAsync(model.UserNameOrEmail)
-                        : await _accountService.FindByNameAsync(model.UserNameOrEmail);
-
-                    return Unauthorized(new
-                    {
-                        message = userExists == null ? "User not found" : "Invalid password"
-                    });
-                }
                 return Ok(loginResult);
             }
-            catch (Exception ex)
+            catch (UnauthorizedAccessException ex)
             {
-                return StatusCode(500, new { message = ex.Message });
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "An unexpected error occurred during login." });
             }
         }
     }
