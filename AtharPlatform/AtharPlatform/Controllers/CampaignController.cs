@@ -238,12 +238,12 @@ namespace AtharPlatform.Controllers
 
 
 
-        /// <summary>
-        /// Bulk import campaigns (SuperAdmin only). Links to the first matching existing charity by name from supporting_charities or charity_name.
-        /// Missing numeric/date fields will be randomized; duplicates (same Title+Charity) will be skipped.
-        /// </summary>
-        [HttpPost("import")]
-        [Authorize(Roles = "SuperAdmin")]
+    /// <summary>
+    /// Bulk import campaigns (SuperAdmin only). Links to the first matching existing charity by name from supporting_charities or charity_name.
+    /// Missing numeric/date fields will be randomized; duplicates (same Title+Charity) will be skipped.
+    /// </summary>
+    [HttpPost("import")]
+    [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> ImportCampaigns([FromBody] List<CampaignImportItemDto> items)
         {
             if (items == null || items.Count == 0)
@@ -368,6 +368,148 @@ namespace AtharPlatform.Controllers
             return Ok(new { imported, skipped, withoutCharity, duplicates, invalid, errors });
         }
 
+        /// <summary>
+        /// Import or update campaigns by Title. If a campaign with the same Title exists, it will be UPDATED in-place:
+        /// - ExternalId and SupportingCharitiesJson are set from the payload
+        /// - ImageUrl, Description optionally updated if provided
+        /// - Numeric/date fields and category are updated only if provided to avoid breaking existing demo data
+        /// If not found, it will be created using the same logic as ImportCampaigns (including charity resolution).
+        /// Temporarily AllowAnonymous to ease dev automation; tighten to SuperAdmin later.
+        /// </summary>
+    [HttpPost("import-or-update")]
+    [Authorize(Roles = "SuperAdmin")]
+        public async Task<IActionResult> ImportOrUpdate([FromBody] List<CampaignImportItemDto> items)
+        {
+            if (items == null || items.Count == 0)
+                return BadRequest(new { error = "Empty payload" });
+
+            int inserted = 0, updated = 0, skipped = 0, invalid = 0;
+            var errors = new List<object>();
+
+            foreach (var i in items)
+            {
+                try
+                {
+                    var title = (i.Title ?? string.Empty).Trim();
+                    if (string.IsNullOrWhiteSpace(title)) { invalid++; continue; }
+
+                    var existing = await _context.Campaigns.FirstOrDefaultAsync(c => c.Title == title);
+                    if (existing != null)
+                    {
+                        // Update minimal fields and scraped metadata
+                        if (!string.IsNullOrWhiteSpace(i.Description)) existing.Description = i.Description!.Trim();
+                        if (!string.IsNullOrWhiteSpace(i.ImageUrl)) existing.ImageUrl = i.ImageUrl!.Trim();
+                        if (i.GoalAmount.HasValue) existing.GoalAmount = i.GoalAmount.Value;
+                        if (i.RaisedAmount.HasValue) existing.RaisedAmount = i.RaisedAmount.Value;
+                        if (i.IsCritical.HasValue) existing.isCritical = i.IsCritical.Value;
+                        if (i.StartDate.HasValue) existing.StartDate = i.StartDate.Value;
+                        if (i.DurationDays.HasValue) existing.Duration = i.DurationDays.Value;
+
+                        // Category update if provided
+                        if (!string.IsNullOrWhiteSpace(i.Category))
+                        {
+                            existing.Category = InferCategory(i.Category, title, existing.Description);
+                        }
+
+                        existing.ExternalId = i.ExternalId;
+                        existing.SupportingCharitiesJson = (i.SupportingCharities != null && i.SupportingCharities.Count > 0)
+                            ? JsonSerializer.Serialize(i.SupportingCharities)
+                            : existing.SupportingCharitiesJson; // keep old if not provided
+
+                        updated++;
+                        continue;
+                    }
+
+                    // Otherwise, create new using the same logic as ImportCampaigns
+                    var description = (i.Description ?? string.Empty).Trim();
+                    var imageUrl = (i.ImageUrl ?? string.Empty).Trim();
+                    if (string.IsNullOrWhiteSpace(description) || string.IsNullOrWhiteSpace(imageUrl))
+                    {
+                        invalid++;
+                        continue;
+                    }
+
+                    // Resolve charity by provided charity_name first, else supporting_charities
+                    var charityNames = new List<string>();
+                    if (!string.IsNullOrWhiteSpace(i.CharityName)) charityNames.Add(i.CharityName!.Trim());
+                    if (i.SupportingCharities != null) charityNames.AddRange(i.SupportingCharities.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()));
+
+                    Charity? charity = null;
+                    foreach (var name in charityNames.Distinct())
+                    {
+                        var n = name;
+                        charity = await _unitOfWork.Charity.GetAsync(c => c.Name == n || EF.Functions.Like(c.Name, $"%{n}%"));
+                        if (charity != null) break;
+                    }
+
+                    if (charity == null)
+                    {
+                        var allCharities = await _unitOfWork.Charity.GetAllAsync();
+                        if (allCharities == null || allCharities.Count == 0)
+                        {
+                            skipped++;
+                            errors.Add(new { title, error = "No charities available to assign" });
+                            continue;
+                        }
+                        charity = allCharities[Random.Shared.Next(0, allCharities.Count)];
+                    }
+
+                    var rng = Random.Shared;
+                    var startDate = i.StartDate ?? DateTime.UtcNow.Date.AddDays(-rng.Next(0, 60));
+                    var duration = i.DurationDays ?? rng.Next(20, 61);
+                    var goal = i.GoalAmount ?? Math.Round(rng.Next(50_000, 500_001) / 100.0) * 100;
+                    var raised = i.RaisedAmount ?? Math.Round(goal * (rng.Next(20, 81) / 100.0), 2);
+                    var isCritical = i.IsCritical ?? false;
+                    var category = InferCategory(i.Category, title, description);
+
+                    var status = CampainStatusEnum.inProgress;
+                    if (raised >= goal) status = CampainStatusEnum.Completed;
+                    else if (DateTime.UtcNow.Date > startDate.AddDays(duration)) status = CampainStatusEnum.expired;
+
+                    var charityUserId = (charity as UserAccount)?.Id ?? charity.Id;
+
+                    var campaign = new Campaign
+                    {
+                        Title = title,
+                        Description = description,
+                        ImageUrl = imageUrl,
+                        ExternalId = i.ExternalId,
+                        SupportingCharitiesJson = i.SupportingCharities != null && i.SupportingCharities.Count > 0
+                            ? JsonSerializer.Serialize(i.SupportingCharities)
+                            : null,
+                        StartDate = startDate,
+                        Duration = duration,
+                        GoalAmount = goal,
+                        RaisedAmount = raised,
+                        isCritical = isCritical,
+                        Category = category,
+                        Status = status,
+                        CharityID = charityUserId
+                    };
+
+                    await _unitOfWork.Campaign.AddAsync(campaign);
+                    inserted++;
+                }
+                catch (Exception ex)
+                {
+                    skipped++;
+                    errors.Add(new { title = i?.Title, error = ex.Message });
+                }
+            }
+
+            try
+            {
+                await _unitOfWork.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                errors.Add(new { error = $"Save failed: {ex.Message}", inner = ex.InnerException?.Message });
+                return StatusCode(500, new { inserted, updated, skipped, invalid, errors });
+            }
+
+            return Ok(new { inserted, updated, skipped, invalid, errors });
+        }
+
         private static CampaignCategoryEnum InferCategory(string? provided, string title, string description)
         {
             if (!string.IsNullOrWhiteSpace(provided))
@@ -404,8 +546,8 @@ namespace AtharPlatform.Controllers
         }
 
         // (DELETE) /api/Campaign/by-title?title=...
-        [HttpDelete("by-title")]
-        [AllowAnonymous]
+    [HttpDelete("by-title")]
+    [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> DeleteByTitle([FromQuery] string title)
         {
             if (string.IsNullOrWhiteSpace(title)) return BadRequest("Title is required.");

@@ -477,48 +477,149 @@ namespace AtharPlatform.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<CharityCountDto>>> GetCampaignCounts()
         {
-            var items = await _db.Charities
+            // Compute counts including FK-linked AND supporter-derived campaigns
+            var charities = await _db.Charities
+                .AsNoTracking()
                 .Where(c => c.IsActive)
-                .Select(c => new CharityCountDto
-                {
-                    CharityId = c.Id,
-                    CharityName = c.Name,
-                    CampaignsCount = c.campaigns.Count
-                })
-                .OrderByDescending(x => x.CampaignsCount)
-                .ThenBy(x => x.CharityName)
+                .Select(c => new { c.Id, c.Name })
                 .ToListAsync();
 
-            return Ok(items);
+            var allCamps = await _db.Campaigns
+                .AsNoTracking()
+                .Select(x => new { x.Id, x.CharityID, x.SupportingCharitiesJson })
+                .ToListAsync();
+
+            static IEnumerable<string> ParseSupporters(string? json)
+            {
+                if (string.IsNullOrWhiteSpace(json)) return Array.Empty<string>();
+                try
+                {
+                    var list = System.Text.Json.JsonSerializer.Deserialize<IEnumerable<string>>(json);
+                    return list?.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()) ?? Array.Empty<string>();
+                }
+                catch { return Array.Empty<string>(); }
+            }
+
+            static bool NameMatches(string supporter, string charityName)
+            {
+                if (string.IsNullOrWhiteSpace(supporter) || string.IsNullOrWhiteSpace(charityName)) return false;
+                var s = supporter.Trim();
+                var n = charityName.Trim();
+                return string.Equals(s, n, StringComparison.Ordinal) || n.Contains(s) || s.Contains(n);
+            }
+
+            var result = new List<CharityCountDto>(charities.Count);
+            foreach (var ch in charities)
+            {
+                var set = new HashSet<int>();
+
+                // FK-linked
+                foreach (var c in allCamps.Where(c => c.CharityID == ch.Id)) set.Add(c.Id);
+
+                // Support-derived
+                foreach (var c in allCamps)
+                {
+                    var supporters = ParseSupporters(c.SupportingCharitiesJson);
+                    if (supporters.Any(s => NameMatches(s, ch.Name))) set.Add(c.Id);
+                }
+
+                result.Add(new CharityCountDto
+                {
+                    CharityId = ch.Id,
+                    CharityName = ch.Name,
+                    CampaignsCount = set.Count
+                });
+            }
+
+            var ordered = result
+                .OrderByDescending(x => x.CampaignsCount)
+                .ThenBy(x => x.CharityName)
+                .ToList();
+
+            return Ok(ordered);
         }
 
         // (GET) /api/charities/campaigns-summary?includeCampaigns=true&format=json
         // Returns per-charity counts and optionally their campaign list. When format=csv, returns a CSV file.
+        // IMPORTANT: This summary includes campaigns linked by FK AND campaigns where the charity appears in Campaign.SupportingCharitiesJson.
         [HttpGet("campaigns-summary")]
         [AllowAnonymous]
         public async Task<IActionResult> GetCampaignsSummary([FromQuery] bool includeCampaigns = true, [FromQuery] string format = "json")
         {
-            var items = await _db.Charities
+            // Load active charities (id + name) ordered by name
+            var charities = await _db.Charities
+                .AsNoTracking()
                 .Where(c => c.IsActive)
-                .Include(c => c.campaigns)
                 .OrderBy(c => c.Name)
+                .Select(c => new { c.Id, c.Name })
                 .ToListAsync();
 
-            var dto = items.Select(c => new CharityCampaignsSummaryDto
+            // Load minimal campaign fields once
+            var allCamps = await _db.Campaigns
+                .AsNoTracking()
+                .Select(x => new
+                {
+                    x.Id,
+                    x.Title,
+                    x.GoalAmount,
+                    x.RaisedAmount,
+                    x.CharityID,
+                    x.SupportingCharitiesJson
+                })
+                .ToListAsync();
+
+            static IEnumerable<string> ParseSupporters(string? json)
             {
-                CharityId = c.Id,
-                CharityName = c.Name,
-                CampaignsCount = c.campaigns?.Count ?? 0,
-                Campaigns = includeCampaigns
-                    ? (c.campaigns ?? new()).Select(x => new MiniCampaignDto
+                if (string.IsNullOrWhiteSpace(json)) return Array.Empty<string>();
+                try
+                {
+                    var list = System.Text.Json.JsonSerializer.Deserialize<IEnumerable<string>>(json);
+                    return list?.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()) ?? Array.Empty<string>();
+                }
+                catch { return Array.Empty<string>(); }
+            }
+
+            static bool NameMatches(string supporter, string charityName)
+            {
+                if (string.IsNullOrWhiteSpace(supporter) || string.IsNullOrWhiteSpace(charityName)) return false;
+                var s = supporter.Trim();
+                var n = charityName.Trim();
+                // exact or contains in either direction (basic fuzzy)
+                return string.Equals(s, n, StringComparison.Ordinal) || n.Contains(s) || s.Contains(n);
+            }
+
+            var dto = new List<CharityCampaignsSummaryDto>(charities.Count);
+
+            foreach (var ch in charities)
+            {
+                var set = new Dictionary<int, MiniCampaignDto>();
+
+                // FK-linked campaigns
+                foreach (var c in allCamps.Where(c => c.CharityID == ch.Id))
+                {
+                    if (!set.ContainsKey(c.Id))
+                        set[c.Id] = new MiniCampaignDto { Id = c.Id, Title = c.Title, GoalAmount = c.GoalAmount, RaisedAmount = c.RaisedAmount };
+                }
+
+                // Support-derived campaigns
+                foreach (var c in allCamps)
+                {
+                    var supporters = ParseSupporters(c.SupportingCharitiesJson);
+                    if (supporters.Any(s => NameMatches(s, ch.Name)))
                     {
-                        Id = x.Id,
-                        Title = x.Title,
-                        GoalAmount = x.GoalAmount,
-                        RaisedAmount = x.RaisedAmount
-                    })
-                    : Array.Empty<MiniCampaignDto>()
-            }).ToList();
+                        if (!set.ContainsKey(c.Id))
+                            set[c.Id] = new MiniCampaignDto { Id = c.Id, Title = c.Title, GoalAmount = c.GoalAmount, RaisedAmount = c.RaisedAmount };
+                    }
+                }
+
+                dto.Add(new CharityCampaignsSummaryDto
+                {
+                    CharityId = ch.Id,
+                    CharityName = ch.Name,
+                    CampaignsCount = set.Count,
+                    Campaigns = includeCampaigns ? set.Values.ToList() : Array.Empty<MiniCampaignDto>()
+                });
+            }
 
             if (!string.Equals(format, "csv", StringComparison.OrdinalIgnoreCase))
                 return Ok(dto);
