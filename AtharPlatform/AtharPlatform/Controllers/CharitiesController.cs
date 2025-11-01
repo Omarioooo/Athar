@@ -30,7 +30,7 @@ namespace AtharPlatform.Controllers
 
         // (GET) /api/charities?query=&page=1&pageSize=12
         [HttpGet]
-    public async Task<ActionResult<PaginatedResultDto<CharityCardDto>>> GetAll([FromQuery] string? query, [FromQuery] int page = 1, [FromQuery] int pageSize = 12)
+    public async Task<ActionResult<PaginatedResultDto<CharityCardDto>>> GetAll([FromQuery] string? query, [FromQuery] int page = 1, [FromQuery] int pageSize = 12, [FromQuery] bool includeCampaigns = false)
         {
 
 
@@ -53,17 +53,91 @@ namespace AtharPlatform.Controllers
 
             var items = await _uow.Charity.GetPageAsync(query, page, pageSize);
 
+            // When includeCampaigns=true, enrich each charity with campaigns derived from:
+            // 1) Direct FK (Campaign.CharityID == Charity.Id)
+            // 2) Indirect support: Campaign.SupportingCharitiesJson contains the charity name
+            List<(int Id, string Name, string? ImageUrl, string? ExternalWebsiteUrl, byte[]? Image, string Description)> pageCharities = items
+                .Select(c => ((c as UserAccount).Id, c.Name, c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
+                               c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null, c.Image, c.Description))
+                .ToList();
+
+            var campaignMap = new Dictionary<int, List<MiniCampaignDto>>();
+            if (includeCampaigns)
+            {
+                // Load minimal campaign fields once
+                var allCamps = await _db.Campaigns
+                    .AsNoTracking()
+                    .Select(x => new
+                    {
+                        x.Id,
+                        x.Title,
+                        x.GoalAmount,
+                        x.RaisedAmount,
+                        x.CharityID,
+                        x.SupportingCharitiesJson
+                    })
+                    .ToListAsync();
+
+                static IEnumerable<string> ParseSupporters(string? json)
+                {
+                    if (string.IsNullOrWhiteSpace(json)) return Array.Empty<string>();
+                    try
+                    {
+                        var list = System.Text.Json.JsonSerializer.Deserialize<IEnumerable<string>>(json);
+                        return list?.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()) ?? Array.Empty<string>();
+                    }
+                    catch { return Array.Empty<string>(); }
+                }
+
+                bool NameMatches(string supporter, string charityName)
+                {
+                    if (string.IsNullOrWhiteSpace(supporter) || string.IsNullOrWhiteSpace(charityName)) return false;
+                    var s = supporter.Trim();
+                    var n = charityName.Trim();
+                    // exact or contains in either direction (basic fuzzy)
+                    return string.Equals(s, n, StringComparison.Ordinal) || n.Contains(s) || s.Contains(n);
+                }
+
+                foreach (var (Id, Name, _, _, _, _) in pageCharities)
+                {
+                    var set = new Dictionary<int, MiniCampaignDto>();
+
+                    // FK-linked campaigns
+                    foreach (var c in allCamps.Where(c => c.CharityID == Id))
+                    {
+                        if (!set.ContainsKey(c.Id))
+                            set[c.Id] = new MiniCampaignDto { Id = c.Id, Title = c.Title, GoalAmount = c.GoalAmount, RaisedAmount = c.RaisedAmount };
+                    }
+
+                    // Support-derived campaigns
+                    foreach (var c in allCamps)
+                    {
+                        var supporters = ParseSupporters(c.SupportingCharitiesJson);
+                        if (supporters.Any(s => NameMatches(s, Name)))
+                        {
+                            if (!set.ContainsKey(c.Id))
+                                set[c.Id] = new MiniCampaignDto { Id = c.Id, Title = c.Title, GoalAmount = c.GoalAmount, RaisedAmount = c.RaisedAmount };
+                        }
+                    }
+
+                    campaignMap[Id] = set.Values.ToList();
+                }
+            }
+
             var dto = new PaginatedResultDto<CharityCardDto>
             {
-                Items = items.Select(c => new CharityCardDto
+                Items = pageCharities.Select(pc => new CharityCardDto
                 {
-                    Id = c.Id,
-                    Name = c.Name,
-                    Description = c.Description,
-                    Image = c.Image,
-                    ImageUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
-                    ExternalWebsiteUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null,
-                    CampaignsCount = c.campaigns?.Count ?? 0
+                    Id = pc.Id,
+                    Name = pc.Name,
+                    Description = pc.Description,
+                    Image = pc.Image,
+                    ImageUrl = pc.ImageUrl,
+                    ExternalWebsiteUrl = pc.ExternalWebsiteUrl,
+                    CampaignsCount = includeCampaigns ? (campaignMap.TryGetValue(pc.Id, out var list) ? list.Count : 0) : 0,
+                    Campaigns = includeCampaigns && campaignMap.TryGetValue(pc.Id, out var lst)
+                        ? lst
+                        : Array.Empty<MiniCampaignDto>()
                 }),
                 Page = page,
                 PageSize = pageSize,
@@ -81,7 +155,7 @@ namespace AtharPlatform.Controllers
 
             var dto = new CharityCardDto
             {
-                Id = c.Id,
+                Id = (c as UserAccount).Id,
                 Name = c.Name,
                 Description = c.Description,
                 Image = c.Image,
@@ -123,7 +197,7 @@ namespace AtharPlatform.Controllers
 
             var dto = new CharityCardDto
             {
-                Id = c.Id,
+                Id = (c as UserAccount).Id,
                 Name = c.Name,
                 Description = c.Description,
                 Image = c.Image,

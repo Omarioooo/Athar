@@ -67,25 +67,35 @@ def absolutize(url: str) -> str:
     return url
 
 
-BG_RE_STRICT = re.compile(
-    r"<div[^>]+class=\"[^\"]*cover-section[^\"]*\"[^>]*style=\"[^\"]*background-image\s*:\s*url\((?:&quot;|&apos;|\"|')?([^\)\"'&]+)",
+BG_RE_STRICT_QUOTED = re.compile(
+    r"<div[^>]+class=\"[^\"]*cover-section[^\"]*\"[^>]*style=\"[^\"]*background-image\s*:\s*url\((?:&quot;|&apos;|\"|')([^\"']+)(?:&quot;|&apos;|\"|')\)",
     flags=re.I | re.S,
 )
-BG_RE_LOOSE = re.compile(
-    r"background-image\s*:\s*url\((?:&quot;|&apos;|\"|')?([^\)\"'&]+)",
+BG_RE_STRICT_UNQUOTED = re.compile(
+    r"<div[^>]+class=\"[^\"]*cover-section[^\"]*\"[^>]*style=\"[^\"]*background-image\s*:\s*url\(([^)]+)\)",
+    flags=re.I | re.S,
+)
+BG_RE_LOOSE_QUOTED = re.compile(
+    r"background-image\s*:\s*url\((?:&quot;|&apos;|\"|')([^\"']+)(?:&quot;|&apos;|\"|')\)",
+    flags=re.I,
+)
+BG_RE_LOOSE_UNQUOTED = re.compile(
+    r"background-image\s*:\s*url\(([^)]+)\)",
     flags=re.I,
 )
 
 
 def extract_bg_image(html: str) -> Optional[str]:
     # Prefer the hero cover-section background if present
-    m = BG_RE_STRICT.search(html)
-    if m:
-        return absolutize(m.group(1))
+    for rx in (BG_RE_STRICT_QUOTED, BG_RE_STRICT_UNQUOTED):
+        m = rx.search(html)
+        if m:
+            return absolutize(m.group(1).strip())
     # Fallback: first background-image on the page
-    m2 = BG_RE_LOOSE.search(html)
-    if m2:
-        return absolutize(m2.group(1))
+    for rx in (BG_RE_LOOSE_QUOTED, BG_RE_LOOSE_UNQUOTED):
+        m2 = rx.search(html)
+        if m2:
+            return absolutize(m2.group(1).strip())
     return None
 
 
