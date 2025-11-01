@@ -4,6 +4,7 @@ using AtharPlatform.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 
 namespace AtharPlatform.Controllers
@@ -13,10 +14,12 @@ namespace AtharPlatform.Controllers
     public class CampaignController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly Context _context;
 
-        public CampaignController(IUnitOfWork unitOfWork)
+        public CampaignController(IUnitOfWork unitOfWork, Context context)
         {
             _unitOfWork = unitOfWork;
+            _context = context;
         }
 
 
@@ -47,24 +50,24 @@ namespace AtharPlatform.Controllers
             if (page <= 0 || pageSize <= 0)
                 return BadRequest("Page and PageSize must be greater than zero.");
 
-            var total = await _unitOfWork.Campaign.CountAsync(query);
+            var q = _context.Campaigns.AsQueryable();
 
-            if (total == 0)
+            if (!string.IsNullOrWhiteSpace(query))
             {
-                return Ok(new PaginatedResultDto<CampaignDto>
-                {
-                    Items = new List<CampaignDto>(),
-                    Page = page,
-                    PageSize = pageSize,
-                    Total = 0
-                });
+                var term = query.Trim();
+                q = q.Where(c =>
+                    c.Title.Contains(term) ||
+                    c.Description.Contains(term) ||
+                    (c.Charity != null && c.Charity.Name.Contains(term)));
             }
 
-            var campaigns = await _unitOfWork.Campaign.GetPageAsync(query, page, pageSize);
+            var total = await q.CountAsync();
 
-            var dto = new PaginatedResultDto<CampaignDto>
-            {
-                Items = campaigns.Select(c => new CampaignDto
+            var items = await q
+                .OrderBy(c => c.Title)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(c => new CampaignDto
                 {
                     Id = c.Id,
                     Title = c.Title,
@@ -75,14 +78,17 @@ namespace AtharPlatform.Controllers
                     StartDate = c.StartDate,
                     EndDate = c.EndDate,
                     Category = c.Category,
-                    CharityName = c.Charity?.Name
-                }),
+                    CharityName = c.Charity != null ? c.Charity.Name : null
+                })
+                .ToListAsync();
+
+            return Ok(new PaginatedResultDto<CampaignDto>
+            {
+                Items = items,
                 Page = page,
                 PageSize = pageSize,
                 Total = total
-            };
-
-            return Ok(dto);
+            });
         }
 
 
@@ -125,7 +131,7 @@ namespace AtharPlatform.Controllers
                 StartDate = c.StartDate,
                 EndDate = c.EndDate,
                 Category = c.Category,
-                CharityName = c.Charity.Name
+                CharityName = c.Charity != null ? c.Charity.Name : null
             });
             return Ok(result);
         }
@@ -149,10 +155,85 @@ namespace AtharPlatform.Controllers
                 StartDate = c.StartDate,
                 EndDate = c.EndDate,
                 Category = c.Category,
-                CharityName = c.Charity?.Name
+                CharityName = c.Charity != null ? c.Charity.Name : null
             });
 
             return Ok(result);
+        }
+
+        // (GET) /api/Campaign/scraped?query=&page=1&pageSize=12
+        // Returns campaigns in the original scraped JSON shape (snake_case) including supporting_charities and external_id
+        [HttpGet("scraped")]
+        [AllowAnonymous]
+        public async Task<ActionResult<PaginatedResultDto<CampaignScrapedDto>>> GetScraped([FromQuery] string? query, [FromQuery] int page = 1, [FromQuery] int pageSize = 12)
+        {
+            if (page <= 0 || pageSize <= 0)
+                return BadRequest("Page and PageSize must be greater than zero.");
+
+            var q = _context.Campaigns.AsNoTracking().AsQueryable();
+            if (!string.IsNullOrWhiteSpace(query))
+            {
+                var term = query.Trim();
+                q = q.Where(c =>
+                    c.Title.Contains(term) ||
+                    c.Description.Contains(term) ||
+                    (c.Charity != null && c.Charity.Name.Contains(term)));
+            }
+
+            var total = await q.CountAsync();
+
+            var rows = await q
+                .OrderBy(c => c.Title)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(c => new
+                {
+                    c.Title,
+                    c.Description,
+                    c.ImageUrl,
+                    c.GoalAmount,
+                    c.RaisedAmount,
+                    c.isCritical,
+                    c.StartDate,
+                    c.Duration,
+                    c.Category,
+                    c.ExternalId,
+                    c.SupportingCharitiesJson
+                })
+                .ToListAsync();
+
+            var dtos = rows.Select(c =>
+            {
+                IEnumerable<string> supporters = Array.Empty<string>();
+                if (!string.IsNullOrWhiteSpace(c.SupportingCharitiesJson))
+                {
+                    try { supporters = JsonSerializer.Deserialize<IEnumerable<string>>(c.SupportingCharitiesJson!) ?? Array.Empty<string>(); }
+                    catch { supporters = Array.Empty<string>(); }
+                }
+
+                return new CampaignScrapedDto
+                {
+                    Title = c.Title,
+                    Description = c.Description,
+                    ImageUrl = c.ImageUrl,
+                    SupportingCharities = supporters,
+                    GoalAmount = c.GoalAmount,
+                    RaisedAmount = c.RaisedAmount,
+                    IsCritical = c.isCritical,
+                    StartDate = c.StartDate.ToString("yyyy-MM-dd"),
+                    DurationDays = c.Duration,
+                    Category = c.Category.ToString(),
+                    ExternalId = c.ExternalId
+                };
+            });
+
+            return Ok(new PaginatedResultDto<CampaignScrapedDto>
+            {
+                Items = dtos,
+                Page = page,
+                PageSize = pageSize,
+                Total = total
+            });
         }
 
 
@@ -169,6 +250,7 @@ namespace AtharPlatform.Controllers
                 return BadRequest(new { error = "Empty payload" });
 
             int imported = 0, skipped = 0, withoutCharity = 0, duplicates = 0, invalid = 0;
+            var errors = new List<object>();
 
             foreach (var i in items)
             {
@@ -210,8 +292,16 @@ namespace AtharPlatform.Controllers
                         charity = allCharities[Random.Shared.Next(0, allCharities.Count)];
                     }
 
-                    // Check duplicate by Title+Charity
-                    var exists = await _unitOfWork.Campaign.GetAsync(c => c.Title == title && c.CharityID == charity.Id);
+                    // Check duplicate by Title+Charity (repository throws when not found, so handle gracefully)
+                    Campaign? exists = null;
+                    try
+                    {
+                        exists = await _unitOfWork.Campaign.GetAsync(c => c.Title == title && c.CharityID == charity.Id);
+                    }
+                    catch
+                    {
+                        exists = null; // not found -> safe to insert
+                    }
                     if (exists != null)
                     {
                         duplicates++;
@@ -234,11 +324,18 @@ namespace AtharPlatform.Controllers
                     if (raised >= goal) status = CampainStatusEnum.Completed;
                     else if (DateTime.UtcNow.Date > startDate.AddDays(duration)) status = CampainStatusEnum.expired;
 
+                    // Properly resolve the FK id (Charity inherits from UserAccount, local Charity.Id may be hidden/0)
+                    var charityUserId = (charity as UserAccount)?.Id ?? charity.Id;
+
                     var campaign = new Campaign
                     {
                         Title = title,
                         Description = description,
                         ImageUrl = imageUrl,
+                        ExternalId = i.ExternalId,
+                        SupportingCharitiesJson = i.SupportingCharities != null && i.SupportingCharities.Count > 0
+                            ? JsonSerializer.Serialize(i.SupportingCharities)
+                            : null,
                         StartDate = startDate,
                         Duration = duration,
                         GoalAmount = goal,
@@ -246,21 +343,29 @@ namespace AtharPlatform.Controllers
                         isCritical = isCritical,
                         Category = category,
                         Status = status,
-                        CharityID = charity.Id
+                        CharityID = charityUserId
                     };
 
                     await _unitOfWork.Campaign.AddAsync(campaign);
                     imported++;
                 }
-                catch
+                catch (Exception ex)
                 {
                     skipped++;
+                    errors.Add(new { title = i?.Title, error = ex.Message });
                 }
             }
+            try
+            {
+                await _unitOfWork.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                errors.Add(new { error = $"Save failed: {ex.Message}", inner = ex.InnerException?.Message });
+                return StatusCode(500, new { imported, skipped, withoutCharity, duplicates, invalid, errors });
+            }
 
-            await _unitOfWork.SaveAsync();
-
-            return Ok(new { imported, skipped, withoutCharity, duplicates, invalid });
+            return Ok(new { imported, skipped, withoutCharity, duplicates, invalid, errors });
         }
 
         private static CampaignCategoryEnum InferCategory(string? provided, string title, string description)
@@ -285,6 +390,41 @@ namespace AtharPlatform.Controllers
             return CampaignCategoryEnum.Other;
         }
 
+        // (DELETE) /api/Campaign/{id}
+        [HttpDelete("{id:int}")]
+        [Authorize(Roles = "SuperAdmin")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var existing = await _unitOfWork.Campaign.GetAsync(id);
+            if (existing == null) return NotFound("Campaign not found.");
+
+            await _unitOfWork.Campaign.DeleteAsync(id);
+            await _unitOfWork.SaveAsync();
+            return NoContent();
+        }
+
+        // (DELETE) /api/Campaign/by-title?title=...
+        [HttpDelete("by-title")]
+        [AllowAnonymous]
+        public async Task<IActionResult> DeleteByTitle([FromQuery] string title)
+        {
+            if (string.IsNullOrWhiteSpace(title)) return BadRequest("Title is required.");
+            Campaign? existing = null;
+            try
+            {
+                existing = await _unitOfWork.Campaign.GetAsync(c => c.Title == title.Trim());
+            }
+            catch
+            {
+                existing = null;
+            }
+
+            if (existing == null) return NotFound("Campaign not found.");
+
+            await _unitOfWork.Campaign.DeleteAsync(existing.Id);
+            await _unitOfWork.SaveAsync();
+            return NoContent();
+        }
 
     }
 }
