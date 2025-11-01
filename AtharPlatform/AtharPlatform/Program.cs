@@ -2,6 +2,7 @@ using AtharPlatform.Hubs;
 using AtharPlatform.Repositories;
 using AtharPlatform.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
@@ -109,6 +110,17 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
+        // Ensure database is up-to-date with latest migrations
+        try
+        {
+            var db = services.GetRequiredService<Context>();
+            await db.Database.MigrateAsync();
+        }
+        catch
+        {
+            // Don't block startup if migration fails; endpoints can still be used to diagnose
+        }
+
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
         var userManager = services.GetRequiredService<UserManager<UserAccount>>();
         var config = services.GetRequiredService<IConfiguration>();

@@ -54,7 +54,7 @@ namespace AtharPlatform.Repositories
                 q = q.Where(c =>
                     c.Title.Contains(term) ||
                     c.Description.Contains(term) ||
-                    c.Charity.Name.Contains(term));
+                    (c.Charity != null && c.Charity.Name.Contains(term)));
             }
 
             return await q
@@ -74,7 +74,7 @@ namespace AtharPlatform.Repositories
                 q = q.Where(c =>
                     c.Title.Contains(term) ||
                     c.Description.Contains(term) ||
-                    c.Charity.Name.Contains(term));
+                    (c.Charity != null && c.Charity.Name.Contains(term)));
             }
 
             return await q.CountAsync();
