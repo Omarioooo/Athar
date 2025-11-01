@@ -32,7 +32,7 @@ namespace AtharPlatform.Repositories
             return await Task.FromResult(true);
         }
 
-        public override async Task<bool> Update(Notification notification)
+        public override async Task<bool> UpdateAsync(Notification notification)
         {
             if (notification == null)
                 return await Task.FromResult(false);

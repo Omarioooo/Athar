@@ -120,6 +120,11 @@ namespace AtharPlatform.Services
                     Message = $"A new subscriber ({senderName}) joined at {time}.",
                     CreatedAt = time
                 },
+                NotificationsTypeEnum.NewFollower => new NotificationMessageDto
+                {
+                    Message = $"A new follower ({senderName}) followed you at {time}.",
+                    CreatedAt = time
+                },
                 _ => new NotificationMessageDto
                 {
                     Message = $"You have a new notification from {senderName} at {time}.",
@@ -129,6 +134,5 @@ namespace AtharPlatform.Services
 
             return Task.FromResult(message);
         }
-0
     }
 }

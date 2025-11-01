@@ -18,5 +18,6 @@ namespace AtharPlatform.Models
         public virtual List<CampaignDonation> Donations { get; set; } = new();
         public virtual List<Reaction> Reactions { get; set; } = new();
         public virtual List<Subscription> Subscriptions { get; set; } = new();
+        public virtual List<Follow> Follows { get; set; } = new();
     }
 }

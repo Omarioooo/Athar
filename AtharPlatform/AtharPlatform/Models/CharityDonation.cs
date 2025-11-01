@@ -14,10 +14,5 @@ namespace AtharPlatform.Models
         [ForeignKey(nameof(Charity))]
         public int charityID { get; set; }
         public virtual Charity Charity { get; set; } = new();
-
-
-        [ForeignKey(nameof(Donor))]
-        public int DonorID { get; set; }
-        public virtual Donor Donor { get; set; } = new();
     }
 }

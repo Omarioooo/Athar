@@ -8,34 +8,33 @@ namespace AtharPlatform.Repositories
     {
         public CharityRepository(Context context) : base(context) { }
 
-        public override Task<List<Charity>> GetAllAsync()
+        public async Task<List<int>> GetAllFollowersAsync(int id)
         {
-            return base.GetAllAsync();
+            var donorIds = await _context.Follows
+                .Where(f => f.charityID == id)
+                .Select(f => f.donornID)
+                .ToListAsync();
+
+            return donorIds;
         }
 
-        public override Task<Charity?> GetAsync(int id)
+        public async Task<List<int>> GetCharitySubscribersAsync(int id)
         {
-            return base.GetAsync(id);
+            var donorIds = await _context.Subscriptions
+                .Where(f => f.CharityID == id)
+                .Select(f => f.DonorID)
+                .ToListAsync();
+
+            return donorIds;
         }
 
-        public override Task<Charity?> GetAsync(Expression<Func<Charity, bool>> expression)
+        public async Task<Charity> GetCharityByCampaignAsync(int campaignId)
         {
-            return base.GetAsync(expression);
-        }
+            var charity = await _context.Charities
+                .Include(c => c.campaigns)
+                .FirstOrDefaultAsync(c => c.campaigns.Any(cm => cm.Id == campaignId));
 
-        public override Task<bool> AddAsync(Charity entity)
-        {
-            return base.AddAsync(entity);
-        }
-
-        public override Task<bool> Update(Charity entity)
-        {
-            return base.Update(entity);
-        }
-
-        public override Task<bool> DeleteAsync(int id)
-        {
-            return base.DeleteAsync(id);
+            return charity;
         }
     }
 }

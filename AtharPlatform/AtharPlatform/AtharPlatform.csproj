@@ -30,10 +30,8 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="9.0.6" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
+    <PackageReference Include="Xdot.Paymob.CashIn" Version="1.0.7" />
+    <PackageReference Include="Xdot.Paymob.CashIn.DependencyInjection" Version="1.0.7" />
   </ItemGroup>
 
 </Project>

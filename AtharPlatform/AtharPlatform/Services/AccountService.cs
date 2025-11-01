@@ -38,7 +38,10 @@ namespace AtharPlatform.Services
                 var userName = new MailAddress(model.Email).User;
 
                 using MemoryStream stream = new MemoryStream();
-                await model.ProfileImage.CopyToAsync(stream);
+                if (model.ProfileImage != null)
+                {
+                    await model.ProfileImage.CopyToAsync(stream);
+                }
 
                 var user = new UserAccount
                 {
@@ -58,7 +61,10 @@ namespace AtharPlatform.Services
                 await _userManager.AddToRoleAsync(user, RolesEnum.Charity.ToString());
 
                 using MemoryStream docStream = new MemoryStream();
-                await model.VerificationDocument.CopyToAsync(docStream);
+                if (model.VerificationDocument != null)
+                {
+                    await model.VerificationDocument.CopyToAsync(docStream);
+                }
 
                 var Charity = new Charity
                 {
@@ -81,7 +87,7 @@ namespace AtharPlatform.Services
             }
         }
 
-        public async Task<IdentityResult> DonorRegisterAsync(DonorRegisterDto model)
+        public async Task<IdentityResult> PersonRegisterAsync(PersonRegisterDto model, RolesEnum role)
         {
             try
             {
@@ -93,8 +99,12 @@ namespace AtharPlatform.Services
 
                 var userName = new MailAddress(model.Email).User;
 
+
                 using MemoryStream stream = new MemoryStream();
-                await model.ProfileImage.CopyToAsync(stream);
+                if (model.ProfileImage != null)
+                {
+                    await model.ProfileImage.CopyToAsync(stream);
+                }
 
                 var user = new UserAccount
                 {
@@ -111,7 +121,7 @@ namespace AtharPlatform.Services
                 if (!result.Succeeded)
                     return result;
 
-                await _userManager.AddToRoleAsync(user, RolesEnum.Donor.ToString());
+                await _userManager.AddToRoleAsync(user, role.ToString());
 
                 var Donor = new Donor
                 {
