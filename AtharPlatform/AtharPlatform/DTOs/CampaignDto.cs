@@ -7,7 +7,11 @@ namespace AtharPlatform.Dtos
         public int Id { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+<<<<<<< HEAD
         public byte[] Image { get; set; } 
+=======
+        public string ImageUrl { get; set; } = string.Empty;
+>>>>>>> master
         public double GoalAmount { get; set; }
         public double RaisedAmount { get; set; }
         public CampainStatusEnum Status { get; set; } 
