@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Text;
 
 namespace AtharPlatform.Controllers
 {
@@ -394,6 +395,83 @@ namespace AtharPlatform.Controllers
                 CharityName = c.Charity?.Name
             });
             return Ok(result);
+        }
+
+        // (GET) /api/charities/campaign-counts
+        // Lightweight payload for dashboards: [{ charity_id, charity_name, campaigns_count }]
+        [HttpGet("campaign-counts")]
+        [AllowAnonymous]
+        public async Task<ActionResult<IEnumerable<CharityCountDto>>> GetCampaignCounts()
+        {
+            var items = await _db.Charities
+                .Where(c => c.IsActive)
+                .Select(c => new CharityCountDto
+                {
+                    CharityId = c.Id,
+                    CharityName = c.Name,
+                    CampaignsCount = c.campaigns.Count
+                })
+                .OrderByDescending(x => x.CampaignsCount)
+                .ThenBy(x => x.CharityName)
+                .ToListAsync();
+
+            return Ok(items);
+        }
+
+        // (GET) /api/charities/campaigns-summary?includeCampaigns=true&format=json
+        // Returns per-charity counts and optionally their campaign list. When format=csv, returns a CSV file.
+        [HttpGet("campaigns-summary")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetCampaignsSummary([FromQuery] bool includeCampaigns = true, [FromQuery] string format = "json")
+        {
+            var items = await _db.Charities
+                .Where(c => c.IsActive)
+                .Include(c => c.campaigns)
+                .OrderBy(c => c.Name)
+                .ToListAsync();
+
+            var dto = items.Select(c => new CharityCampaignsSummaryDto
+            {
+                CharityId = c.Id,
+                CharityName = c.Name,
+                CampaignsCount = c.campaigns?.Count ?? 0,
+                Campaigns = includeCampaigns
+                    ? (c.campaigns ?? new()).Select(x => new MiniCampaignDto
+                    {
+                        Id = x.Id,
+                        Title = x.Title,
+                        GoalAmount = x.GoalAmount,
+                        RaisedAmount = x.RaisedAmount
+                    })
+                    : Array.Empty<MiniCampaignDto>()
+            }).ToList();
+
+            if (!string.Equals(format, "csv", StringComparison.OrdinalIgnoreCase))
+                return Ok(dto);
+
+            // CSV export
+            var sb = new StringBuilder();
+            // Header
+            sb.AppendLine("CharityName,CampaignsCount,CampaignTitles");
+            foreach (var row in dto)
+            {
+                var titles = includeCampaigns ? string.Join(" | ", row.Campaigns.Select(x => x.Title)) : string.Empty;
+                // Escape quotes and commas
+                var charityName = EscapeCsv(row.CharityName);
+                var titlesEscaped = EscapeCsv(titles);
+                sb.AppendLine($"{charityName},{row.CampaignsCount},{titlesEscaped}");
+            }
+
+            var bytes = Encoding.UTF8.GetBytes(sb.ToString());
+            return File(bytes, "text/csv; charset=utf-8", fileDownloadName: $"charity_campaigns_summary_{DateTime.UtcNow:yyyyMMdd}.csv");
+        }
+
+        private static string EscapeCsv(string? value)
+        {
+            if (string.IsNullOrEmpty(value)) return string.Empty;
+            var needsQuotes = value.Contains(',') || value.Contains('"') || value.Contains('\n') || value.Contains('\r');
+            var v = value.Replace("\"", "\"\"");
+            return needsQuotes ? $"\"{v}\"" : v;
         }
 
         // (GET) /api/charities/{id}/material-donations
