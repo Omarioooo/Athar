@@ -11,12 +11,7 @@ namespace AtharPlatform.Repositories
 
         public INotificationTypeRepository NotificationsTypes { get; private set; }
         public ICampaignRepository Campaign { get; private set; }
-<<<<<<< HEAD
 
-
-        public UnitOfWork(Context context, IDonorRepository donorRepositroy,
-            ICharityRepository charityRepository, ICampaignRepository campaignRepository)
-=======
 
         public IVendorOfferRepository VendorOffers { get;  }
         public IVolunteerApplicationRepository VolunteerApplications { get; private set; }
@@ -31,20 +26,18 @@ namespace AtharPlatform.Repositories
                  IVolunteerApplicationRepository volunteerApplicationRepository
 
             )
->>>>>>> master
+
         {
             _context = context;
             Donor = donorRepository;
             Charity = charityRepository;
-<<<<<<< HEAD
-            Campaign = campaignRepository;
-=======
+
             Notifications = notificationRepository;
             NotificationsTypes = notificationTypeRepository;
             Campaign = campaignRepository;
             VendorOffers = vendorOfferRepository;
             VolunteerApplications = volunteerApplicationRepository;
->>>>>>> master
+
         }
 
         public async Task SaveAsync()

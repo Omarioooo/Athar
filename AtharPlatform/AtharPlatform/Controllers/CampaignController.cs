@@ -31,6 +31,7 @@ namespace AtharPlatform.Controllers
             }
         }
         //this for super admin
+        [HttpGet("[action]")]
         public async Task<IActionResult> GetAllgCampaign()
         {
             try

@@ -53,11 +53,10 @@ builder.Services.AddScoped<INotificationTypeRepository, NotificationTypeReposito
 builder.Services.AddScoped<ICharityRepository, CharityRepository>();
 builder.Services.AddScoped<IDonorRepository, DonorRepository>();
 builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
-<<<<<<< HEAD
-=======
+
 builder.Services.AddScoped<IVendorOfferRepository, VendorOfferRepository>();
 builder.Services.AddScoped<IVolunteerApplicationRepository, VolunteerApplicationRepository>();
->>>>>>> master
+
 
 // Inject Services
 builder.Services.AddScoped<IAccountService, AccountService>();
