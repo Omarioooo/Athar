@@ -16,7 +16,7 @@ namespace AtharPlatform.Repositories
                 throw new InvalidOperationException("Campaign not found.");
             return result;
         }
-
+       
         public override async Task<Campaign?> GetAsync(Expression<Func<Campaign, bool>> expression)
         {
             var result = await base.GetAsync(expression);
@@ -31,15 +31,61 @@ namespace AtharPlatform.Repositories
                 .ToListAsync();
         }
 
+
+
         public async Task<List<Campaign>> GetByType(CampaignCategoryEnum type)
         {
             var result = await _dbSet
-               .Where(c => c.Category == type)
+               .Where(c => (c.Category == type))
                .ToListAsync();
             if (result == null)
                 throw new InvalidOperationException("Campaign not found.");
             return result;
 
+        }
+        public async Task<IEnumerable<Campaign>> Search(string keyword)
+        {
+            return await _context.Campaigns
+                .Where(c => (c.Title.Contains(keyword)
+                         || c.Description.Contains(keyword))&&c.Status== CampainStatusEnum.inProgress)
+                .ToListAsync();
+        }
+        public async Task<IEnumerable<Campaign>> GetPaginated(int page, int pageSize)
+        {
+            return await _context.Campaigns
+                .Where(c=> c.Status == CampainStatusEnum.inProgress)
+                .OrderBy(c => c.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<List<Campaign>> Getallforusers()
+        {
+            return await _dbSet
+            .Where(c => c.Status == CampainStatusEnum.inProgress)
+          .Include(c => c.Charity)
+          .ToListAsync();
+        }
+
+        public async Task<Campaign> GetAsyncTousers(int id)
+        {
+            var result = await _dbSet.Where(c => (c.Id == id && c.Status == CampainStatusEnum.inProgress))
+                .Include(c => c.Charity)
+                .FirstOrDefaultAsync();
+            if (result == null)
+                throw new InvalidOperationException("Campaign not found.");
+            return result;
+        }
+
+        public async Task<List<Campaign>> GetByTypetousers(CampaignCategoryEnum type)
+        {
+            var result = await _dbSet
+               .Where(c => (c.Category == type && c.Status == CampainStatusEnum.inProgress))
+               .ToListAsync();
+            if (result == null)
+                throw new InvalidOperationException("Campaign not found.");
+            return result;
         }
     }
 }

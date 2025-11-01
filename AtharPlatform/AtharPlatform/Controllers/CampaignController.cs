@@ -1,177 +1,192 @@
-﻿using AtharPlatform.Dtos;
-using AtharPlatform.DTOs;
-using AtharPlatform.Models;
+﻿using AtharPlatform.DTOs;
 using AtharPlatform.Models.Enum;
-using AtharPlatform.Repositories;
+using AtharPlatform.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.NetworkInformation;
-using static System.Net.Mime.MediaTypeNames;
-
 
 namespace AtharPlatform.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CampaignController : Controller
+    public class CampaignController : ControllerBase
     {
-        private readonly ICampaignRepository _icampaignrepository;
-        private readonly IUnitOfWork _iunitofwork;
-        public CampaignController(ICampaignRepository icampaignrepository, IUnitOfWork iunitofwork)
+        private readonly ICampaignService _service;
+
+        public CampaignController(ICampaignService service)
         {
-            _icampaignrepository = icampaignrepository;
-            _iunitofwork = iunitofwork;
+            _service = service;
         }
+        //this for users
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetAllgCampaigntousers()
+        {
+            try
+            {
+                var result = await _service.GetAllAsyncforusers();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        //this for super admin
         [HttpGet("[action]")]
         public async Task<IActionResult> GetAllgCampaign()
         {
-            var campaign = await _icampaignrepository.GetAllAsync();
-            var result = campaign.Select(c => new CampaignDto
+            try
             {
-                Id = c.Id,
-                Title = c.Title,
-                Description = c.Description,
-                Image = c.Image,
-                GoalAmount = c.GoalAmount,
-                RaisedAmount = c.RaisedAmount,
-                StartDate = c.StartDate,
-                EndDate = c.EndDate,
-                Category = c.Category,
-                CharityName = c.Charity.Name
-
-
-            });
-            return Ok(result);
-
+                var result = await _service.GetAllAsyncforadmin();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+//this for super admin
         [HttpGet("[action]")]
         public async Task<IActionResult> GetCampaignById(int id)
         {
-            var campaign = await _icampaignrepository.GetAsync(id);
-            if (campaign == null)
-                return NotFound("Campaign not found.");
-            var result = new CampaignDto
+            try
             {
-                Id = campaign.Id,
-                Title = campaign.Title,
-                Description = campaign.Description,
-                Image = campaign.Image,
-                GoalAmount = campaign.GoalAmount,
-                RaisedAmount = campaign.RaisedAmount,
-                StartDate = campaign.StartDate,
-                EndDate = campaign.EndDate,
-                Category = campaign.Category,
-                CharityName = campaign.Charity?.Name
-            };
-            return Ok(result);
-
+                var result = await _service.GetByIdAsync(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
+        //this for users
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetCampaignByIdtousers(int id)
+        {
+            try
+            {
+                var result = await _service.GetByIdAsynctousers(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+        //this for super admins
         [HttpGet("[action]")]
         public async Task<IActionResult> GetByType(CampaignCategoryEnum type)
         {
-            var campaign = await _icampaignrepository.GetByType(type);
-            if (campaign == null)
-                return NotFound("Campaign not found.");
-            var result = campaign.Select(c => new CampaignDto
+            try
             {
-                Id = c.Id,
-                Title = c.Title,
-                Description = c.Description,
-                Image = c.Image,
-                GoalAmount = c.GoalAmount,
-                RaisedAmount = c.RaisedAmount,
-                StartDate = c.StartDate,
-                EndDate = c.EndDate,
-                Category = c.Category,
-                CharityName = c.Charity.Name
-
-
-            });
-            return Ok(result);
-
-
-
+                var result = await _service.GetByTypeAsync(type);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+        //this for users
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetByTypetousers(CampaignCategoryEnum type)
+        {
+            try
+            {
+                var result = await _service.GetByTypeAsynctousers(type);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+    
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetAllTypes()
+        {
+            try
+            {
+                var result = await _service.GetAllTypesAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> SearchCampaigns(string keyword)
+        {
+            try
+            {
+                var result = await _service.SearchAsync(keyword);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetPaginated(int page = 1, int pageSize = 10)
+        {
+            try
+            {
+                var result = await _service.GetPaginatedAsync(page, pageSize);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        // all create and update and delete for admin of charities
         [HttpPost("[action]")]
         public async Task<IActionResult> CreateCampaign(AddCampaignDto model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var campaign = new Campaign
+            try
             {
-                Title = model.Title,
-                Description = model.Description,
-                Image = model.Image,
-                isCritical = model.IsCritical,
-                StartDate = model.StartDate ?? DateTime.UtcNow,
-                Duration = model.Duration,
-                GoalAmount = model.GoalAmount,
-                IsInKindDonation = model.IsInKindDonation,
-                Category = model.Category,
-                CharityID = model.CharityID,
-                RaisedAmount = 0,
-                Status = CampainStatusEnum.inProgress
-            };
-
-            await _icampaignrepository.AddAsync(campaign);
-            await _iunitofwork.SaveAsync();
-            var campaignView = new CampaignDto
+                var result = await _service.CreateAsync(model);
+                return CreatedAtAction(nameof(GetCampaignById), new { id = result.Id }, result);
+            }
+            catch (Exception ex)
             {
-                Id = campaign.Id,
-                Title = campaign.Title,
-                Description = campaign.Description,
-                Image = campaign.Image,
-                GoalAmount = campaign.GoalAmount,
-                RaisedAmount = campaign.RaisedAmount,
-                StartDate = campaign.StartDate,
-                EndDate = campaign.EndDate,
-                Category = campaign.Category,
-                CharityName = campaign.Charity?.Name
-            };
-
-            return CreatedAtAction(nameof(GetCampaignById), new { id = campaign.Id }, campaignView);
+                return BadRequest(ex.Message);
+            }
         }
         [HttpPut("[action]")]
-        public async Task<IActionResult>UpdateCampaign(UpdatCampaignDto model)
+        public async Task<IActionResult> UpdateCampaign(UpdatCampaignDto model)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
-            var campaign = await _icampaignrepository.GetAsync(model.Id);
-            if (campaign == null)
-            {
-                return NotFound("Campaign not found.");
-            }
-            campaign.Title = model.Title;
-            campaign.Description = model.Description;
-            campaign.Image = model.Image;
-            campaign.isCritical = model.IsCritical;
-            campaign.Duration = model.Duration;
-            campaign.GoalAmount = model.GoalAmount;
-            campaign.IsInKindDonation = model.IsInKindDonation;
-            campaign.Category = model.Category;
-           _icampaignrepository.Update(campaign);
-           await  _iunitofwork.SaveAsync();
-            return Ok(new { message = "Campaign updated successfully" });
 
+            try
+            {
+                var updatedCampaign = await _service.UpdateAsync(model);
+                return Ok(updatedCampaign);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpDelete("[action]/{id}")]
         public async Task<IActionResult> DeleteCampaign(int id)
         {
-            
-            var campaign = await _icampaignrepository.GetAsync(id);
-            if (campaign == null)
-                return NotFound("Campaign not found.");
-
-           
-            await _icampaignrepository.DeleteAsync(id);
-            await _iunitofwork.SaveAsync();
-
-            return Ok(new { message = "Campaign deleted successfully" });
+            try
+            {
+                await _service.DeleteAsync(id);
+                return Ok(new { message = "Campaign deleted successfully" });
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
-
-
     }
 }
