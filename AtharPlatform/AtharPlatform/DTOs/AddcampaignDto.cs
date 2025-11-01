@@ -12,7 +12,7 @@ namespace AtharPlatform.DTOs
 
 
         [Required]
-        public byte[] Image { get; set; }
+        public string Image { get; set; }
 
         public bool IsCritical { get; set; } = false;
 
