@@ -7,10 +7,9 @@ namespace AtharPlatform.Repositories
     {
         Task<List<T>> GetAllAsync();
         Task<T> GetAsync(int id);
-        Task<T> GetAsync(Expression<Func<T, bool>> expression);
+        Task<T> GetWithExpressionAsync(Expression<Func<T, bool>> expression);
         Task<bool> AddAsync(T entity);
         Task<bool> UpdateAsync(T entity);
         Task<bool> DeleteAsync(int id);
     }
 }
-

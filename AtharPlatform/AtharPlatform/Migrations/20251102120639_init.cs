@@ -37,15 +37,6 @@ namespace AtharPlatform.Migrations
                     ProfileImage = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Discriminator = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PaymobWalletId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Balance = table.Column<decimal>(type: "decimal(18,4)", nullable: true),
-                    VerificationDocument = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: true),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -67,32 +58,13 @@ namespace AtharPlatform.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Contents",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PostImage = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Contents", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Notifications",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsRead = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    TypeId = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -207,176 +179,43 @@ namespace AtharPlatform.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Campaigns",
+                name: "Charities",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Image = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    isCritical = table.Column<bool>(type: "bit", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Duration = table.Column<int>(type: "int", nullable: false),
-                    GoalAmount = table.Column<double>(type: "float", nullable: false),
-                    RaisedAmount = table.Column<double>(type: "float", nullable: false),
-                    IsInKindDonation = table.Column<bool>(type: "bit", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Category = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    CharityID = table.Column<int>(type: "int", nullable: false)
+                    Balance = table.Column<decimal>(type: "decimal(18,4)", nullable: true),
+                    VerificationDocument = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Campaigns", x => x.Id);
+                    table.PrimaryKey("PK_Charities", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Campaigns_AspNetUsers_CharityID",
-                        column: x => x.CharityID,
+                        name: "FK_Charities_AspNetUsers_Id",
+                        column: x => x.Id,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
-                name: "CharityMaterialDonation",
+                name: "Donors",
                 columns: table => new
                 {
-                    MaterialDonationId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CharityId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Role = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CharityMaterialDonation", x => x.MaterialDonationId);
+                    table.PrimaryKey("PK_Donors", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CharityMaterialDonation_AspNetUsers_CharityId",
-                        column: x => x.CharityId,
+                        name: "FK_Donors_AspNetUsers_Id",
+                        column: x => x.Id,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CharityVendorOffers",
-                columns: table => new
-                {
-                    CharityVendorOfferId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CharityId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CharityVendorOffers", x => x.CharityVendorOfferId);
-                    table.ForeignKey(
-                        name: "FK_CharityVendorOffers_AspNetUsers_CharityId",
-                        column: x => x.CharityId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CharityVolunteers",
-                columns: table => new
-                {
-                    CharityVolunteerId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CharityId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CharityVolunteers", x => x.CharityVolunteerId);
-                    table.ForeignKey(
-                        name: "FK_CharityVolunteers_AspNetUsers_CharityId",
-                        column: x => x.CharityId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Donations",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    DonorId = table.Column<int>(type: "int", nullable: false),
-                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    NetAmountToCharity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DonationStatus = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PaymentServiceId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Donations", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Donations_AspNetUsers_DonorId",
-                        column: x => x.DonorId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Subscriptions",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    donornID = table.Column<int>(type: "int", nullable: false),
-                    charityID = table.Column<int>(type: "int", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Frequency = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastPaymentDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    NextPaymentDate = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Subscriptions", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Subscriptions_AspNetUsers_charityID",
-                        column: x => x.charityID,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
-                    table.ForeignKey(
-                        name: "FK_Subscriptions_AspNetUsers_donornID",
-                        column: x => x.donornID,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Reactions",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ReactionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DonorID = table.Column<int>(type: "int", nullable: false),
-                    ContentID = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Reactions", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Reactions_AspNetUsers_DonorID",
-                        column: x => x.DonorID,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
-                    table.ForeignKey(
-                        name: "FK_Reactions_Contents_ContentID",
-                        column: x => x.ContentID,
-                        principalTable: "Contents",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
                 });
@@ -386,7 +225,9 @@ namespace AtharPlatform.Migrations
                 columns: table => new
                 {
                     NotificationId = table.Column<int>(type: "int", nullable: false),
-                    ReceiverId = table.Column<int>(type: "int", nullable: false)
+                    ReceiverId = table.Column<int>(type: "int", nullable: false),
+                    IsRead = table.Column<bool>(type: "bit", nullable: true),
+                    ReadAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -430,26 +271,207 @@ namespace AtharPlatform.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CampaignContents",
+                name: "Campaigns",
                 columns: table => new
                 {
-                    ContentId = table.Column<int>(type: "int", nullable: false),
-                    CampaignId = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Image = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    isCritical = table.Column<bool>(type: "bit", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Duration = table.Column<int>(type: "int", nullable: false),
+                    GoalAmount = table.Column<double>(type: "float", nullable: false),
+                    RaisedAmount = table.Column<double>(type: "float", nullable: false),
+                    IsInKindDonation = table.Column<bool>(type: "bit", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Category = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    CharityID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CampaignContents", x => x.ContentId);
+                    table.PrimaryKey("PK_Campaigns", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CampaignContents_Campaigns_CampaignId",
-                        column: x => x.CampaignId,
-                        principalTable: "Campaigns",
+                        name: "FK_Campaigns_Charities_CharityID",
+                        column: x => x.CharityID,
+                        principalTable: "Charities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CharityMaterialDonation",
+                columns: table => new
+                {
+                    MaterialDonationId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CharityId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CharityMaterialDonation", x => x.MaterialDonationId);
+                    table.ForeignKey(
+                        name: "FK_CharityMaterialDonation_Charities_CharityId",
+                        column: x => x.CharityId,
+                        principalTable: "Charities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CharityVendorOffers",
+                columns: table => new
+                {
+                    CharityVendorOfferId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CharityId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CharityVendorOffers", x => x.CharityVendorOfferId);
+                    table.ForeignKey(
+                        name: "FK_CharityVendorOffers_Charities_CharityId",
+                        column: x => x.CharityId,
+                        principalTable: "Charities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CharityVolunteers",
+                columns: table => new
+                {
+                    CharityVolunteerId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CharityId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CharityVolunteers", x => x.CharityVolunteerId);
+                    table.ForeignKey(
+                        name: "FK_CharityVolunteers_Charities_CharityId",
+                        column: x => x.CharityId,
+                        principalTable: "Charities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Donations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DonorId = table.Column<int>(type: "int", nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    NetAmountToCharity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DonationStatus = table.Column<int>(type: "int", nullable: false),
+                    PaymentID = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MerchantOrderId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TransactionId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CharityId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Donations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Donations_Charities_CharityId",
+                        column: x => x.CharityId,
+                        principalTable: "Charities",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Donations_Donors_DonorId",
+                        column: x => x.DonorId,
+                        principalTable: "Donors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Follows",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DonorId = table.Column<int>(type: "int", nullable: false),
+                    CharityId = table.Column<int>(type: "int", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Follows", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Follows_Charities_CharityId",
+                        column: x => x.CharityId,
+                        principalTable: "Charities",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
-                        name: "FK_CampaignContents_Contents_ContentId",
-                        column: x => x.ContentId,
-                        principalTable: "Contents",
+                        name: "FK_Follows_Donors_DonorId",
+                        column: x => x.DonorId,
+                        principalTable: "Donors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Subscriptions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DonorId = table.Column<int>(type: "int", nullable: false),
+                    CharityId = table.Column<int>(type: "int", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Frequency = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastPaymentDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    NextPaymentDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Subscriptions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Subscriptions_Charities_CharityId",
+                        column: x => x.CharityId,
+                        principalTable: "Charities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_Subscriptions_Donors_DonorId",
+                        column: x => x.DonorId,
+                        principalTable: "Donors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Contents",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PostImage = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    CampaignId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Contents", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Contents_Campaigns_CampaignId",
+                        column: x => x.CampaignId,
+                        principalTable: "Campaigns",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
                 });
@@ -548,11 +570,6 @@ namespace AtharPlatform.Migrations
                 {
                     table.PrimaryKey("PK_CampaignDonations", x => x.DonationId);
                     table.ForeignKey(
-                        name: "FK_CampaignDonations_AspNetUsers_DonorId",
-                        column: x => x.DonorId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_CampaignDonations_Campaigns_CampaignId",
                         column: x => x.CampaignId,
                         principalTable: "Campaigns",
@@ -564,6 +581,11 @@ namespace AtharPlatform.Migrations
                         principalTable: "Donations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_CampaignDonations_Donors_DonorId",
+                        column: x => x.DonorId,
+                        principalTable: "Donors",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -577,15 +599,42 @@ namespace AtharPlatform.Migrations
                 {
                     table.PrimaryKey("PK_CharityDonations", x => x.DonationId);
                     table.ForeignKey(
-                        name: "FK_CharityDonations_AspNetUsers_charityID",
+                        name: "FK_CharityDonations_Charities_charityID",
                         column: x => x.charityID,
-                        principalTable: "AspNetUsers",
+                        principalTable: "Charities",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_CharityDonations_Donations_DonationId",
                         column: x => x.DonationId,
                         principalTable: "Donations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Reactions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ReactionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DonorID = table.Column<int>(type: "int", nullable: false),
+                    ContentID = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Reactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Reactions_Contents_ContentID",
+                        column: x => x.ContentID,
+                        principalTable: "Contents",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_Reactions_Donors_DonorID",
+                        column: x => x.DonorID,
+                        principalTable: "Donors",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
                 });
@@ -630,11 +679,6 @@ namespace AtharPlatform.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CampaignContents_CampaignId",
-                table: "CampaignContents",
-                column: "CampaignId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_CampaignDonations_CampaignId",
                 table: "CampaignDonations",
                 column: "CampaignId");
@@ -670,9 +714,30 @@ namespace AtharPlatform.Migrations
                 column: "CharityId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Contents_CampaignId",
+                table: "Contents",
+                column: "CampaignId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Donations_CharityId",
+                table: "Donations",
+                column: "CharityId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Donations_DonorId",
                 table: "Donations",
                 column: "DonorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Follows_CharityId",
+                table: "Follows",
+                column: "CharityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Follows_DonorId_CharityId",
+                table: "Follows",
+                columns: new[] { "DonorId", "CharityId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MaterialDonations_MaterialDonationId",
@@ -700,14 +765,15 @@ namespace AtharPlatform.Migrations
                 column: "SenderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Subscriptions_charityID",
+                name: "IX_Subscriptions_CharityId",
                 table: "Subscriptions",
-                column: "charityID");
+                column: "CharityId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Subscriptions_donornID",
+                name: "IX_Subscriptions_DonorId_CharityId",
                 table: "Subscriptions",
-                column: "donornID");
+                columns: new[] { "DonorId", "CharityId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_VendorForms_CharityVendorOfferId",
@@ -739,13 +805,13 @@ namespace AtharPlatform.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "CampaignContents");
-
-            migrationBuilder.DropTable(
                 name: "CampaignDonations");
 
             migrationBuilder.DropTable(
                 name: "CharityDonations");
+
+            migrationBuilder.DropTable(
+                name: "Follows");
 
             migrationBuilder.DropTable(
                 name: "MaterialDonations");
@@ -772,9 +838,6 @@ namespace AtharPlatform.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Campaigns");
-
-            migrationBuilder.DropTable(
                 name: "Donations");
 
             migrationBuilder.DropTable(
@@ -791,6 +854,15 @@ namespace AtharPlatform.Migrations
 
             migrationBuilder.DropTable(
                 name: "CharityVolunteers");
+
+            migrationBuilder.DropTable(
+                name: "Donors");
+
+            migrationBuilder.DropTable(
+                name: "Campaigns");
+
+            migrationBuilder.DropTable(
+                name: "Charities");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

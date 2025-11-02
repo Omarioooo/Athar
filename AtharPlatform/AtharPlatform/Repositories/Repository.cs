@@ -15,9 +15,10 @@ namespace AtharPlatform.Repositories
 
         public virtual async Task<List<T>> GetAllAsync() => await _dbSet.ToListAsync();
 
+
         public virtual async Task<T?> GetAsync(int id) => await _dbSet.FindAsync(id);
 
-        public virtual async Task<T?> GetAsync(Expression<Func<T, bool>> expression)
+        public virtual async Task<T?> GetWithExpressionAsync(Expression<Func<T, bool>> expression)
         {
             var entity = await _dbSet.FirstOrDefaultAsync(expression);
 

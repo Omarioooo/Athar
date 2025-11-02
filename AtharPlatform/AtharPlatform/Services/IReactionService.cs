@@ -2,7 +2,7 @@
 
 namespace AtharPlatform.Services
 {
-    public interface IReactService
+    public interface IReactionService
     {
         /// <summary>
         /// 

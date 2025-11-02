@@ -9,17 +9,12 @@ namespace AtharPlatform.Models
         public int Id { get; set; }
 
         [Required]
-        public string Message { get; set; }
+        public string Message { get; set; } = null!;
 
-        public bool IsRead { get; set; }
-
-        public bool IsDeleted { get; set; }
-
-        public int TypeId { get; set; }
-
+        public bool IsDeleted { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public NotificationSender Sender { get; set; }
+        public virtual NotificationSender Sender { get; set; } = null!;
         public virtual List<NotificationReceiver> Receivers { get; set; } = new();
     }
 }

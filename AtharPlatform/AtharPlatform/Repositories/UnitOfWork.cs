@@ -4,14 +4,13 @@ namespace AtharPlatform.Repositories
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly Context _context;
+        public Context _context { get; }
         public IDonorRepository Donors { get; private set; }
         public ICharityRepository Charities { get; private set; }
         public ICampaignRepository Campaigns { get; private set; }
         public IContentRepository Contents { get; private set; }
         public IReactionRepository Reactions { get; private set; }
         public INotificationRepository Notifications { get; private set; }
-        public INotificationTypeRepository NotificationTypes { get; private set; }
         public IFollowRepository Follows { get; private set; }
 
 
@@ -31,7 +30,6 @@ namespace AtharPlatform.Repositories
             Contents = new ContentRepository(_context);
             Reactions = new ReactionRepository(_context);
             Notifications = new NotificationRepository(_context);
-            NotificationTypes = new NotificationTypeRepository(_context);
             Follows = new FollowRepository(_context);
         }
 

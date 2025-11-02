@@ -1,18 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace AtharPlatform.Models
 {
     public class Context : IdentityDbContext<UserAccount, IdentityRole<int>, int>
     {
         public Context(DbContextOptions<Context> options) : base(options) { }
-
-
-        protected Context()
-        {
-        }
 
         // Users and Charities
         public DbSet<Donor> Donors { get; set; }
@@ -28,7 +20,6 @@ namespace AtharPlatform.Models
 
         // Campaigns
         public DbSet<Campaign> Campaigns { get; set; }
-        public DbSet<CampaignContent> CampaignContents { get; set; }
 
         // Donations
         public DbSet<Donation> Donations { get; set; }
@@ -50,9 +41,30 @@ namespace AtharPlatform.Models
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            // Many-to-Many Relation with composite PK
             builder.Entity<NotificationReceiver>()
                 .HasKey(a => new { a.NotificationId, a.ReceiverId });
-        }
 
+            // Many-to-Many Relation with composite PK
+            builder.Entity<NotificationReceiver>()
+                .HasKey(nr => new { nr.NotificationId, nr.ReceiverId });
+
+            builder.Entity<Notification>()
+                .HasOne(n => n.Sender)
+                .WithOne(ns => ns.Notification)
+                .HasForeignKey<NotificationSender>(ns => ns.NotificationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // put unique index
+            builder.Entity<Follow>()
+               .HasIndex(f => new { f.DonorId, f.CharityId })
+               .IsUnique();
+
+            builder.Entity<Subscription>()
+       .HasIndex(s => new { s.DonorId, s.CharityId })
+       .IsUnique();
+
+        }
     }
 }

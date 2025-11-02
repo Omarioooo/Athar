@@ -18,7 +18,7 @@
         /// <param name="charityId">The unique identifier of the charity. Must be a positive integer.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the <see cref="Follow"/> object
         /// representing the follow relationship, or <see langword="null"/> if no such relationship exists.</returns>
-        Task<Follow> GetFollowAsync(int donorId, int charityId);
+        Task<Follow> GetFollowByDonorAndCharityAsync(int donorId, int charityId);
 
 
         /// <summary>
