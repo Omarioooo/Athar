@@ -1,7 +1,7 @@
 ﻿using X.Paymob.CashIn;
 using X.Paymob.CashIn.Models.Orders;
 using X.Paymob.CashIn.Models.Payment;
-using AtharPlatform.DTOs;
+using AtharPlatform.DTO;
 using AtharPlatform.Repositories;
 using AtharPlatform.Models.Enums;
 

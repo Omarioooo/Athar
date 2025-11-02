@@ -1,5 +1,5 @@
 ﻿using AtharPlatform.DTO;
-using AtharPlatform.DTOs;
+using AtharPlatform.DTO;
 using AtharPlatform.Models.Enums;
 
 namespace AtharPlatform.Services

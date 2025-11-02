@@ -1,4 +1,4 @@
-﻿using AtharPlatform.DTOs;
+﻿using AtharPlatform.DTO;
 using AtharPlatform.Models.Enums;
 using AtharPlatform.Repositories;
 
@@ -21,11 +21,11 @@ namespace AtharPlatform.Services
         public async Task<string> DonateToCampaignAsync(DonationDto model)
         {
             // Check the donor
-            var donor = await _unitOfWork.Donor.GetAsync(model.DonorId)
+            var donor = await _unitOfWork.Donors.GetAsync(model.DonorId)
                         ?? throw new Exception($"Donor with id {model.DonorId} not found");
 
             // Check the campagin
-            var campaign = await _unitOfWork.Campaign.GetAsync(model.CharityOrCampaignId)
+            var campaign = await _unitOfWork.Campaigns.GetAsync(model.CharityOrCampaignId)
                           ?? throw new Exception($"Charity with id {model.CharityOrCampaignId} not found");
 
             // Donot forget the status of the campaign
@@ -76,11 +76,11 @@ namespace AtharPlatform.Services
         public async Task<string> DonateToCharityAsync(DonationDto model)
         {
             // Check the donor
-            var donor = await _unitOfWork.Donor.GetAsync(model.DonorId)
+            var donor = await _unitOfWork.Donors.GetAsync(model.DonorId)
                         ?? throw new Exception($"Donor with id {model.DonorId} not found");
 
             // Check the charity
-            var charity = await _unitOfWork.Charity.GetAsync(model.CharityOrCampaignId)
+            var charity = await _unitOfWork.Charities.GetAsync(model.CharityOrCampaignId)
                           ?? throw new Exception($"Charity with id {model.CharityOrCampaignId} not found");
 
             if (charity.Status != CharityStatusEnum.Approved)

@@ -1,5 +1,5 @@
 ﻿
-using AtharPlatform.DTOs;
+using AtharPlatform.DTO;
 using AtharPlatform.Repositories;
 
 namespace AtharPlatform.Services
@@ -17,15 +17,15 @@ namespace AtharPlatform.Services
         public async Task<bool> React(ReactionDto model)
         {
             // check the donor
-            var donor = _unitOfWork.Donor.GetAsync(model.donorId)
+            var donor = _unitOfWork.Donors.GetAsync(model.donorId)
                 ?? throw new Exception($"Donor with id {model.donorId} not found");
 
             // check the content
-            var content = _unitOfWork.Content.GetAsync(model.contentId)
+            var content = _unitOfWork.Contents.GetAsync(model.contentId)
                 ?? throw new Exception($"Content with id {model.contentId} not found");
 
             // check the reaction
-            var reaction = _unitOfWork.Reaction.GetByDonorAndContent(model);
+            var reaction = _unitOfWork.Reactions.GetByDonorAndContent(model);
 
             if (reaction != null)
                 return true;
@@ -36,7 +36,7 @@ namespace AtharPlatform.Services
                 ContentID = model.contentId
             };
 
-            await _unitOfWork.Reaction.AddAsync(react);
+            await _unitOfWork.Reactions.AddAsync(react);
 
             return true;
 

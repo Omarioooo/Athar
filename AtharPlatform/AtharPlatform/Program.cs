@@ -31,8 +31,12 @@ builder.Services.AddScoped<INotificationTypeRepository, NotificationTypeReposito
 builder.Services.AddScoped<IDonorRepository, DonorRepository>();
 builder.Services.AddScoped<ICharityRepository, CharityRepository>();
 builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
+builder.Services.AddScoped<IContentRepository, ContentRepository>();
+builder.Services.AddScoped<IFollowRepository, FollowRepository>();
+builder.Services.AddScoped<IReactionRepository, ReactionRepository>();
 
 // Inject Services
+builder.Services.AddScoped<IJWTService, JWTService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IPaymentService<PaymobService>, PaymobService>();
 builder.Services.AddScoped<IAccountContextService, AccountContextService>();

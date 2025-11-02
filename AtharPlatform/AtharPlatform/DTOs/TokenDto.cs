@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace AtharPlatform.DTOs
+namespace AtharPlatform.DTO
 {
     public class TokenDto
     {

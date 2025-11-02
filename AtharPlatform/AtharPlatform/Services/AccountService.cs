@@ -1,23 +1,19 @@
 ﻿using AtharPlatform.DTO;
-using AtharPlatform.DTOs;
 using AtharPlatform.Models.Enums;
 using AtharPlatform.Repositories;
-using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel.DataAnnotations;
-using System.IdentityModel.Tokens.Jwt;
 using System.Net.Mail;
-using System.Security.Claims;
-using System.Text;
+
 
 namespace AtharPlatform.Services
 {
     public class AccountService : IAccountService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IJWTServices _jwtServices;
+        private readonly IJWTService _jwtServices;
         private readonly UserManager<UserAccount> _userManager;
 
-        public AccountService(IUnitOfWork unitOfWork, IJWTServices jwtServices,
+        public AccountService(IUnitOfWork unitOfWork, IJWTService jwtServices,
             UserManager<UserAccount> userManager)
         {
             _unitOfWork = unitOfWork;
@@ -27,23 +23,25 @@ namespace AtharPlatform.Services
 
         public async Task<IdentityResult> CharityRegisterAsync(CharityRegisterDto model)
         {
+            // Check the model
             if (model == null)
                 throw new ArgumentNullException(nameof(model), "Registration data cannot be null.");
 
+            // check user data
             if (string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrWhiteSpace(model.Password))
                 throw new ArgumentException("Email and Password are required.");
 
-            var userName = new MailAddress(model.Email).User;
-
+            // Dealing with files (ProfileImage)
             using MemoryStream stream = new MemoryStream();
             if (model.ProfileImage != null)
             {
                 await model.ProfileImage.CopyToAsync(stream);
             }
 
-            var user = new UserAccount
+            // The account entity
+            var account = new UserAccount
             {
-                UserName = userName,
+                UserName = new MailAddress(model.Email).User,
                 Email = model.Email.ToLowerInvariant(),
                 Country = model.Country,
                 City = model.City,
@@ -51,15 +49,17 @@ namespace AtharPlatform.Services
                 CreatedAt = DateTime.UtcNow
             };
 
-            var result = await _userManager.CreateAsync(user, model.Password);
+            // Create the account using the identity
+            var result = await _userManager.CreateAsync(account, model.Password);
 
             if (!result.Succeeded)
                 throw new InvalidOperationException("Failed to create user: " +
                     string.Join(", ", result.Errors.Select(e => e.Description)));
 
+            // Assign roles to the account (The account is for charity)
+            await _userManager.AddToRoleAsync(account, RolesEnum.Charity.ToString());
 
-            await _userManager.AddToRoleAsync(user, RolesEnum.Charity.ToString());
-
+            // Dealing with files (verification doc)
             using MemoryStream docStream = new MemoryStream();
             if (model.VerificationDocument != null)
             {
@@ -68,13 +68,12 @@ namespace AtharPlatform.Services
 
             var Charity = new Charity
             {
-                Id = user.Id,
+                Id = account.Id,
                 Name = model.CharityName,
                 Description = model.Description,
                 VerificationDocument = docStream.ToArray()
             };
-
-            await _unitOfWork.Charity.AddAsync(Charity);
+            await _unitOfWork.Charities.AddAsync(Charity);
 
             return result;
         }
@@ -95,7 +94,7 @@ namespace AtharPlatform.Services
                 await model.ProfileImage.CopyToAsync(stream);
             }
 
-            var user = new UserAccount
+            var account = new UserAccount
             {
                 UserName = userName,
                 Email = model.Email.ToLowerInvariant(),
@@ -105,25 +104,25 @@ namespace AtharPlatform.Services
                 CreatedAt = DateTime.UtcNow
             };
 
-            var result = await _userManager.CreateAsync(user, model.Password);
+            var result = await _userManager.CreateAsync(account, model.Password);
 
             if (!result.Succeeded)
                 throw new InvalidOperationException("Failed to create user: " +
                     string.Join(", ", result.Errors.Select(e => e.Description)));
 
-
-            await _userManager.AddToRoleAsync(user, role.ToString());
+            // Explicitly give the Account role as admin or donor
+            await _userManager.AddToRoleAsync(account, role.ToString());
 
             var Donor = new Donor
             {
-                Id = user.Id,
+                Id = account.Id,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Country = model.Country,
                 City = model.City,
             };
 
-            await _unitOfWork.Donor.AddAsync(Donor);
+            await _unitOfWork.Donors.AddAsync(Donor);
 
             return result;
         }

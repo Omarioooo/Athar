@@ -1,4 +1,4 @@
-﻿using AtharPlatform.DTOs;
+﻿using AtharPlatform.DTO;
 using AtharPlatform.Services;
 using AtharPlatform.Models.Enums;
 using Microsoft.AspNetCore.Mvc;
