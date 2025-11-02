@@ -8,11 +8,11 @@ namespace AtharPlatform.Models
         [Key]
         [ForeignKey(nameof(Donation))]
         public int DonationId { get; set; }
-        public virtual Donation Donation { get; set; } = new();
+        public virtual Donation Donation { get; set; } = null!;
 
         [ForeignKey(nameof(Campaign))]
         public int CampaignId { get; set; }
-        public virtual Campaign Campaign { get; set; } = new();
+        public virtual Campaign Campaign { get; set; } = null!;
 
     }
 }

@@ -44,11 +44,6 @@ namespace AtharPlatform.Services
             if (sender == null)
                 throw new ArgumentException("Sender not found");
 
-            // Get NotificationType from DB
-            var notificationType = await _unitOfWork.NotificationTypes.GetNotificationTypeByIdAsync((int)type);
-
-            if (notificationType == null)
-                throw new ArgumentException($"NotificationType {(int)type} not found in database");
 
             // Generate message content
             var messageDto = await CreateMessage(type, sender.UserName);
@@ -58,18 +53,17 @@ namespace AtharPlatform.Services
             var notification = new Notification
             {
                 Message = messageDto.Message,
-                TypeId = notificationType.Id,
                 CreatedAt = messageDto.CreatedAt,
-                IsRead = false,
                 IsDeleted = false,
             };
             await _unitOfWork.Notifications.AddAsync(notification);
+            await _unitOfWork.SaveAsync();
 
             // Add Sender
             var notificationSender = new NotificationSender
             {
-                SenderId = senderId,
-                Notification = notification
+                NotificationId = notification.Id,
+                SenderId = senderId
             };
             await _unitOfWork.Notifications.AddSenderAsync(notificationSender);
 
@@ -77,8 +71,10 @@ namespace AtharPlatform.Services
             var notificationReceivers =
                 receiverIds.Select(rid => new NotificationReceiver
                 {
+                    
+                    NotificationId = notification.Id,
                     ReceiverId = rid,
-                    Notification = notification
+                    IsRead = false
                 }).ToList();
             await _unitOfWork.Notifications.AddReceiversAsync(notificationReceivers);
 

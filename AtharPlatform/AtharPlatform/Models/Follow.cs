@@ -8,17 +8,14 @@ namespace AtharPlatform.Models
         [Key]
         public int Id { get; set; }
 
-
         [ForeignKey(nameof(Donor))]
-        public int donornID { get; set; }
-        public Donor Donor { get; set; }
-
+        public int DonorId { get; set; }
+        public virtual Donor Donor { get; set; } = null!;
 
         [ForeignKey(nameof(Charity))]
-        public int charityID { get; set; }
-        public Charity Charity { get; set; }
+        public int CharityId { get; set; }
+        public virtual Charity Charity { get; set; } = null!;
 
         public DateTime StartDate { get; set; } = DateTime.UtcNow;
-
     }
 }

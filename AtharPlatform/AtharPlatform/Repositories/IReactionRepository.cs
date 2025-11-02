@@ -4,6 +4,20 @@ namespace AtharPlatform.Repositories
 {
     public interface IReactionRepository : IRepository<Reaction>
     {
-        Task<Reaction> GetByDonorAndContent(ReactionDto model);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="donorId"></param>
+        /// <param name="contentId"></param>
+        /// <returns></returns>
+        Task<Reaction> GetReactionByDonorAndContentAsync(int donorId, int contentId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="donorId"></param>
+        /// <param name="contentId"></param>
+        /// <returns></returns>
+        Task<bool> IsReactedAsync(int donorId, int contentId);
     }
 }

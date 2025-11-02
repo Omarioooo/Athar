@@ -79,24 +79,6 @@ namespace AtharPlatform.Migrations
                     b.ToTable("Campaigns");
                 });
 
-            modelBuilder.Entity("AtharPlatform.Models.CampaignContent", b =>
-                {
-                    b.Property<int>("ContentId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CampaignId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("ContentId");
-
-                    b.HasIndex("CampaignId");
-
-                    b.ToTable("CampaignContents");
-                });
-
             modelBuilder.Entity("AtharPlatform.Models.CampaignDonation", b =>
                 {
                     b.Property<int>("DonationId")
@@ -115,6 +97,34 @@ namespace AtharPlatform.Migrations
                     b.HasIndex("DonorId");
 
                     b.ToTable("CampaignDonations");
+                });
+
+            modelBuilder.Entity("AtharPlatform.Models.Charity", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("Balance")
+                        .HasColumnType("decimal(18, 4)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("VerificationDocument")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Charities");
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.CharityDonation", b =>
@@ -203,10 +213,14 @@ namespace AtharPlatform.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CampaignId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
@@ -222,6 +236,8 @@ namespace AtharPlatform.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CampaignId");
+
                     b.ToTable("Contents");
                 });
 
@@ -236,7 +252,7 @@ namespace AtharPlatform.Migrations
                     b.Property<int?>("CharityId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Currency")
@@ -273,6 +289,26 @@ namespace AtharPlatform.Migrations
                     b.ToTable("Donations");
                 });
 
+            modelBuilder.Entity("AtharPlatform.Models.Donor", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Donors");
+                });
+
             modelBuilder.Entity("AtharPlatform.Models.Follow", b =>
                 {
                     b.Property<int>("Id")
@@ -281,20 +317,21 @@ namespace AtharPlatform.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CharityId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DonorId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("charityID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("donornID")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("charityID");
+                    b.HasIndex("CharityId");
 
-                    b.HasIndex("donornID");
+                    b.HasIndex("DonorId", "CharityId")
+                        .IsUnique();
 
                     b.ToTable("Follows");
                 });
@@ -366,15 +403,9 @@ namespace AtharPlatform.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("TypeId")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -388,6 +419,12 @@ namespace AtharPlatform.Migrations
 
                     b.Property<int>("ReceiverId")
                         .HasColumnType("int");
+
+                    b.Property<bool?>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("NotificationId", "ReceiverId");
 
@@ -425,7 +462,7 @@ namespace AtharPlatform.Migrations
                     b.Property<int>("DonorID")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ReactionDate")
+                    b.Property<DateTime?>("ReactionDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -448,10 +485,10 @@ namespace AtharPlatform.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("CharityID")
+                    b.Property<int>("CharityId")
                         .HasColumnType("int");
 
-                    b.Property<int>("DonorID")
+                    b.Property<int>("DonorId")
                         .HasColumnType("int");
 
                     b.Property<string>("Frequency")
@@ -469,9 +506,10 @@ namespace AtharPlatform.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CharityID");
+                    b.HasIndex("CharityId");
 
-                    b.HasIndex("DonorID");
+                    b.HasIndex("DonorId", "CharityId")
+                        .IsUnique();
 
                     b.ToTable("Subscriptions");
                 });
@@ -499,11 +537,6 @@ namespace AtharPlatform.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -562,10 +595,6 @@ namespace AtharPlatform.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasDiscriminator().HasValue("UserAccount");
-
-                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.VendorOffers", b =>
@@ -796,73 +825,15 @@ namespace AtharPlatform.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("AtharPlatform.Models.Charity", b =>
-                {
-                    b.HasBaseType("AtharPlatform.Models.UserAccount");
-
-                    b.Property<decimal?>("Balance")
-                        .HasColumnType("decimal(18, 4)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<byte[]>("VerificationDocument")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.HasDiscriminator().HasValue("Charity");
-                });
-
-            modelBuilder.Entity("AtharPlatform.Models.Donor", b =>
-                {
-                    b.HasBaseType("AtharPlatform.Models.UserAccount");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasDiscriminator().HasValue("Donor");
-                });
-
             modelBuilder.Entity("AtharPlatform.Models.Campaign", b =>
                 {
                     b.HasOne("AtharPlatform.Models.Charity", "Charity")
-                        .WithMany("campaigns")
+                        .WithMany("Campaigns")
                         .HasForeignKey("CharityID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Charity");
-                });
-
-            modelBuilder.Entity("AtharPlatform.Models.CampaignContent", b =>
-                {
-                    b.HasOne("AtharPlatform.Models.Campaign", "Campaign")
-                        .WithMany("CampaignContent")
-                        .HasForeignKey("CampaignId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AtharPlatform.Models.Content", "Content")
-                        .WithMany()
-                        .HasForeignKey("ContentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Campaign");
-
-                    b.Navigation("Content");
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.CampaignDonation", b =>
@@ -888,6 +859,17 @@ namespace AtharPlatform.Migrations
                     b.Navigation("Donation");
                 });
 
+            modelBuilder.Entity("AtharPlatform.Models.Charity", b =>
+                {
+                    b.HasOne("AtharPlatform.Models.UserAccount", "Account")
+                        .WithMany()
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+                });
+
             modelBuilder.Entity("AtharPlatform.Models.CharityDonation", b =>
                 {
                     b.HasOne("AtharPlatform.Models.Donation", "Donation")
@@ -910,7 +892,7 @@ namespace AtharPlatform.Migrations
             modelBuilder.Entity("AtharPlatform.Models.CharityMaterialDonation", b =>
                 {
                     b.HasOne("AtharPlatform.Models.Charity", "Charity")
-                        .WithMany("charityMaterialDonations")
+                        .WithMany("CharityMaterialDonations")
                         .HasForeignKey("CharityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -921,7 +903,7 @@ namespace AtharPlatform.Migrations
             modelBuilder.Entity("AtharPlatform.Models.CharityVendorOffer", b =>
                 {
                     b.HasOne("AtharPlatform.Models.Charity", "Charity")
-                        .WithMany("charityVendorOffers")
+                        .WithMany("CharityVendorOffers")
                         .HasForeignKey("CharityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -932,7 +914,7 @@ namespace AtharPlatform.Migrations
             modelBuilder.Entity("AtharPlatform.Models.CharityVolunteer", b =>
                 {
                     b.HasOne("AtharPlatform.Models.Charity", "Charity")
-                        .WithMany("charityVolunteers")
+                        .WithMany("CharityVolunteers")
                         .HasForeignKey("CharityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -940,10 +922,21 @@ namespace AtharPlatform.Migrations
                     b.Navigation("Charity");
                 });
 
+            modelBuilder.Entity("AtharPlatform.Models.Content", b =>
+                {
+                    b.HasOne("AtharPlatform.Models.Campaign", "Campaign")
+                        .WithMany()
+                        .HasForeignKey("CampaignId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Campaign");
+                });
+
             modelBuilder.Entity("AtharPlatform.Models.Donation", b =>
                 {
                     b.HasOne("AtharPlatform.Models.Charity", null)
-                        .WithMany("donations")
+                        .WithMany("Donations")
                         .HasForeignKey("CharityId");
 
                     b.HasOne("AtharPlatform.Models.Donor", "Donor")
@@ -955,17 +948,28 @@ namespace AtharPlatform.Migrations
                     b.Navigation("Donor");
                 });
 
+            modelBuilder.Entity("AtharPlatform.Models.Donor", b =>
+                {
+                    b.HasOne("AtharPlatform.Models.UserAccount", "Account")
+                        .WithMany()
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+                });
+
             modelBuilder.Entity("AtharPlatform.Models.Follow", b =>
                 {
                     b.HasOne("AtharPlatform.Models.Charity", "Charity")
                         .WithMany("Follows")
-                        .HasForeignKey("charityID")
+                        .HasForeignKey("CharityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("AtharPlatform.Models.Donor", "Donor")
                         .WithMany("Follows")
-                        .HasForeignKey("donornID")
+                        .HasForeignKey("DonorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1045,14 +1049,14 @@ namespace AtharPlatform.Migrations
             modelBuilder.Entity("AtharPlatform.Models.Subscription", b =>
                 {
                     b.HasOne("AtharPlatform.Models.Charity", "Charity")
-                        .WithMany("subscriptions")
-                        .HasForeignKey("CharityID")
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("CharityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("AtharPlatform.Models.Donor", "Donor")
                         .WithMany("Subscriptions")
-                        .HasForeignKey("DonorID")
+                        .HasForeignKey("DonorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1134,33 +1138,26 @@ namespace AtharPlatform.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("AtharPlatform.Models.Charity", b =>
-                {
-                    b.HasOne("AtharPlatform.Models.UserAccount", "Account")
-                        .WithMany()
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Account");
-                });
-
-            modelBuilder.Entity("AtharPlatform.Models.Donor", b =>
-                {
-                    b.HasOne("AtharPlatform.Models.UserAccount", "Account")
-                        .WithMany()
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Account");
-                });
-
             modelBuilder.Entity("AtharPlatform.Models.Campaign", b =>
                 {
-                    b.Navigation("CampaignContent");
-
                     b.Navigation("CampaignDonations");
+                });
+
+            modelBuilder.Entity("AtharPlatform.Models.Charity", b =>
+                {
+                    b.Navigation("Campaigns");
+
+                    b.Navigation("CharityMaterialDonations");
+
+                    b.Navigation("CharityVendorOffers");
+
+                    b.Navigation("CharityVolunteers");
+
+                    b.Navigation("Donations");
+
+                    b.Navigation("Follows");
+
+                    b.Navigation("Subscriptions");
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.CharityMaterialDonation", b =>
@@ -1190,6 +1187,17 @@ namespace AtharPlatform.Migrations
                     b.Navigation("CharityDonations");
                 });
 
+            modelBuilder.Entity("AtharPlatform.Models.Donor", b =>
+                {
+                    b.Navigation("Donations");
+
+                    b.Navigation("Follows");
+
+                    b.Navigation("Reactions");
+
+                    b.Navigation("Subscriptions");
+                });
+
             modelBuilder.Entity("AtharPlatform.Models.Notification", b =>
                 {
                     b.Navigation("Receivers");
@@ -1201,34 +1209,6 @@ namespace AtharPlatform.Migrations
             modelBuilder.Entity("AtharPlatform.Models.UserAccount", b =>
                 {
                     b.Navigation("Receivers");
-                });
-
-            modelBuilder.Entity("AtharPlatform.Models.Charity", b =>
-                {
-                    b.Navigation("Follows");
-
-                    b.Navigation("campaigns");
-
-                    b.Navigation("charityMaterialDonations");
-
-                    b.Navigation("charityVendorOffers");
-
-                    b.Navigation("charityVolunteers");
-
-                    b.Navigation("donations");
-
-                    b.Navigation("subscriptions");
-                });
-
-            modelBuilder.Entity("AtharPlatform.Models.Donor", b =>
-                {
-                    b.Navigation("Donations");
-
-                    b.Navigation("Follows");
-
-                    b.Navigation("Reactions");
-
-                    b.Navigation("Subscriptions");
                 });
 #pragma warning restore 612, 618
         }

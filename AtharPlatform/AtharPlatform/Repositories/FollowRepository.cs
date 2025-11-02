@@ -11,29 +11,24 @@ namespace AtharPlatform.Repositories
         public async Task<List<int>> GetAllFollowedCharitiesByDonorAsync(int donorId)
         {
             return await _context.Follows
-             .Where(f => f.donornID == donorId)
-             .Select(f => f.charityID)
+             .Where(f => f.DonorId == donorId)
+             .Select(f => f.CharityId)
              .ToListAsync();
         }
 
         public async Task<List<int>> GetAllFollowersForCharityAsync(int charityId)
         {
             return await _context.Follows
-             .Where(f => f.charityID == charityId)
-             .Select(f => f.donornID)
+             .Where(f => f.CharityId == charityId)
+             .Select(f => f.DonorId)
              .ToListAsync();
         }
 
-        public async Task<Follow> GetFollowAsync(int donorId, int charityId)
-            => await _dbSet.FirstOrDefaultAsync(fl => fl.donornID == donorId && fl.charityID == charityId);
+        public async Task<Follow> GetFollowByDonorAndCharityAsync(int donorId, int charityId)
+            => await _dbSet.FirstOrDefaultAsync(fl => fl.DonorId == donorId && fl.CharityId == charityId);
 
 
         public async Task<bool> IsFollowedAsync(int donorId, int charityId)
-        {
-
-            var res =  await _dbSet.AnyAsync(fl => fl.donornID == donorId && fl.charityID == charityId);
-            var nn = res;
-            return nn;
-        }
+            => await _dbSet.AnyAsync(fl => fl.DonorId == donorId && fl.CharityId == charityId);
     }
 }

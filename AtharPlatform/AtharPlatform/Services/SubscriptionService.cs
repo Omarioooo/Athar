@@ -49,8 +49,8 @@ namespace AtharPlatform.Services
             // Create the subscription entity
             var subscription = new Subscription
             {
-                DonorID = model.DonorId,
-                CharityID = model.CharityId,
+                DonorId = model.DonorId,
+                CharityId = model.CharityId,
                 Amount = model.Amount,
                 Frequency = model.Frequency,
                 StartDate = DateTime.UtcNow,
@@ -62,7 +62,7 @@ namespace AtharPlatform.Services
             {
                 DonorFirstName = donor.FirstName,
                 DonorLastName = donor.LastName,
-                DonorEmail = donor.Email,
+                DonorEmail = donor.Account.Email,
                 Amount = model.Amount,
                 MerchantOrderId = $"subscription_{subscription.Id}_{Guid.NewGuid()}"
             });
@@ -88,7 +88,7 @@ namespace AtharPlatform.Services
             // get the subscription
             var subscription = _unitOfWork
                 .Subscriptions
-                .FirstOrDefault(S => S.DonorID == model.DonorID && S.CharityID == model.CharityID);
+                .FirstOrDefault(S => S.DonorId == model.DonorID && S.CharityId == model.CharityID);
 
             if (subscription == null)
                 throw new Exception("There is no subscription");
@@ -106,7 +106,7 @@ namespace AtharPlatform.Services
             // get the subscription
             var subscription = _unitOfWork
                 .Subscriptions
-                .FirstOrDefault(S => S.DonorID == model.DonorID && S.CharityID == model.CharityID);
+                .FirstOrDefault(S => S.DonorId == model.DonorID && S.CharityId == model.CharityID);
 
             if (subscription == null)
                 throw new Exception("There is no subscription");
@@ -125,7 +125,7 @@ namespace AtharPlatform.Services
         {
             return await _unitOfWork
                 .Subscriptions
-                .AnyAsync(s => s.DonorID == model.DonorID && s.CharityID == model.CharityID);
+                .AnyAsync(s => s.DonorId == model.DonorID && s.CharityId == model.CharityID);
         }
 
     }

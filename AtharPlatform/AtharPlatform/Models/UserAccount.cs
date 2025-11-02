@@ -12,7 +12,7 @@
 
         public string? City { get; set; }
 
-        public virtual List<NotificationReceiver> Receivers { get; set; } = new();
+        public virtual List<NotificationReceiver> Receivers { get; set; } = null!;
     }
 }
 

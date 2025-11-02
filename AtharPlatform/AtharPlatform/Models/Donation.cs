@@ -13,7 +13,7 @@ namespace AtharPlatform.Models
 
         [ForeignKey(nameof(Donor))]
         public int DonorId { get; set; }
-        public virtual Donor Donor { get; set; } = new();
+        public virtual Donor Donor { get; set; } = null!;
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalAmount { get; set; }
@@ -34,8 +34,8 @@ namespace AtharPlatform.Models
         public string? MerchantOrderId { get; set; }
         public string? TransactionId { get; set; }
 
-        public virtual DateTime CreatedAt { get; set; } = new();
-        public virtual List<CharityDonation> CharityDonations { get; set; } = new();
-        public virtual List<CampaignDonation> CampaignDonations { get; set; } = new();
+        public virtual DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        public virtual List<CharityDonation> CharityDonations { get; set; } = null!;
+        public virtual List<CampaignDonation> CampaignDonations { get; set; } = null!;
     }
 }

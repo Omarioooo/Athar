@@ -19,15 +19,14 @@ builder.Services.AddSwaggerGen();
 //  options => options.UseNpgsql(builder.Configuration.GetConnectionString("connection"))
 //  );
 
-builder.Services.AddDbContext<Context>(
-  options => options.UseSqlServer(builder.Configuration.GetConnectionString("MSSConnection"))
+builder.Services.AddDbContext<Context>(options =>
+  options.UseSqlServer(builder.Configuration.GetConnectionString("MSSConnection"))
   );
 
 
 // Inject Repositories
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
-builder.Services.AddScoped<INotificationTypeRepository, NotificationTypeRepository>();
 builder.Services.AddScoped<IDonorRepository, DonorRepository>();
 builder.Services.AddScoped<ICharityRepository, CharityRepository>();
 builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
@@ -43,7 +42,7 @@ builder.Services.AddScoped<IAccountContextService, AccountContextService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<IFollowService, FollowService>();
-builder.Services.AddScoped<IReactService, ReactService>();
+builder.Services.AddScoped<IReactionService, ReactionService>();
 builder.Services.AddScoped<IDonationService, DonationService>();
 builder.Services.AddScoped<IDonorService, DonorService>();
 

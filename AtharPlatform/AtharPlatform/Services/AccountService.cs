@@ -1,4 +1,5 @@
 ﻿using AtharPlatform.DTO;
+using AtharPlatform.Models.Enum;
 using AtharPlatform.Models.Enums;
 using AtharPlatform.Repositories;
 using System.ComponentModel.DataAnnotations;
@@ -12,13 +13,15 @@ namespace AtharPlatform.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IJWTService _jwtServices;
         private readonly UserManager<UserAccount> _userManager;
+        private readonly INotificationService _notificationService;
 
         public AccountService(IUnitOfWork unitOfWork, IJWTService jwtServices,
-            UserManager<UserAccount> userManager)
+            UserManager<UserAccount> userManager, INotificationService notificationService)
         {
             _unitOfWork = unitOfWork;
             _jwtServices = jwtServices;
             _userManager = userManager;
+            _notificationService = notificationService;
         }
 
         public async Task<IdentityResult> CharityRegisterAsync(CharityRegisterDto model)
@@ -75,6 +78,10 @@ namespace AtharPlatform.Services
             };
             await _unitOfWork.Charities.AddAsync(Charity);
 
+            // Send notifcation to admins
+            var admins = await _unitOfWork.Donors.GetAllAdminsIdsAsync();
+            await _notificationService.SendNotificationAsync(Charity.Id, admins, NotificationsTypeEnum.NewCharity);
+
             return result;
         }
 
@@ -118,8 +125,7 @@ namespace AtharPlatform.Services
                 Id = account.Id,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
-                Country = model.Country,
-                City = model.City,
+                Role = role,
             };
 
             await _unitOfWork.Donors.AddAsync(Donor);

@@ -5,9 +5,11 @@ namespace AtharPlatform.Services
     public class FollowService : IFollowService
     {
         private readonly IUnitOfWork _unitOfWork;
-        public FollowService(IUnitOfWork unitOfWork)
+        private readonly INotificationService _notificationService;
+        public FollowService(IUnitOfWork unitOfWork, INotificationService notificationService)
         {
             _unitOfWork = unitOfWork;
+            _notificationService = notificationService;
         }
 
         public async Task<bool> FollowAsync(int donorId, int charityId)
@@ -23,13 +25,16 @@ namespace AtharPlatform.Services
 
             var follow = new Follow()
             {
-                charityID = charityId,
-                donornID = donorId,
+                CharityId = charityId,
+                DonorId = donorId,
                 StartDate = DateTime.UtcNow
             };
 
             await _unitOfWork.Follows.AddAsync(follow);
             await _unitOfWork.SaveAsync();
+
+            // Notify the charity
+            await _notificationService.SendNotificationAsync(donorId, [charityId], Models.Enum.NotificationsTypeEnum.NewFollower);
 
             return true;
         }
@@ -41,7 +46,7 @@ namespace AtharPlatform.Services
                 ?? throw new KeyNotFoundException("Charity not found.");
 
             // check the follow
-            var follow = await _unitOfWork.Follows.GetFollowAsync(donorId, charityId)
+            var follow = await _unitOfWork.Follows.GetFollowByDonorAndCharityAsync(donorId, charityId)
                 ?? throw new InvalidOperationException("You are not following this charity.");
 
             await _unitOfWork.Follows.DeleteAsync(follow.Id);
