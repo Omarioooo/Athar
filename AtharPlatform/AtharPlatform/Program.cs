@@ -54,12 +54,15 @@ builder.Services.AddScoped<INotificationTypeRepository, NotificationTypeReposito
 builder.Services.AddScoped<ICharityRepository, CharityRepository>();
 builder.Services.AddScoped<IDonorRepository, DonorRepository>();
 builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
+
 builder.Services.AddScoped<IVendorOfferRepository, VendorOfferRepository>();
 builder.Services.AddScoped<IVolunteerApplicationRepository, VolunteerApplicationRepository>();
+
 
 // Inject Services
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<ICampaignService, CampaignService>();
 
 // Inject Hubs
 builder.Services.AddSignalR();

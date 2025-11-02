@@ -1,11 +1,12 @@
-﻿using AtharPlatform.Dtos;
+using AtharPlatform.DTOs;
+using AtharPlatform.Models;
 using AtharPlatform.Models.Enum;
+using AtharPlatform.Services;
 using AtharPlatform.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
-
 
 namespace AtharPlatform.Controllers
 {
@@ -13,218 +14,187 @@ namespace AtharPlatform.Controllers
     [ApiController]
     public class CampaignController : ControllerBase
     {
+        private readonly ICampaignService _service;
         private readonly IUnitOfWork _unitOfWork;
         private readonly Context _context;
 
-        public CampaignController(IUnitOfWork unitOfWork, Context context)
+        public CampaignController(ICampaignService service, IUnitOfWork unitOfWork, Context context)
         {
+            _service = service;
             _unitOfWork = unitOfWork;
             _context = context;
         }
 
-
-        //public async Task<IActionResult> GetAllCampaign()
-        //{
-        //    var campaign = await _icampaignrepository.GetAllAsync();
-        //    var result = campaign.Select(c => new CampaignDto
-        //    {
-        //        Id = c.Id,
-        //        Title = c.Title,
-        //        Description = c.Description,
-        //        Image = c.Image,
-        //        GoalAmount = c.GoalAmount,
-        //        RaisedAmount = c.RaisedAmount,
-        //        StartDate = c.StartDate,
-        //        EndDate = c.EndDate,
-        //        Category = c.Category,
-        //        CharityName = c.Charity.Name
-
-
-        //    });
-        //    return Ok(result);
-
-        //}
-        [HttpGet("[action]")]
-        public async Task<ActionResult<PaginatedResultDto<CampaignDto>>> GetAll([FromQuery] string? query, [FromQuery] int page = 1, [FromQuery] int pageSize = 12)
-        {
-            if (page <= 0 || pageSize <= 0)
-                return BadRequest("Page and PageSize must be greater than zero.");
-
-            var q = _context.Campaigns.AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(query))
-            {
-                var term = query.Trim();
-                q = q.Where(c =>
-                    c.Title.Contains(term) ||
-                    c.Description.Contains(term) ||
-                    (c.Charity != null && c.Charity.Name.Contains(term)));
-            }
-
-            var total = await q.CountAsync();
-
-            var rows = await q
-                .OrderBy(c => c.Title)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .Select(c => new
-                {
-                    c.Id,
-                    c.Title,
-                    c.Description,
-                    c.ImageUrl,
-                    c.GoalAmount,
-                    c.RaisedAmount,
-                    c.StartDate,
-                    EndDate = c.EndDate,
-                    c.Category,
-                    c.isCritical,
-                    CharityName = c.Charity != null ? c.Charity.Name : null,
-                    c.SupportingCharitiesJson
-                })
-                .ToListAsync();
-
-            var items = rows.Select(r =>
-            {
-                IEnumerable<string>? supporters = null;
-                if (!string.IsNullOrWhiteSpace(r.SupportingCharitiesJson))
-                {
-                    try { supporters = JsonSerializer.Deserialize<IEnumerable<string>>(r.SupportingCharitiesJson!); }
-                    catch { supporters = null; }
-                }
-
-                return new CampaignDto
-                {
-                    Id = r.Id,
-                    Title = r.Title,
-                    Description = r.Description,
-                    ImageUrl = r.ImageUrl,
-                    GoalAmount = r.GoalAmount,
-                    RaisedAmount = r.RaisedAmount,
-                    StartDate = r.StartDate,
-                    EndDate = r.EndDate,
-                    Category = r.Category,
-                    IsCritical = r.isCritical,
-                    // If scraped (has supporters), return supporting_charities only; else return charity_name
-                    SupportingCharities = supporters,
-                    CharityName = (supporters == null || !supporters.Any()) ? r.CharityName : null
-                };
-            }).ToList();
-
-            return Ok(new PaginatedResultDto<CampaignDto>
-            {
-                Items = items,
-                Page = page,
-                PageSize = pageSize,
-                Total = total
-            });
-        }
-
+        // =====================================
+        // ========== Service-based =============
+        // =====================================
 
         [HttpGet("[action]")]
-        public async Task<IActionResult>GetCampaignById(int id)
+        public async Task<IActionResult> GetAllgCampaigntousers()
         {
-            var campaign = await _unitOfWork.Campaign.GetAsync(id);
-            if (campaign == null)
-                return NotFound("Campaign not found.");
-            IEnumerable<string>? supportersById = null;
-            if (!string.IsNullOrWhiteSpace(campaign.SupportingCharitiesJson))
+            try
             {
-                try { supportersById = JsonSerializer.Deserialize<IEnumerable<string>>(campaign.SupportingCharitiesJson!); }
-                catch { supportersById = null; }
+                var result = await _service.GetAllAsyncforusers();
+                return Ok(result);
             }
-
-            var result = new CampaignDto
+            catch (Exception ex)
             {
-                Id = campaign.Id,
-                Title = campaign.Title,
-                Description = campaign.Description,
-                ImageUrl = campaign.ImageUrl,
-                GoalAmount = campaign.GoalAmount,
-                RaisedAmount = campaign.RaisedAmount,
-                StartDate = campaign.StartDate,
-                EndDate = campaign.EndDate,
-                Category = campaign.Category,
-                IsCritical = campaign.isCritical,
-                SupportingCharities = supportersById,
-                CharityName = (supportersById == null || !supportersById.Any()) ? campaign.Charity?.Name : null
-            };
-            return Ok(result);
-
+                return BadRequest(ex.Message);
+            }
         }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetAllgCampaign()
+        {
+            try
+            {
+                var result = await _service.GetAllAsyncforadmin();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetCampaignById(int id)
+        {
+            try
+            {
+                var result = await _service.GetByIdAsync(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetCampaignByIdtousers(int id)
+        {
+            try
+            {
+                var result = await _service.GetByIdAsynctousers(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
         [HttpGet("[action]")]
         public async Task<IActionResult> GetByType(CampaignCategoryEnum type)
         {
-            var campaign = await _unitOfWork.Campaign.GetByType(type);
-            if (campaign == null || !campaign.Any())// it return list so I check if list is Empty
-                return NotFound("Campaign not found.");
-            var result = campaign.Select(c =>
+            try
             {
-                IEnumerable<string>? supporters = null;
-                if (!string.IsNullOrWhiteSpace(c.SupportingCharitiesJson))
-                {
-                    try { supporters = JsonSerializer.Deserialize<IEnumerable<string>>(c.SupportingCharitiesJson!); }
-                    catch { supporters = null; }
-                }
-
-                return new CampaignDto
-                {
-                    Id = c.Id,
-                    Title = c.Title,
-                    Description = c.Description,
-                    ImageUrl = c.ImageUrl,
-                    GoalAmount = c.GoalAmount,
-                    RaisedAmount = c.RaisedAmount,
-                    StartDate = c.StartDate,
-                    EndDate = c.EndDate,
-                    Category = c.Category,
-                    IsCritical = c.isCritical,
-                    SupportingCharities = supporters,
-                    CharityName = (supporters == null || !supporters.Any()) ? (c.Charity != null ? c.Charity.Name : null) : null
-                };
-            });
-            return Ok(result);
+                var result = await _service.GetByTypeAsync(type);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("[action]")]
-        public async Task<IActionResult> GetByDate([FromQuery] bool latestFirst = true)
+        public async Task<IActionResult> GetByTypetousers(CampaignCategoryEnum type)
         {
-            var campaigns = await _unitOfWork.Campaign.GetByDateAsync(latestFirst);
-
-            if (campaigns == null || !campaigns.Any())
-                return NotFound("No campaigns found.");
-
-            var result = campaigns.Select(c =>
+            try
             {
-                IEnumerable<string>? supporters = null;
-                if (!string.IsNullOrWhiteSpace(c.SupportingCharitiesJson))
-                {
-                    try { supporters = JsonSerializer.Deserialize<IEnumerable<string>>(c.SupportingCharitiesJson!); }
-                    catch { supporters = null; }
-                }
-
-                return new CampaignDto
-                {
-                    Id = c.Id,
-                    Title = c.Title,
-                    Description = c.Description,
-                    ImageUrl = c.ImageUrl,
-                    GoalAmount = c.GoalAmount,
-                    RaisedAmount = c.RaisedAmount,
-                    StartDate = c.StartDate,
-                    EndDate = c.EndDate,
-                    Category = c.Category,
-                    IsCritical = c.isCritical,
-                    SupportingCharities = supporters,
-                    CharityName = (supporters == null || !supporters.Any()) ? (c.Charity != null ? c.Charity.Name : null) : null
-                };
-            });
-
-            return Ok(result);
+                var result = await _service.GetByTypeAsynctousers(type);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        // (GET) /api/Campaign/scraped?query=&page=1&pageSize=12
-        // Returns campaigns in the original scraped JSON shape (snake_case) including supporting_charities and external_id
+        [HttpGet("[action]")]
+        public async Task<IActionResult> SearchCampaigns(string keyword)
+        {
+            try
+            {
+                var result = await _service.SearchAsync(keyword);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetPaginated(int page = 1, int pageSize = 10)
+        {
+            try
+            {
+                var result = await _service.GetPaginatedAsync(page, pageSize);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> CreateCampaign(AddCampaignDto model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var result = await _service.CreateAsync(model);
+                return CreatedAtAction(nameof(GetCampaignById), new { id = result.Id }, result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("[action]")]
+        public async Task<IActionResult> UpdateCampaign(UpdatCampaignDto model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var updatedCampaign = await _service.UpdateAsync(model);
+                return Ok(updatedCampaign);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("[action]/{id}")]
+        public async Task<IActionResult> DeleteCampaign(int id)
+        {
+            try
+            {
+                await _service.DeleteAsync(id);
+                return Ok(new { message = "Campaign deleted successfully" });
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+
+        // =====================================
+        // ========== UnitOfWork-based ==========
+        // =====================================
+
+        // GET /api/Campaign/scraped
         [HttpGet("scraped")]
         [AllowAnonymous]
         public async Task<ActionResult<PaginatedResultDto<CampaignScrapedDto>>> GetScraped([FromQuery] string? query, [FromQuery] int page = 1, [FromQuery] int pageSize = 12)
@@ -298,14 +268,9 @@ namespace AtharPlatform.Controllers
             });
         }
 
-
-
-    /// <summary>
-    /// Bulk import campaigns (SuperAdmin only). Links to the first matching existing charity by name from supporting_charities or charity_name.
-    /// Missing numeric/date fields will be randomized; duplicates (same Title+Charity) will be skipped.
-    /// </summary>
-    [HttpPost("import")]
-    [Authorize(Roles = "SuperAdmin")]
+        // POST /api/Campaign/import
+        [HttpPost("import")]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> ImportCampaigns([FromBody] List<CampaignImportItemDto> items)
         {
             if (items == null || items.Count == 0)
@@ -318,7 +283,6 @@ namespace AtharPlatform.Controllers
             {
                 try
                 {
-                    // Basic validation
                     var title = (i.Title ?? string.Empty).Trim();
                     var description = (i.Description ?? string.Empty).Trim();
                     var imageUrl = (i.ImageUrl ?? string.Empty).Trim();
@@ -329,7 +293,7 @@ namespace AtharPlatform.Controllers
                         continue;
                     }
 
-                    // Resolve charity by provided charity_name first, else supporting_charities
+                    // Resolve charity
                     var charityNames = new List<string>();
                     if (!string.IsNullOrWhiteSpace(i.CharityName)) charityNames.Add(i.CharityName!.Trim());
                     if (i.SupportingCharities != null) charityNames.AddRange(i.SupportingCharities.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()));
@@ -337,14 +301,12 @@ namespace AtharPlatform.Controllers
                     Charity? charity = null;
                     foreach (var name in charityNames.Distinct())
                     {
-                        var n = name;
-                        charity = await _unitOfWork.Charity.GetAsync(c => c.Name == n || EF.Functions.Like(c.Name, $"%{n}%"));
+                        charity = await _unitOfWork.Charity.GetAsync(c => c.Name == name || EF.Functions.Like(c.Name, $"%{name}%"));
                         if (charity != null) break;
                     }
 
                     if (charity == null)
                     {
-                        // Fallback: assign randomly from existing 101 charities (current DB state)
                         var allCharities = await _unitOfWork.Charity.GetAllAsync();
                         if (allCharities == null || allCharities.Count == 0)
                         {
@@ -354,39 +316,32 @@ namespace AtharPlatform.Controllers
                         charity = allCharities[Random.Shared.Next(0, allCharities.Count)];
                     }
 
-                    // Check duplicate by Title+Charity (repository throws when not found, so handle gracefully)
                     Campaign? exists = null;
                     try
                     {
                         exists = await _unitOfWork.Campaign.GetAsync(c => c.Title == title && c.CharityID == charity.Id);
                     }
-                    catch
-                    {
-                        exists = null; // not found -> safe to insert
-                    }
+                    catch { exists = null; }
+
                     if (exists != null)
                     {
                         duplicates++;
                         continue;
                     }
 
-                    // Randomize missing values
                     var rng = Random.Shared;
                     var startDate = i.StartDate ?? DateTime.UtcNow.Date.AddDays(-rng.Next(0, 60));
-                    var duration = i.DurationDays ?? rng.Next(20, 61); // 20-60 days
-                    var goal = i.GoalAmount ?? Math.Round(rng.Next(50_000, 500_001) / 100.0) * 100; // round to nearest 100
+                    var duration = i.DurationDays ?? rng.Next(20, 61);
+                    var goal = i.GoalAmount ?? Math.Round(rng.Next(50_000, 500_001) / 100.0) * 100;
                     var raised = i.RaisedAmount ?? Math.Round(goal * (rng.Next(20, 81) / 100.0), 2);
                     var isCritical = i.IsCritical ?? false;
 
-                    // Infer category
                     var category = InferCategory(i.Category, title, description);
 
-                    // Determine status
                     var status = CampainStatusEnum.inProgress;
                     if (raised >= goal) status = CampainStatusEnum.Completed;
                     else if (DateTime.UtcNow.Date > startDate.AddDays(duration)) status = CampainStatusEnum.expired;
 
-                    // Properly resolve the FK id (Charity inherits from UserAccount, local Charity.Id may be hidden/0)
                     var charityUserId = (charity as UserAccount)?.Id ?? charity.Id;
 
                     var campaign = new Campaign
@@ -417,6 +372,7 @@ namespace AtharPlatform.Controllers
                     errors.Add(new { title = i?.Title, error = ex.Message });
                 }
             }
+
             try
             {
                 await _unitOfWork.SaveAsync();
@@ -429,8 +385,6 @@ namespace AtharPlatform.Controllers
 
             return Ok(new { imported, skipped, withoutCharity, duplicates, invalid, errors });
         }
-
-        
 
         private static CampaignCategoryEnum InferCategory(string? provided, string title, string description)
         {
@@ -450,11 +404,9 @@ namespace AtharPlatform.Controllers
             if (t.Contains("غذاء") || t.Contains("طعام") || t.Contains("سلة") || t.Contains("إطعام")) return CampaignCategoryEnum.Food;
             if (t.Contains("مأوى") || t.Contains("سكن") || t.Contains("الفقراء") || t.Contains("خيمة") || t.Contains("لاجئ")) return CampaignCategoryEnum.Shelter;
             if (t.Contains("يتيم") || t.Contains("أيتام") || t.Contains("كفالة")) return CampaignCategoryEnum.Orphans;
-            if (t.Contains("إغاثة") || t.Contains("اغاثة") || t.Contains("الإغاثة العاجلة")) return CampaignCategoryEnum.Other; // could be a separate enum later
+            if (t.Contains("إغاثة") || t.Contains("اغاثة")) return CampaignCategoryEnum.Other;
+
             return CampaignCategoryEnum.Other;
         }
-
-        
-
     }
 }
