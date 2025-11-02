@@ -34,6 +34,9 @@ namespace AtharPlatform.Services
             await _unitOfWork.SaveAsync();
 
             // Notify the charity
+            if (_notificationService == null)
+                throw new Exception("notification service is null");
+
             await _notificationService.SendNotificationAsync(donorId, [charityId], Models.Enum.NotificationsTypeEnum.NewFollower);
 
             return true;
