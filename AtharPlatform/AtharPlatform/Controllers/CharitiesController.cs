@@ -460,7 +460,7 @@ namespace AtharPlatform.Controllers
                 Id = c.Id,
                 Title = c.Title,
                 Description = c.Description,
-                ImageUrl = c.ImageUrl,
+                Image = c.ImageUrl,
                 GoalAmount = c.GoalAmount,
                 RaisedAmount = c.RaisedAmount,
                 StartDate = c.StartDate,
