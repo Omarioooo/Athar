@@ -1,4 +1,5 @@
 ﻿using AtharPlatform.Models.Enum;
+using System.Text.Json.Serialization;
 
 namespace AtharPlatform.Dtos
 {
@@ -18,6 +19,14 @@ namespace AtharPlatform.Dtos
         public DateTime EndDate { get; set; }
         public bool IsCritical { get; set; }
 
-        public string? CharityName { get; set; } 
+        // For manually-created campaigns (single owning charity)
+        [JsonPropertyName("charity_name")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? CharityName { get; set; }
+
+        // For scraped campaigns (multiple supporters). Only populated for scraped items.
+        [JsonPropertyName("supporting_charities")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public IEnumerable<string>? SupportingCharities { get; set; }
     }
 }
