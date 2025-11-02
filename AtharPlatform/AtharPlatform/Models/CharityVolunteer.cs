@@ -15,9 +15,9 @@ namespace AtharPlatform.Models
         [ForeignKey(nameof(Charity))]
         public int CharityId { get; set; }
 
-        public virtual Charity Charity { get; set; } = new();
+        public virtual Charity Charity { get; set; } = null!;
 
         // Navigation Property
-        public virtual List<VolunteerApplication> VolunteerApplications { get; set; } = new();
+        public virtual List<VolunteerApplication> VolunteerApplications { get; set; } = null!;
     }
 }

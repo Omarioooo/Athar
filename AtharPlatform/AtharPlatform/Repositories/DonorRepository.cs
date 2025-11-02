@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using AtharPlatform.Models.Enums;
+using System.Linq.Expressions;
 
 namespace AtharPlatform.Repositories
 {
@@ -6,34 +7,53 @@ namespace AtharPlatform.Repositories
     {
         public DonorRepository(Context context) : base(context) { }
 
-        public override Task<List<Donor>> GetAllAsync()
+        public async override Task<Donor> GetAsync(int id)
         {
-            return base.GetAllAsync();
+            var donor = await _dbSet.Include(d => d.Account)
+                .Where(d => d.Role == RolesEnum.Donor)
+                 .FirstOrDefaultAsync(d => d.Id == id);
+
+            if (donor == null)
+                throw new KeyNotFoundException($"Donor with id {id} not found");
+
+            return donor;
         }
 
-        public override Task<Donor?> GetAsync(int id)
+        public async override Task<List<Donor>> GetAllAsync()
         {
-            return base.GetAsync(id);
+            var donors = await _dbSet.Include(d => d.Account)
+                .Where(d => d.Role == RolesEnum.Donor)
+                .ToListAsync();
+
+            if (donors == null)
+                throw new KeyNotFoundException($"Donors not found");
+
+            return donors;
         }
 
-        public override Task<Donor?> GetAsync(Expression<Func<Donor, bool>> expression)
+        public async override Task<Donor> GetWithExpressionAsync(Expression<Func<Donor, bool>> expression)
         {
-            return base.GetAsync(expression);
+            var donors = await _dbSet.Include(d => d.Account)
+                .Where(d => d.Role == RolesEnum.Donor)
+                .FirstOrDefaultAsync(expression);
+
+            if (donors == null)
+                throw new KeyNotFoundException($"Donor not found");
+
+            return donors;
         }
 
-        public override Task<bool> AddAsync(Donor entity)
+        public async Task<List<int>> GetAllAdminsIdsAsync()
         {
-            return base.AddAsync(entity);
-        }
+            var admins = await _dbSet.Include(d => d.Account)
+                .Where(d => d.Role == RolesEnum.Admin)
+                .Select(a => a.Id)
+                .ToListAsync();
 
-        public override Task<bool> Update(Donor entity)
-        {
-            return base.Update(entity);
-        }
+            if (admins == null)
+                throw new KeyNotFoundException($"Admins not found");
 
-        public override Task<bool> DeleteAsync(int id)
-        {
-            return base.DeleteAsync(id);
+            return admins;
         }
     }
 }

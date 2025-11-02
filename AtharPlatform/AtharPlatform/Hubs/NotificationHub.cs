@@ -1,27 +1,28 @@
 ﻿using AtharPlatform.DTO;
+using AtharPlatform.Hubs;
 using Microsoft.AspNetCore.SignalR;
 
-namespace AtharPlatform.Hubs
+public class NotificationHub : INotificationHub
 {
-    public class NotificationHub : Hub, INotificationHub
+    private readonly IHubContext<NotificationHubHelper> _hubContext;
+
+    public NotificationHub(IHubContext<NotificationHubHelper> hubContext)
     {
-        public async Task SendMessage(int userId, NotificationMessageDto message)
-        {
-            await Clients.User(userId.ToString()).SendAsync("ReceiveNotification", message);
-        }
+        _hubContext = hubContext;
+    }
 
-        public async Task SendMessage(List<int> userIds, NotificationMessageDto message)
-        {
-            var tasks = userIds.Select(userId =>
-                Clients.User(userId.ToString()).SendAsync("ReceiveNotification", message)
-            );
+    public async Task SendMessage(List<int> userIds, NotificationMessageDto message)
+    {
+        var tasks = userIds.Select(userId =>
+            _hubContext.Clients.User(userId.ToString())
+                .SendAsync("ReceiveNotification", message)
+        );
 
-            await Task.WhenAll(tasks);
-        }
+        await Task.WhenAll(tasks);
+    }
 
-        public async Task BroadCastMessage(NotificationMessageDto message)
-        {
-            await Clients.Others.SendAsync("ReceiveNotification", message);
-        }
+    public async Task BroadCastMessage(NotificationMessageDto message)
+    {
+        await _hubContext.Clients.All.SendAsync("ReceiveNotification", message);
     }
 }
