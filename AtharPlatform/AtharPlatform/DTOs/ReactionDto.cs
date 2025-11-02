@@ -1,4 +1,4 @@
-﻿namespace AtharPlatform.DTOs
+﻿namespace AtharPlatform.DTO
 {
     public class ReactionDto
     {

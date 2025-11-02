@@ -1,5 +1,5 @@
 ﻿
-using AtharPlatform.DTOs;
+using AtharPlatform.DTO;
 using AtharPlatform.Models;
 using AtharPlatform.Models.Enum;
 using AtharPlatform.Models.Enums;
@@ -29,12 +29,12 @@ namespace AtharPlatform.Services
         public async Task<string> SubscribeAsync(CreateSubscriptionDto model)
         {
             // Check the donor
-            var donor = await _unitOfWork.Donor.GetAsync(model.DonorId);
+            var donor = await _unitOfWork.Donors.GetAsync(model.DonorId);
             if (donor == null)
                 throw new Exception($"Donor with id {model.DonorId} not found");
 
             // Check the charity
-            var charity = await _unitOfWork.Charity.GetAsync(model.CharityId);
+            var charity = await _unitOfWork.Charities.GetAsync(model.CharityId);
             if (charity == null)
                 throw new Exception($"Charity with id {model.CharityId} not found");
 

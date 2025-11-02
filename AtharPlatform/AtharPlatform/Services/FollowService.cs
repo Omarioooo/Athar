@@ -1,41 +1,34 @@
-﻿
-using AtharPlatform.Repositories;
+﻿using AtharPlatform.Repositories;
 
 namespace AtharPlatform.Services
 {
     public class FollowService : IFollowService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IAccountContextService _accountContextService;
-
-
-        public FollowService(IUnitOfWork unitOfWork,
-            IAccountContextService accountContextService)
+        public FollowService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _accountContextService = accountContextService;
         }
 
-        public async Task<bool> FollowAsync(int charityId)
+        public async Task<bool> FollowAsync(int donorId, int charityId)
         {
-            // get the user id
-            var userId = _accountContextService.GetCurrentAccountId();
-
             // check the charity
-            var charity = _unitOfWork.Charity.GetAsync(charityId);
-            if (charity == null)
-                return false;
+            var charity = await _unitOfWork.Charities.GetAsync(charityId)
+                ?? throw new KeyNotFoundException("Charity not found.");
 
-            // create follow
-            Follow follow = new Follow()
+            // Check if already followed
+            var isAlreadyFollowed = await _unitOfWork.Follows.IsFollowedAsync(donorId, charityId);
+            if (isAlreadyFollowed)
+                throw new InvalidOperationException("You are already following this charity.");
+
+            var follow = new Follow()
             {
-                charityID = charity.Id,
-                donornID = userId,
+                charityID = charityId,
+                donornID = donorId,
                 StartDate = DateTime.UtcNow
             };
 
-            // Save the follow
-            _unitOfWork.Follows.Add(follow);
+            await _unitOfWork.Follows.AddAsync(follow);
             await _unitOfWork.SaveAsync();
 
             return true;
@@ -44,35 +37,17 @@ namespace AtharPlatform.Services
         public async Task<bool> UnFollowAsync(int donorId, int charityId)
         {
             // check the charity
-            var charity = await _unitOfWork.Charity.GetAsync(charityId);
-            if (charity == null)
-                return false;
+            var charity = await _unitOfWork.Charities.GetAsync(charityId)
+                ?? throw new KeyNotFoundException("Charity not found.");
 
             // check the follow
-            var follow = await _unitOfWork
-                .Follows
-                .SingleAsync(fl => fl.donornID == donorId && fl.charityID == charityId);
+            var follow = await _unitOfWork.Follows.GetFollowAsync(donorId, charityId)
+                ?? throw new InvalidOperationException("You are not following this charity.");
 
-            if (follow == null)
-                return false;
-
-            // Remove the follow
-            _unitOfWork.Follows.Remove(follow);
+            await _unitOfWork.Follows.DeleteAsync(follow.Id);
             await _unitOfWork.SaveAsync();
+
             return true;
-        }
-
-        public async Task<bool> IsFollowedAsync(int donorId, int charityId)
-        {
-            // Check if there is a follow between donor and charity
-            return await _unitOfWork
-                .Follows
-                .AnyAsync(fl => fl.donornID == donorId && fl.charityID == charityId);
-        }
-
-        public Task<bool> FollowAsync(int donorId, int charityId)
-        {
-            throw new NotImplementedException();
         }
     }
 }

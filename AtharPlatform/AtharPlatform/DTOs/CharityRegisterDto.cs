@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AtharPlatform.DTOs
+namespace AtharPlatform.DTO
 {
     public class CharityRegisterDto
     {

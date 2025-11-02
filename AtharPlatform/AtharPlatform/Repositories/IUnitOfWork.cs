@@ -2,17 +2,17 @@
 {
     public interface IUnitOfWork : IDisposable
     {
-        IDonorRepository Donor { get; }
-        ICharityRepository Charity { get; }
-        ICampaignRepository Campaign { get; }
-        IContentRepository Content { get; }
-        IReactionRepository Reaction { get; }
+        IDonorRepository Donors { get; }
+        ICharityRepository Charities { get; }
+        ICampaignRepository Campaigns { get; }
+        IContentRepository Contents { get; }
+        IReactionRepository Reactions { get; }
         INotificationRepository Notifications { get; }
         INotificationTypeRepository NotificationTypes { get; }
+        IFollowRepository Follows { get; }
         DbSet<Donation> Donations { get; }
         DbSet<CharityDonation> CharityDonations { get; }
         DbSet<CampaignDonation> CampaignDonations { get; }
-        DbSet<Follow> Follows { get; }
         DbSet<Subscription> Subscriptions { get; }
         Task SaveAsync();
     }

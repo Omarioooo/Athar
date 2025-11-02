@@ -1,5 +1,5 @@
 ﻿
-using AtharPlatform.DTOs;
+using AtharPlatform.DTO;
 
 namespace AtharPlatform.Repositories
 {

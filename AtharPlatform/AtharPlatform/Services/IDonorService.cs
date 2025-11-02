@@ -1,4 +1,4 @@
-﻿using AtharPlatform.DTOs;
+﻿using AtharPlatform.DTO;
 using AtharPlatform.Models.Enums;
 
 namespace AtharPlatform.Services
@@ -7,10 +7,6 @@ namespace AtharPlatform.Services
     {
         Task<bool> DonateToCharityAsync(DonationDto model);
         Task<bool> DonateToCampaignAsync(DonationDto model);
-        Task<List<int>> GetFollowsAsync(int donorId);
-        Task<List<int>> GetSubscriptionsAsync(int donorId);
-
-
 
     }
 }

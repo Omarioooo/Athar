@@ -1,4 +1,4 @@
-﻿using AtharPlatform.DTOs;
+﻿using AtharPlatform.DTO;
 using AtharPlatform.Repositories;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -7,12 +7,12 @@ using System.Text;
 
 namespace AtharPlatform.Services
 {
-    public class JWTServices : IJWTServices
+    public class JWTService : IJWTService
     {
         private readonly UserManager<UserAccount> _userManager;
         private readonly IConfiguration _configuration;
 
-        public JWTServices(UserManager<UserAccount> userManager, IConfiguration configuration)
+        public JWTService(UserManager<UserAccount> userManager, IConfiguration configuration)
         {
             _userManager = userManager;
             _configuration = configuration;

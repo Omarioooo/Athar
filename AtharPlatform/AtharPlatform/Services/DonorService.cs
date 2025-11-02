@@ -1,4 +1,4 @@
-﻿using AtharPlatform.DTOs;
+﻿using AtharPlatform.DTO;
 using AtharPlatform.Models;
 using AtharPlatform.Models.Enum;
 using AtharPlatform.Models.Enums;
@@ -26,89 +26,17 @@ namespace AtharPlatform.Services
             _followService = followService;
         }
 
-        public async Task<bool> FollowAsync(int donorId, int charityId)
-        {
-            // check the donor
-            var donor = await _unitOfWork.Donor.GetAsync(donorId);
 
-            if (donor == null)
-                return false;
-
-            // check the charity
-            var charity = await _unitOfWork.Charity.GetAsync(charityId);
-            if (charity == null)
-                return false;
-
-            var successed = await _followService.FollowAsync(donorId, charityId);
-
-            if (!successed)
-                return false;
-
-            // Send Notification
-            await _notificationService.SendNotificationAsync(donorId, [charityId], NotificationsTypeEnum.NewFollower);
-
-            return true;
-        }
-
-        public async Task<bool> UnFollowAsync(int donorId, int charityId)
-        {
-            // check the donor
-            var donor = await _unitOfWork.Donor.GetAsync(donorId);
-            if (donor == null)
-                return false;
-
-            // check the charity
-            var charity = await _unitOfWork.Charity.GetAsync(charityId);
-            if (charity == null)
-                return false;
-
-            return await _followService.UnFollowAsync(donorId, charityId);
-
-        }
-        public async Task<bool> IsFollowedAsync(int donorId, int charityId)
-        {
-            // check the donor
-            var donor = await _unitOfWork.Donor.GetAsync(donorId);
-            if (donor == null)
-                return false;
-
-            // check the charity
-            var charity = await _unitOfWork.Charity.GetAsync(charityId);
-            if (charity == null)
-                return false;
-
-            return await _followService.IsFollowedAsync(donorId, charityId);
-        }
-
-        public async Task<List<int>> GetFollowsAsync(int donorId)
-        {
-            // check the donor
-            var donor = await _unitOfWork.Donor.GetAsync(donorId);
-            if (donor == null)
-                throw new Exception("Donor is not valied");
-
-            return await _unitOfWork.Donor.GetFollowsAsync(donorId);
-        }
-
-        public async Task<List<int>> GetSubscriptionsAsync(int donorId)
-        {
-            // check the donor
-            var donor = await _unitOfWork.Donor.GetAsync(donorId);
-            if (donor == null)
-                throw new Exception("Donor is not valied");
-
-            return await _unitOfWork.Donor.GetSubscriptionsAsync(donorId);
-        }
 
         public async Task<bool> DonateToCharityAsync(DonationDto model)
         {
             // Check the donor
-            var donor = await _unitOfWork.Donor.GetAsync(model.DonorId);
+            var donor = await _unitOfWork.Donors.GetAsync(model.DonorId);
             if (donor == null)
                 throw new Exception($"Donor with id {model.DonorId} not found");
 
             // Check the charity
-            var charity = await _unitOfWork.Charity.GetAsync(model.CharityOrCampaignId);
+            var charity = await _unitOfWork.Charities.GetAsync(model.CharityOrCampaignId);
             if (charity == null)
                 throw new Exception($"Charity with id {model.CharityOrCampaignId} not found");
 

@@ -1,8 +1,8 @@
-﻿using AtharPlatform.DTOs;
+﻿using AtharPlatform.DTO;
 
 namespace AtharPlatform.Services
 {
-    public interface IJWTServices
+    public interface IJWTService
     {
         Task<TokenDto> CreateJwtTokenAsync(UserAccount user);
     }
