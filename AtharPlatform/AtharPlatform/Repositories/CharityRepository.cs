@@ -41,16 +41,6 @@ namespace AtharPlatform.Repositories
             return Charitys;
         }
 
-        public async Task<List<int>> GetAllFollowersAsync(int id)
-        {
-            var donorIds = await _context.Follows
-                .Where(f => f.CharityId == id)
-                .Select(f => f.DonorId)
-                .ToListAsync();
-
-            return donorIds;
-        }
-
         public async Task<List<int>> GetCharitySubscribersAsync(int id)
         {
             var donorIds = await _context.Subscriptions

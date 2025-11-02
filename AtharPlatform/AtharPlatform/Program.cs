@@ -8,23 +8,16 @@ using X.Paymob.CashIn;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Controllers
 builder.Services.AddControllers();
-
-// Inject Swagger
 builder.Services.AddSwaggerGen();
 
-// PostgraSql
-//builder.Services.AddDbContext<Context>(
-//  options => options.UseNpgsql(builder.Configuration.GetConnectionString("connection"))
-//  );
-
+// Database
 builder.Services.AddDbContext<Context>(options =>
-  options.UseSqlServer(builder.Configuration.GetConnectionString("MSSConnection"))
-  );
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MSSConnection"))
+);
 
-
-// Inject Repositories
+// Repositories
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IDonorRepository, DonorRepository>();
@@ -34,7 +27,7 @@ builder.Services.AddScoped<IContentRepository, ContentRepository>();
 builder.Services.AddScoped<IFollowRepository, FollowRepository>();
 builder.Services.AddScoped<IReactionRepository, ReactionRepository>();
 
-// Inject Services
+// Services
 builder.Services.AddScoped<IJWTService, JWTService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IPaymentService<PaymobService>, PaymobService>();
@@ -46,16 +39,19 @@ builder.Services.AddScoped<IReactionService, ReactionService>();
 builder.Services.AddScoped<IDonationService, DonationService>();
 builder.Services.AddScoped<IDonorService, DonorService>();
 
-// Inject Hubs
-builder.Services.AddSignalR();
+// Hub
 builder.Services.AddScoped<INotificationHub, NotificationHub>();
 
-// Inject Identity
+// SignalR
+builder.Services.AddSignalR();
+
+// Identity
 builder.Services
     .AddIdentity<UserAccount, IdentityRole<int>>()
     .AddEntityFrameworkStores<Context>()
     .AddDefaultTokenProviders();
 
+// Password settings
 builder.Services.Configure<IdentityOptions>(options =>
 {
     options.Password.RequireDigit = true;
@@ -65,12 +61,13 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Password.RequireNonAlphanumeric = false;
 });
 
-/// Configure JWT Authentication
+// JWT Auth
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
+})
+.AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -85,48 +82,42 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Add SignalR
-builder.Services.AddSignalR();
-
-// Add CORS
+// CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", builder =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader();
+        policy
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .SetIsOriginAllowed(_ => true)
+            .AllowCredentials();
     });
 });
 
-// Inject Paymob
+// Paymob
 builder.Services.AddPaymobCashIn(config =>
 {
     config.ApiKey = builder.Configuration["Paymob:ApiKey"];
     config.Hmac = builder.Configuration["Paymob:Hmac"];
-    //config.IntegrationId = int.Parse(builder.Configuration["Paymob:IntegrationId"]);
 });
 
-
+// Build app
 var app = builder.Build();
 
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
 app.UseCors("AllowAll");
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
 // Map SignalR Hub
-app.MapHub<NotificationHub>("/notificationHub");
+app.MapHub<NotificationHubHelper>("/notificationHub");
 
 app.MapControllers();
-
 app.Run();

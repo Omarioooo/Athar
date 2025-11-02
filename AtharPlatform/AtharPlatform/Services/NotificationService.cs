@@ -71,7 +71,7 @@ namespace AtharPlatform.Services
             var notificationReceivers =
                 receiverIds.Select(rid => new NotificationReceiver
                 {
-                    
+
                     NotificationId = notification.Id,
                     ReceiverId = rid,
                     IsRead = false
@@ -82,6 +82,9 @@ namespace AtharPlatform.Services
             await _unitOfWork.SaveAsync();
 
             // Send notification
+            if (_hub == null)
+                throw new Exception("Hub is null");
+
             await _hub.SendMessage(receiverIds, messageDto);
         }
 

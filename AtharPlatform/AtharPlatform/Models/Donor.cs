@@ -15,6 +15,7 @@ namespace AtharPlatform.Models
 
         public string? LastName { get; set; }
 
+
         public RolesEnum Role { get; set; } = RolesEnum.Donor;
 
         public virtual UserAccount Account { get; set; } = null!;
