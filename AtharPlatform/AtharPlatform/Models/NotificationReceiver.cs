@@ -8,11 +8,13 @@ namespace AtharPlatform.Models
     {
         [ForeignKey(nameof(Notification))]
         public int NotificationId { get; set; }
-        public virtual Notification Notification { get; set; } = new();
-
+        public virtual Notification Notification { get; set; } = null!;
 
         [ForeignKey(nameof(Receiver))]
         public int ReceiverId { get; set; }
-        public virtual UserAccount Receiver { get; set; } = new();
+        public virtual UserAccount Receiver { get; set; } = null!;
+
+        public bool? IsRead { get; set; } = false;
+        public DateTime? ReadAt { get; set; }
     }
 }

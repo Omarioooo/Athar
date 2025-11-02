@@ -8,34 +8,56 @@ namespace AtharPlatform.Repositories
     {
         public CharityRepository(Context context) : base(context) { }
 
-        public override Task<List<Charity>> GetAllAsync()
+        public async override Task<Charity?> GetAsync(int id)
         {
-            return base.GetAllAsync();
+            var charity = await _dbSet.Include(c => c.Account)
+                 .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (charity == null)
+                throw new KeyNotFoundException($"Charity with id {id} not found");
+
+            return charity;
         }
 
-        public override Task<Charity?> GetAsync(int id)
+        public async override Task<List<Charity>> GetAllAsync()
         {
-            return base.GetAsync(id);
+            var charities = await _dbSet.Include(c => c.Account)
+                .ToListAsync();
+
+            if (charities == null)
+                throw new KeyNotFoundException($"Charities not found");
+
+            return charities;
         }
 
-        public override Task<Charity?> GetAsync(Expression<Func<Charity, bool>> expression)
+        public async override Task<Charity> GetWithExpressionAsync(Expression<Func<Charity, bool>> expression)
         {
-            return base.GetAsync(expression);
+            var Charitys = await _dbSet.Include(c => c.Account)
+                .FirstOrDefaultAsync(expression);
+
+            if (Charitys == null)
+                throw new KeyNotFoundException($"Charity not found");
+
+            return Charitys;
         }
 
-        public override Task<bool> AddAsync(Charity entity)
+        public async Task<List<int>> GetCharitySubscribersAsync(int id)
         {
-            return base.AddAsync(entity);
+            var donorIds = await _context.Subscriptions
+                .Where(f => f.CharityId == id)
+                .Select(f => f.DonorId)
+                .ToListAsync();
+
+            return donorIds;
         }
 
-        public override Task<bool> Update(Charity entity)
+        public async Task<Charity> GetCharityByCampaignAsync(int campaignId)
         {
-            return base.Update(entity);
-        }
+            var charity = await _context.Charities
+                .Include(c => c.Campaigns)
+                .FirstOrDefaultAsync(c => c.Campaigns.Any(cm => cm.Id == campaignId));
 
-        public override Task<bool> DeleteAsync(int id)
-        {
-            return base.DeleteAsync(id);
+            return charity;
         }
     }
 }

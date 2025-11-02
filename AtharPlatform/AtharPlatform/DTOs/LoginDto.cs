@@ -4,10 +4,10 @@ namespace AtharPlatform.DTO
 {
     public class LoginDto
     {
-        [Required]
-        public string? UserNameOrEmail { get; set; }
+        [Required(ErrorMessage = "Username or email is required")]
+        public string UserNameOrEmail { get; set; } = string.Empty;
 
-        [Required]
-        public string? Password { get; set; }
+        [Required(ErrorMessage = "Password is required")]
+        public string Password { get; set; } = string.Empty;
     }
 }
