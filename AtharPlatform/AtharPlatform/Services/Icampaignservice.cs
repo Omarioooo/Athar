@@ -7,6 +7,11 @@ namespace AtharPlatform.Services
     public interface ICampaignService
     {
         /// <summary>
+        /// Get the total number of inProgress Campaign 
+        /// </summary>
+        Task<int> GetCountOfCampaignsAsync();
+
+        /// <summary>
         /// Retrieves all campaigns, optionally filtering by active (in-progress) status 
         /// and including related charity details.
         /// </summary>
@@ -15,7 +20,7 @@ namespace AtharPlatform.Services
         /// <summary>
         /// Retrieves a single campaign by its ID, optionally including charity details.
         /// </summary>
-        Task<CampaignDto> GetAsync(int id, bool inCludeCharity = true);
+        Task<CampaignDto> GetAsync(int id, bool inProgress = true, bool inCludeCharity = true);
 
         /// <summary>
         /// Retrieves all campaigns that belong to a specific category type.
@@ -45,7 +50,7 @@ namespace AtharPlatform.Services
         /// <summary>
         /// Updates an existing campaign with new data.
         /// </summary>
-        Task<bool> UpdateAsync(UpdatCampaignDto model);
+        Task<Campaign> UpdateAsync(UpdatCampaignDto model);
 
         /// <summary>
         /// Deletes a campaign by its ID.

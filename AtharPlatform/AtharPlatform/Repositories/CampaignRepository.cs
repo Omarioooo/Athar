@@ -8,7 +8,7 @@ namespace AtharPlatform.Repositories
 
         #region Query Helpers
 
-        private IQueryable<Campaign> IncludeCharityQuery(bool includeCharity = false)
+        private IQueryable<Campaign> IncludeCharityQuery(bool includeCharity = true)
         {
             var query = _dbSet.AsQueryable();
 
@@ -18,7 +18,7 @@ namespace AtharPlatform.Repositories
             return query;
         }
 
-        private IQueryable<Campaign> InProgressQuery(bool includeCharity = false)
+        private IQueryable<Campaign> InProgressQuery(bool includeCharity = true)
         {
             return IncludeCharityQuery(includeCharity)
                 .Where(c => c.Status == CampainStatusEnum.inProgress);
@@ -39,48 +39,49 @@ namespace AtharPlatform.Repositories
         #endregion
 
 
-        public async Task<Campaign> GetAsync(int id, bool includeCharity = false)
+        public async Task<Campaign> GetAsync(int id, bool inProgress = true, bool includeCharity = true)
         {
-            var campaign = await InProgressQuery(includeCharity: includeCharity)
-                .FirstOrDefaultAsync(c => c.Id == id);
+            var campaign = inProgress
+               ? await InProgressQuery(includeCharity: includeCharity).FirstOrDefaultAsync(c => c.Id == id)
+               : await IncludeCharityQuery(includeCharity: includeCharity).FirstOrDefaultAsync(c => c.Id == id);
 
             if (campaign == null)
-                throw new InvalidOperationException($"Campaign with ID {id} not found or not in progress.");
+                throw new KeyNotFoundException($"Campaign with ID {id} not found or not in progress.");
 
             return campaign;
         }
 
-        public async Task<List<Campaign>> GetAllAsync(bool includeCharity = false)
+        public async Task<List<Campaign>> GetAllAsync(bool includeCharity = true)
         {
             return await IncludeCharityQuery(includeCharity: includeCharity).ToListAsync();
         }
 
-        public async Task<List<Campaign>> GetAllInProgressAsync(bool includeCharity = false)
+        public async Task<List<Campaign>> GetAllInProgressAsync(bool includeCharity = true)
         {
             return await InProgressQuery(includeCharity: includeCharity).ToListAsync();
         }
 
-        public async Task<List<Campaign>> GetAllByTypeAsync(CampaignCategoryEnum type, bool includeCharity = false)
+        public async Task<List<Campaign>> GetAllByTypeAsync(CampaignCategoryEnum type, bool includeCharity = true)
         {
             return await IncludeCharityQuery(includeCharity: includeCharity)
                 .Where(c => c.Category == type)
                 .ToListAsync();
         }
 
-        public async Task<List<Campaign>> GetAllInProgressByTypeAsync(CampaignCategoryEnum type, bool includeCharity = false)
+        public async Task<List<Campaign>> GetAllInProgressByTypeAsync(CampaignCategoryEnum type, bool includeCharity = true)
         {
             return await InProgressQuery(includeCharity: includeCharity)
                 .Where(c => c.Category == type)
                 .ToListAsync();
         }
 
-        public async Task<List<Campaign>> Search(string keyword, bool includeCharity = false)
+        public async Task<List<Campaign>> Search(string keyword, bool includeCharity = true)
         {
             return await ApplySearchFilter(InProgressQuery(includeCharity: includeCharity), keyword)
                 .ToListAsync();
         }
 
-        public async Task<List<Campaign>> GetPageAsync(string? query, int page, int pageSize, bool includeCharity = false)
+        public async Task<List<Campaign>> GetPageAsync(string? query, int page, int pageSize, bool includeCharity = true)
         {
             page = Math.Max(page, 1);
             pageSize = Math.Max(pageSize, 12);
@@ -94,7 +95,7 @@ namespace AtharPlatform.Repositories
                 .ToListAsync();
         }
 
-        public async Task<List<Campaign>> GetPaginatedAsync(int page, int pageSize, bool includeCharity = false)
+        public async Task<List<Campaign>> GetPaginatedAsync(int page, int pageSize, bool includeCharity = true)
         {
             page = Math.Max(page, 1);
             pageSize = Math.Max(pageSize, 12);
