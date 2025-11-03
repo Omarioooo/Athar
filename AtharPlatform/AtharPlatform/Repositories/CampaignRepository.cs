@@ -4,13 +4,11 @@ namespace AtharPlatform.Repositories
 {
     public class CampaignRepository : Repository<Campaign>, ICampaignRepository
     {
-        public CampaignRepository(Context context) : base(context)
-        {
-        }
+        public CampaignRepository(Context context) : base(context) { }
 
         #region Query Helpers
 
-        private IQueryable<Campaign> BaseQuery(bool includeCharity = false)
+        private IQueryable<Campaign> IncludeCharityQuery(bool includeCharity = false)
         {
             var query = _dbSet.AsQueryable();
 
@@ -22,7 +20,7 @@ namespace AtharPlatform.Repositories
 
         private IQueryable<Campaign> InProgressQuery(bool includeCharity = false)
         {
-            return BaseQuery(includeCharity)
+            return IncludeCharityQuery(includeCharity)
                 .Where(c => c.Status == CampainStatusEnum.inProgress);
         }
 
@@ -40,65 +38,10 @@ namespace AtharPlatform.Repositories
 
         #endregion
 
-        public async Task<List<Campaign>> GetAllWithCharitiesAsync()
+
+        public async Task<Campaign> GetAsync(int id, bool includeCharity = false)
         {
-            return await BaseQuery(includeCharity: true).ToListAsync();
-        }
-
-        public async Task<List<Campaign>> GetAllInProgressWithCharitiesAsync()
-        {
-            return await InProgressQuery(includeCharity: true).ToListAsync();
-        }
-
-        public async Task<List<Campaign>> GetAllByTypeAsync(CampaignCategoryEnum type)
-        {
-            return await BaseQuery(includeCharity: true)
-                .Where(c => c.Category == type)
-                .ToListAsync();
-        }
-
-        public async Task<List<Campaign>> GetAllInProgressByTypeAsync(CampaignCategoryEnum type)
-        {
-            return await InProgressQuery()
-                .Where(c => c.Category == type)
-                .ToListAsync();
-        }
-
-        public async Task<List<Campaign>> Search(string keyword)
-        {
-            return await ApplySearchFilter(InProgressQuery(includeCharity: true), keyword)
-                .ToListAsync();
-        }
-
-        public async Task<List<Campaign>> GetPageAsync(string? query, int page, int pageSize)
-        {
-            page = Math.Max(page, 1);
-            pageSize = Math.Max(pageSize, 12);
-
-            var q = ApplySearchFilter(BaseQuery(includeCharity: true), query);
-
-            return await q
-                .OrderBy(c => c.Title)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-        }
-
-        public async Task<List<Campaign>> GetPaginatedAsync(int page, int pageSize)
-        {
-            page = Math.Max(page, 1);
-            pageSize = Math.Max(pageSize, 12);
-
-            return await InProgressQuery()
-                .OrderBy(c => c.Id)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-        }
-
-        public async Task<Campaign> GetWithCharityAsync(int id)
-        {
-            var campaign = await InProgressQuery(includeCharity: true)
+            var campaign = await InProgressQuery(includeCharity: includeCharity)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
             if (campaign == null)
@@ -107,5 +50,60 @@ namespace AtharPlatform.Repositories
             return campaign;
         }
 
+        public async Task<List<Campaign>> GetAllAsync(bool includeCharity = false)
+        {
+            return await IncludeCharityQuery(includeCharity: includeCharity).ToListAsync();
+        }
+
+        public async Task<List<Campaign>> GetAllInProgressAsync(bool includeCharity = false)
+        {
+            return await InProgressQuery(includeCharity: includeCharity).ToListAsync();
+        }
+
+        public async Task<List<Campaign>> GetAllByTypeAsync(CampaignCategoryEnum type, bool includeCharity = false)
+        {
+            return await IncludeCharityQuery(includeCharity: includeCharity)
+                .Where(c => c.Category == type)
+                .ToListAsync();
+        }
+
+        public async Task<List<Campaign>> GetAllInProgressByTypeAsync(CampaignCategoryEnum type, bool includeCharity = false)
+        {
+            return await InProgressQuery(includeCharity: includeCharity)
+                .Where(c => c.Category == type)
+                .ToListAsync();
+        }
+
+        public async Task<List<Campaign>> Search(string keyword, bool includeCharity = false)
+        {
+            return await ApplySearchFilter(InProgressQuery(includeCharity: includeCharity), keyword)
+                .ToListAsync();
+        }
+
+        public async Task<List<Campaign>> GetPageAsync(string? query, int page, int pageSize, bool includeCharity = false)
+        {
+            page = Math.Max(page, 1);
+            pageSize = Math.Max(pageSize, 12);
+
+            var q = ApplySearchFilter(IncludeCharityQuery(includeCharity: includeCharity), query);
+
+            return await q
+                .OrderBy(c => c.Title)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<List<Campaign>> GetPaginatedAsync(int page, int pageSize, bool includeCharity = false)
+        {
+            page = Math.Max(page, 1);
+            pageSize = Math.Max(pageSize, 12);
+
+            return await InProgressQuery(includeCharity: includeCharity)
+                .OrderBy(c => c.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
     }
 }

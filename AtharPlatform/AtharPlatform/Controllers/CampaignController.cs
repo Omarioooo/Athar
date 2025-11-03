@@ -1,14 +1,12 @@
 using AtharPlatform.DTOs;
 using AtharPlatform.Dtos;
-using AtharPlatform.Models;
 using AtharPlatform.Models.Enum;
-using AtharPlatform.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.IO;
+using AtharPlatform.Services;
+using AtharPlatform.Repositories;
+
 
 namespace AtharPlatform.Controllers
 {
@@ -16,21 +14,16 @@ namespace AtharPlatform.Controllers
     [ApiController]
     public class CampaignController : ControllerBase
     {
-        private readonly ICampaignService _service;
-        private readonly Context _context;
-        private readonly IWebHostEnvironment _env;
+        private readonly ICampaignService _campaignService;
 
-        public CampaignController(ICampaignService service, Context context, IWebHostEnvironment env)
+        public CampaignController(ICampaignService service, IUnitOfWork unitOfWork)
         {
-            _service = service;
-            _context = context;
-            _env = env;
+            _campaignService = service;
         }
 
         // GET /api/Campaign/GetAll?query=&page=1&pageSize=12
         // Returns paginated campaigns. If a campaign has supporting_charities it will be returned in supporting_charities (and charity_name will be omitted), otherwise charity_name is returned.
         [HttpGet("GetAll")]
-        [AllowAnonymous]
         public async Task<ActionResult<PaginatedResultDto<CampaignDto>>> GetAll([FromQuery] string? query, [FromQuery] int page = 1, [FromQuery] int pageSize = 12)
         {
             if (page <= 0 || pageSize <= 0)
@@ -181,7 +174,7 @@ namespace AtharPlatform.Controllers
         {
             try
             {
-                var result = await _service.GetByIdAsync(id);
+                var result = await _campaignService.GetByIdAsync(id);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -195,7 +188,7 @@ namespace AtharPlatform.Controllers
         {
             try
             {
-                var result = await _service.GetByIdAsynctousers(id);
+                var result = await _campaignService.GetByIdAsynctousers(id);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -209,7 +202,7 @@ namespace AtharPlatform.Controllers
         {
             try
             {
-                var result = await _service.GetByTypeAsync(type);
+                var result = await _campaignService.GetByTypeAsync(type);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -219,11 +212,11 @@ namespace AtharPlatform.Controllers
         }
 
         [HttpGet("[action]")]
-        public async Task<IActionResult> GetByTypetousers(CampaignCategoryEnum type)
+        public async Task<IActionResult> GetByType(CampaignCategoryEnum type)
         {
             try
             {
-                var result = await _service.GetByTypeAsynctousers(type);
+                var result = await _campaignService.GetByTypeAsync(type);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -237,7 +230,7 @@ namespace AtharPlatform.Controllers
         {
             try
             {
-                var result = await _service.GetAllTypesAsync();
+                var result = await _campaignService.GetAllTypesAsync();
                 return Ok(result);
             }
             catch (Exception ex)
@@ -251,7 +244,7 @@ namespace AtharPlatform.Controllers
         {
             try
             {
-                var result = await _service.SearchAsync(keyword);
+                var result = await _campaignService.SearchAsync(keyword);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -270,7 +263,7 @@ namespace AtharPlatform.Controllers
 
             try
             {
-                var result = await _service.CreateAsync(model);
+                var result = await _campaignService.CreateAsync(model);
                 return CreatedAtAction(nameof(GetCampaignById), new { id = result.Id }, result);
             }
             catch (Exception ex)
@@ -287,7 +280,7 @@ namespace AtharPlatform.Controllers
 
             try
             {
-                var updatedCampaign = await _service.UpdateAsync(model);
+                var updatedCampaign = await _campaignService.UpdateAsync(model);
                 return Ok(updatedCampaign);
             }
             catch (Exception ex)
@@ -301,7 +294,7 @@ namespace AtharPlatform.Controllers
         {
             try
             {
-                await _service.DeleteAsync(id);
+                await _campaignService.DeleteAsync(id);
                 return Ok(new { message = "Campaign deleted successfully" });
             }
             catch (Exception ex)

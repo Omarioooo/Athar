@@ -5,14 +5,14 @@ namespace AtharPlatform.DTOs
 {
     public class AddCampaignDto
     {
-        public string Title { get; set; }
+        public string Title { get; set; } = null!;
 
         [Required]
-        public string Description { get; set; }
+        public string Description { get; set; } = null!;
 
 
         [Required]
-        public string Image { get; set; }
+        public IFormFile Image { get; set; } = null!;
 
         public bool IsCritical { get; set; } = false;
 

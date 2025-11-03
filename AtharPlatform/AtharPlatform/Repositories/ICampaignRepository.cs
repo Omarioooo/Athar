@@ -5,43 +5,44 @@ namespace AtharPlatform.Repositories
     public interface ICampaignRepository : IRepository<Campaign>
     {
         /// <summary>
-        /// Retrieves all campaigns with related charities.
+        /// Get a campaign by its ID.
         /// </summary>
-        Task<List<Campaign>> GetAllWithCharitiesAsync();
+        Task<Campaign> GetAsync(int id, bool includeCharity = true);
 
         /// <summary>
-        /// Retrieves all active (in-progress) campaigns with related charities.
+        /// Get all campaigns.
         /// </summary>
-        Task<List<Campaign>> GetAllInProgressWithCharitiesAsync();
+        Task<List<Campaign>> GetAllAsync(bool includeCharity = true);
 
         /// <summary>
-        /// Retrieves all campaigns of a specific type with related charities.
+        /// Get all campaigns that are currently in progress.
         /// </summary>
-        Task<List<Campaign>> GetAllByTypeAsync(CampaignCategoryEnum type);
+        Task<List<Campaign>> GetAllInProgressAsync(bool includeCharity = true);
 
         /// <summary>
-        /// Retrieves all in-progress campaigns of a specific type.
+        /// Get all campaigns by category type.
         /// </summary>
-        Task<List<Campaign>> GetAllInProgressByTypeAsync(CampaignCategoryEnum type);
+        Task<List<Campaign>> GetAllByTypeAsync(CampaignCategoryEnum type, bool includeCharity = true);
 
         /// <summary>
-        /// Searches for campaigns matching the given keyword among active campaigns.
+        /// Get all in-progress campaigns by category type.
         /// </summary>
-        Task<List<Campaign>> Search(string keyword);
+        Task<List<Campaign>> GetAllInProgressByTypeAsync(CampaignCategoryEnum type, bool includeCharity = true);
 
         /// <summary>
-        /// Retrieves a paginated list of campaigns, optionally filtered by a query string.
+        /// Search campaigns by keyword.
         /// </summary>
-        Task<List<Campaign>> GetPageAsync(string? query, int page, int pageSize);
+        Task<List<Campaign>> Search(string keyword, bool includeCharity = true);
 
         /// <summary>
-        /// Retrieves a paginated list of in-progress campaigns.
+        /// Get campaigns by query with pagination.
         /// </summary>
-        Task<List<Campaign>> GetPaginatedAsync(int page, int pageSize);
+        Task<List<Campaign>> GetPageAsync(string? query, int page, int pageSize, bool includeCharity = true);
 
         /// <summary>
-        /// Retrieves a single campaign (in-progress only) with its related charity.
+        /// Get paginated list of campaigns.
         /// </summary>
-        Task<Campaign> GetWithCharityAsync(int id);
+        Task<List<Campaign>> GetPaginatedAsync(int page, int pageSize, bool includeCharity = true);
     }
+
 }
