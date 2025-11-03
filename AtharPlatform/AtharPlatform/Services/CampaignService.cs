@@ -1,6 +1,6 @@
-﻿using AtharPlatform.Dtos;
+﻿using Ardalis.GuardClauses;
+using AtharPlatform.Dtos;
 using AtharPlatform.DTOs;
-using AtharPlatform.Models;
 using AtharPlatform.Models.Enum;
 using AtharPlatform.Repositories;
 
@@ -16,14 +16,14 @@ namespace AtharPlatform.Services
             _unitOfWork = unitOfWork;
         }
 
+        public async Task<int> GetCountOfCampaignsAsync()
+            => (await GetAllAsync(inProgress: true, includeCharity: false)).Count();
+
         public async Task<List<CampaignDto>> GetAllAsync(bool inProgress = true, bool includeCharity = true)
         {
-            List<Campaign> campaigns;
-
-            if (inProgress)
-                campaigns = await _unitOfWork.Campaigns.GetAllInProgressAsync(includeCharity);
-            else
-                campaigns = await _unitOfWork.Campaigns.GetAllAsync(includeCharity);
+            var campaigns = inProgress
+                 ? await _unitOfWork.Campaigns.GetAllInProgressAsync(includeCharity)
+                 : await _unitOfWork.Campaigns.GetAllAsync(includeCharity);
 
             if (campaigns == null)
                 throw new KeyNotFoundException("Campaigns not found");
@@ -43,9 +43,9 @@ namespace AtharPlatform.Services
             }).ToList(); ;
         }
 
-        public async Task<CampaignDto> GetAsync(int id, bool inCludeCharity = true)
+        public async Task<CampaignDto> GetAsync(int id, bool inProgress = true, bool inCludeCharity = true)
         {
-            var campaign = await _unitOfWork.Campaigns.GetAsync(id, inCludeCharity);
+            var campaign = await _unitOfWork.Campaigns.GetAsync(id, inProgress: inProgress, includeCharity: inCludeCharity);
             if (campaign == null)
                 throw new KeyNotFoundException("Campaign not found");
 
@@ -120,10 +120,14 @@ namespace AtharPlatform.Services
 
         public async Task<List<CampaignDto>> GetPaginatedAsync(int page, int pageSize, bool inCludeCharity = true)
         {
+
+            if (page <= 0 || pageSize <= 0)
+                throw new ArgumentOutOfRangeException("Page and PageSize must be greater than zero.");
+
             var campaigns = await _unitOfWork.Campaigns.GetPaginatedAsync(page, pageSize, inCludeCharity);
 
-            if (campaigns == null || !campaigns.Any())
-                throw new Exception("No campaigns found");
+            if (campaigns == null)
+                throw new KeyNotFoundException("No campaigns found");
 
             return campaigns.Select(c => new CampaignDto
             {
@@ -144,7 +148,7 @@ namespace AtharPlatform.Services
         {
             // Check the model
             if (model == null)
-                throw new ArgumentNullException("Your model from request is null.");
+                throw new ArgumentNullException(nameof(model), "Your model from request is null.");
 
             // Dealing with files
             using MemoryStream stream = new MemoryStream();
@@ -175,12 +179,12 @@ namespace AtharPlatform.Services
             return true;
         }
 
-        public async Task<bool> UpdateAsync(UpdatCampaignDto model)
+        public async Task<Campaign> UpdateAsync(UpdatCampaignDto model)
         {
             // check the campaign
             var campaign = await _unitOfWork.Campaigns.GetAsync(model.Id, includeCharity: false);
             if (campaign == null)
-                throw new Exception("Campaign not found");
+                throw new ArgumentNullException(nameof(model), "Campaign not found");
 
             // deal with files
             using MemoryStream stream = new MemoryStream();
@@ -201,21 +205,19 @@ namespace AtharPlatform.Services
             await _unitOfWork.Campaigns.UpdateAsync(campaign);
             await _unitOfWork.SaveAsync();
 
-
-            return true;
+            return campaign;
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
             var campaign = await _unitOfWork.Campaigns.GetAsync(id, includeCharity: false);
             if (campaign == null)
-                throw new Exception("Campaign not found");
+                throw new KeyNotFoundException("Campaign not found");
 
             await _unitOfWork.Campaigns.DeleteAsync(id);
             await _unitOfWork.SaveAsync();
 
             return true;
         }
-
     }
 }

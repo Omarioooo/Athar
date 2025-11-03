@@ -7,7 +7,7 @@ namespace AtharPlatform.Repositories
         /// <summary>
         /// Get a campaign by its ID.
         /// </summary>
-        Task<Campaign> GetAsync(int id, bool includeCharity = true);
+        Task<Campaign> GetAsync(int id, bool inProgress = true, bool includeCharity = true);
 
         /// <summary>
         /// Get all campaigns.

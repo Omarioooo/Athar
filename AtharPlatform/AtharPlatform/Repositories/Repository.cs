@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 
 namespace AtharPlatform.Repositories
 {
@@ -15,15 +16,20 @@ namespace AtharPlatform.Repositories
 
         public virtual async Task<List<T>> GetAllAsync() => await _dbSet.ToListAsync();
 
+        public virtual async Task<T?> GetAsync(int id)
+        {
+            var entity = await _dbSet.FindAsync(id);
+            if (entity == null)
+                throw new KeyNotFoundException($"Database error : Entity with id {id} of type {typeof(T).Name} not found.");
+            return entity;
+        }
 
-        public virtual async Task<T?> GetAsync(int id) => await _dbSet.FindAsync(id);
-
-        public virtual async Task<T?> GetWithExpressionAsync(Expression<Func<T, bool>> expression)
+        public virtual async Task<T> GetWithExpressionAsync(Expression<Func<T, bool>> expression)
         {
             var entity = await _dbSet.FirstOrDefaultAsync(expression);
 
             if (entity == null)
-                throw new KeyNotFoundException($"Entity of type {typeof(T).Name} not found.");
+                throw new KeyNotFoundException($"Database error : Entity of type {typeof(T).Name} not found.");
 
             return entity;
         }
@@ -31,17 +37,16 @@ namespace AtharPlatform.Repositories
         public virtual async Task<bool> AddAsync(T entity)
         {
             if (entity == null)
-                throw new ArgumentNullException(nameof(entity));
+                throw new ArgumentNullException($"Database error : {nameof(entity)}");
 
-            _dbSet.Add(entity);
-
+            await _dbSet.AddAsync(entity);
             return true;
         }
 
         public virtual async Task<bool> UpdateAsync(T entity)
         {
             if (entity == null)
-                throw new ArgumentNullException(nameof(entity));
+                throw new ArgumentNullException($"Database error : {nameof(entity)}");
 
             _dbSet.Update(entity);
             return true;
@@ -51,11 +56,10 @@ namespace AtharPlatform.Repositories
         {
             var entity = await GetAsync(id);
             if (entity == null)
-                return false;
+                throw new KeyNotFoundException($"Database error : Cannot delete. Entity with id {id} not found.");
 
             _dbSet.Remove(entity);
             return true;
         }
-
     }
 }
