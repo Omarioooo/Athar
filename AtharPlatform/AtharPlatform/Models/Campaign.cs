@@ -10,19 +10,13 @@ namespace AtharPlatform.Models
         public int Id { get; set; }
 
         [Required]
-        public string Title { get; set; }
+        public string Title { get; set; } = null!;
 
         [Required]
-        public string Description { get; set; }
+        public string Description { get; set; } = null!;
 
         [Required]
-        public string ImageUrl { get; set; }
-
-        // Scraped source identifier (e.g., megakheir slug)
-        public string? ExternalId { get; set; }
-
-        // Full list of scraped supporting charity names (JSON array of strings)
-        public string? SupportingCharitiesJson { get; set; }
+        public byte[]? Image { get; set; }
 
         public bool isCritical { get; set; } = false;
 
@@ -44,15 +38,24 @@ namespace AtharPlatform.Models
 
         public bool IsInKindDonation { get; set; } = false;
 
-        public DateTime Date { get; set; } = DateTime.UtcNow;
+        public DateTime StartingDate { get; set; } = DateTime.UtcNow;
 
         public CampaignCategoryEnum Category { get; set; } = CampaignCategoryEnum.Other;
         public CampainStatusEnum Status { get; set; } = CampainStatusEnum.inProgress;
 
 
+        #region // Scraped Date
+        // Scraped source identifier (e.g., megakheir slug)
+        public string? ExternalId { get; set; }
+
+        // Full list of scraped supporting charity names (JSON array of strings)
+        public string? SupportingCharitiesJson { get; set; }
+        #endregion
+
         [ForeignKey(nameof(Charity))]
         public int CharityID { get; set; }
         public virtual Charity Charity { get; set; } = null!;
         public virtual List<CampaignDonation> CampaignDonations { get; set; } = null!;
+        public byte[] ImageUrl { get; internal set; }
     }
 }
