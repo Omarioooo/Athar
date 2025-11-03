@@ -17,13 +17,27 @@ namespace AtharPlatform.Models
         [Required]
         public String Description { get; set; }
 
-
         [Column(TypeName = "decimal(18, 4)")]
         public decimal? Balance { get; set; } = 0.0m;
 
         [Required]
         public byte[]? VerificationDocument { get; set; }
         public CharityStatusEnum Status { get; set; } = CharityStatusEnum.Pending;
+
+        // Scrapping attributes
+
+        // Scraped external presentation fields moved to a 1:1 entity
+        public virtual CharityExternalInfo? ScrapedInfo { get; set; }
+
+        // Distinguish whether data was imported from scraping or created manually
+        public bool IsScraped { get; set; } = false;
+        public string? ExternalId { get; set; }
+        public DateTime? ImportedAt { get; set; }
+
+        // Soft delete / deactivate flag
+        public bool IsActive { get; set; } = true;
+        public DateTime? DeactivatedAt { get; set; }
+
 
         public virtual UserAccount Account { get; set; }
         public virtual List<CharityVolunteer> CharityVolunteers { get; set; } = null!;

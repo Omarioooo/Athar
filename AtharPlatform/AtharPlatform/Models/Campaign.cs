@@ -16,7 +16,13 @@ namespace AtharPlatform.Models
         public string Description { get; set; }
 
         [Required]
-        public byte[] Image { get; set; }
+        public string ImageUrl { get; set; }
+
+        // Scraped source identifier (e.g., megakheir slug)
+        public string? ExternalId { get; set; }
+
+        // Full list of scraped supporting charity names (JSON array of strings)
+        public string? SupportingCharitiesJson { get; set; }
 
         public bool isCritical { get; set; } = false;
 

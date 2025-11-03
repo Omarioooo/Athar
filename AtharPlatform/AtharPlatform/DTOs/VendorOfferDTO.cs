@@ -1,12 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿
+using System.ComponentModel.DataAnnotations;
 using AtharPlatform.Models.Enums;
 
-namespace AtharPlatform.Models
+namespace AtharPlatform.DTOs
 {
-    public class VendorOffers
+    public class VendorOfferDTO
     {
-        [Key]
         public int Id { get; set; }
 
         [Required]
@@ -32,19 +31,15 @@ namespace AtharPlatform.Models
         public string Description { get; set; }
 
         [Required]
-        [Column(TypeName = "decimal(18,2)")]
         public decimal PriceBeforDiscount { get; set; }
 
         [Required]
-        [Column(TypeName = "decimal(18,2)")]
         public decimal PriceAfterDiscount { get; set; }
 
-        [Required]
-        public OfferStatus Status { get; set; }= OfferStatus.Pending;
+        // ممكن نخلي الـStatus للـAdmin فقط
+        public OfferStatus Status { get; set; } = OfferStatus.Pending;
 
         [Required]
-        [ForeignKey(nameof(CharityVendorOffer))]
         public int CharityVendorOfferId { get; set; }
-        public virtual CharityVendorOffer CharityVendorOffer { get; set; } = null!;
     }
 }
