@@ -53,7 +53,6 @@ namespace AtharPlatform.Models
         [ForeignKey(nameof(Charity))]
     public int CharityID { get; set; }
     public virtual Charity? Charity { get; set; }
-        public virtual List<CampaignDonation> CampaignDonations { get; set; } = new();    
-        public virtual List<CampaignContent> CampaignContent { get; set; } = new();
+        public virtual List<CampaignDonation> CampaignDonations { get; set; } = new();
     }
 }

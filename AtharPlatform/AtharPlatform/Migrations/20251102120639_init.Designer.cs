@@ -13,7 +13,7 @@ namespace AtharPlatform.Migrations
 {
     [DbContext(typeof(Context))]
     [Migration("20251102120639_init")]
-    partial class init
+    partial class init2_20251102120639
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

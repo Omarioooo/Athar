@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AtharPlatform.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class init2_20251102120639 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
