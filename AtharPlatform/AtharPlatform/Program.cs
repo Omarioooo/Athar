@@ -14,8 +14,11 @@ builder.Services.AddSwaggerGen();
 
 // Database
 builder.Services.AddDbContext<Context>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MSSConnection"))
-);
+{
+    var cs = builder.Configuration.GetConnectionString("MSSConnection")
+             ?? builder.Configuration.GetConnectionString("DefaultConnection");
+    options.UseSqlServer(cs);
+});
 
 // Repositories
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -38,6 +41,7 @@ builder.Services.AddScoped<IFollowService, FollowService>();
 builder.Services.AddScoped<IReactionService, ReactionService>();
 builder.Services.AddScoped<IDonationService, DonationService>();
 builder.Services.AddScoped<IDonorService, DonorService>();
+builder.Services.AddScoped<ICampaignService, CampaignService>();
 
 // Hub
 builder.Services.AddScoped<INotificationHub, NotificationHub>();
@@ -110,6 +114,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Note: Database migrations are not auto-applied here to avoid
+// blocking startup when there are pending model changes. Use EF CLI
+// or the Ops/migrations endpoint to apply migrations manually.
 
 app.UseCors("AllowAll");
 app.UseHttpsRedirection();

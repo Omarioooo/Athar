@@ -59,5 +59,47 @@ namespace AtharPlatform.Repositories
 
             return charity;
         }
+
+        public async Task<int> CountAsync(string? query)
+        {
+            var q = _context.Charities.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(query))
+            {
+                var term = query.Trim();
+                q = q.Where(c => c.Name.Contains(term) || c.Description.Contains(term));
+            }
+            return await q.CountAsync();
+        }
+
+        public async Task<List<Charity>> GetPageAsync(string? query, int page, int pageSize)
+        {
+            var q = _context.Charities.Include(c => c.ScrapedInfo).AsQueryable();
+            if (!string.IsNullOrWhiteSpace(query))
+            {
+                var term = query.Trim();
+                q = q.Where(c => c.Name.Contains(term) || c.Description.Contains(term));
+            }
+
+            return await q
+                .OrderBy(c => c.Name)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<Charity?> GetWithCampaignsAsync(int id)
+        {
+            return await _context.Charities
+                .Include(c => c.ScrapedInfo)
+                .Include(c => c.Campaigns)
+                .FirstOrDefaultAsync(c => c.Id == id);
+        }
+
+        public Task BulkImportAsync(IEnumerable<Charity> items)
+        {
+            if (items == null) throw new ArgumentNullException(nameof(items));
+            _context.Charities.AddRange(items);
+            return Task.CompletedTask;
+        }
     }
 }

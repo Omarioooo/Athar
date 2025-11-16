@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.IO;
+using System.Linq;
 
 namespace AtharPlatform.Controllers
 {
@@ -308,6 +309,90 @@ namespace AtharPlatform.Controllers
             {
                 return NotFound(ex.Message);
             }
+        }
+
+        // (POST) /api/Campaign/import - bulk import scraped campaigns and link to existing charities by name
+        [HttpPost("import")]
+        [Authorize(Roles = "Admin,SuperAdmin")]
+        public async Task<IActionResult> ImportCampaigns([FromBody] IEnumerable<CampaignImportItemDto> items)
+        {
+            if (items == null) return BadRequest("No data provided");
+
+            var list = items.ToList();
+            if (list.Count == 0) return Ok(new { imported = 0, skipped = 0 });
+
+            var charities = await _context.Charities
+                .AsNoTracking()
+                .Select(c => new { c.Id, c.Name })
+                .ToListAsync();
+
+            static bool NameMatches(string supporter, string charityName)
+            {
+                if (string.IsNullOrWhiteSpace(supporter) || string.IsNullOrWhiteSpace(charityName)) return false;
+                var s = supporter.Trim();
+                var n = charityName.Trim();
+                return string.Equals(s, n, StringComparison.Ordinal) || n.Contains(s) || s.Contains(n);
+            }
+
+            int imported = 0;
+            var skipped = new List<string>();
+
+            foreach (var it in list)
+            {
+                if (string.IsNullOrWhiteSpace(it.Title)) { skipped.Add("missing title"); continue; }
+
+                int? charityId = null;
+                if (!string.IsNullOrWhiteSpace(it.CharityName))
+                {
+                    var match = charities.FirstOrDefault(c => string.Equals(c.Name, it.CharityName!.Trim(), StringComparison.Ordinal))
+                               ?? charities.FirstOrDefault(c => c.Name.Contains(it.CharityName!.Trim()));
+                    charityId = match?.Id;
+                }
+                if (charityId == null && it.SupportingCharities != null && it.SupportingCharities.Count > 0)
+                {
+                    foreach (var s in it.SupportingCharities)
+                    {
+                        var match = charities.FirstOrDefault(c => NameMatches(s, c.Name));
+                        if (match != null) { charityId = match.Id; break; }
+                    }
+                }
+
+                if (charityId == null) { skipped.Add($"no charity match for '{it.Title}'"); continue; }
+
+                // Map category
+                CampaignCategoryEnum category = CampaignCategoryEnum.Other;
+                if (!string.IsNullOrWhiteSpace(it.Category) && Enum.TryParse<CampaignCategoryEnum>(it.Category, true, out var parsed))
+                    category = parsed;
+
+                var campaign = new Campaign
+                {
+                    Title = it.Title!,
+                    Description = it.Description ?? string.Empty,
+                    ImageUrl = it.ImageUrl ?? string.Empty,
+                    ExternalId = it.ExternalId,
+                    SupportingCharitiesJson = (it.SupportingCharities != null && it.SupportingCharities.Count > 0)
+                        ? JsonSerializer.Serialize(it.SupportingCharities)
+                        : null,
+                    isCritical = it.IsCritical ?? false,
+                    StartDate = it.StartDate ?? DateTime.UtcNow,
+                    Duration = it.DurationDays ?? 30,
+                    GoalAmount = it.GoalAmount ?? 0,
+                    RaisedAmount = it.RaisedAmount ?? 0,
+                    IsInKindDonation = false,
+                    Date = DateTime.UtcNow,
+                    Category = category,
+                    Status = CampainStatusEnum.inProgress,
+                    CharityID = charityId.Value
+                };
+
+                await _context.Campaigns.AddAsync(campaign);
+                imported++;
+            }
+
+            if (imported > 0)
+                await _context.SaveChangesAsync();
+
+            return Ok(new { imported, skipped = skipped.Count, skippedDetails = skipped });
         }
     }
 }

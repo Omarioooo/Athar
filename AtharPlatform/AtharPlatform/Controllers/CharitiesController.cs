@@ -1,5 +1,6 @@
 using AtharPlatform.Dtos;
 using AtharPlatform.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,11 +15,13 @@ namespace AtharPlatform.Controllers
     {
         private readonly IUnitOfWork _uow;
         private readonly Context _db;
+        private readonly UserManager<UserAccount> _userManager;
 
-        public CharitiesController(IUnitOfWork uow, Context db)
+        public CharitiesController(IUnitOfWork uow, Context db, UserManager<UserAccount> userManager)
         {
             _uow = uow;
             _db = db;
+            _userManager = userManager;
         }
 
         private int? GetCurrentUserId()
@@ -57,7 +60,7 @@ namespace AtharPlatform.Controllers
             // 1) Direct FK (Campaign.CharityID == Charity.Id)
             // 2) Indirect support: Campaign.SupportingCharitiesJson contains the charity name
             List<(int Id, string Name, string? ImageUrl, string? ExternalWebsiteUrl, byte[]? Image, string Description)> pageCharities = items
-                .Select(c => ((c as UserAccount).Id, c.Name, c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
+                .Select(c => (c.Id, c.Name, c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
                                c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null, c.Image, c.Description))
                 .ToList();
 
@@ -155,13 +158,13 @@ namespace AtharPlatform.Controllers
 
             var dto = new CharityCardDto
             {
-                Id = (c as UserAccount).Id,
+                Id = c.Id,
                 Name = c.Name,
                 Description = c.Description,
                 Image = c.Image,
                 ImageUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
                 ExternalWebsiteUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null,
-                Campaigns = (c.campaigns ?? new()).Select(x => new MiniCampaignDto
+                Campaigns = (c.Campaigns ?? new()).Select(x => new MiniCampaignDto
                 {
                     Id = x.Id,
                     Title = x.Title,
@@ -197,7 +200,7 @@ namespace AtharPlatform.Controllers
 
             var dto = new CharityCardDto
             {
-                Id = (c as UserAccount).Id,
+                Id = c.Id,
                 Name = c.Name,
                 Description = c.Description,
                 Image = c.Image,
@@ -221,7 +224,7 @@ namespace AtharPlatform.Controllers
                 Image = c.Image,
                 ImageUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
                 ExternalWebsiteUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null,
-                CampaignsCount = c.campaigns?.Count ?? 0
+                CampaignsCount = c.Campaigns?.Count ?? 0
             }));
         }
 
@@ -247,7 +250,7 @@ namespace AtharPlatform.Controllers
 
         // (POST) /api/charities/import - bulk import scraped data
         [HttpPost("import")]
-        [Authorize(Roles = "SuperAdmin")]
+        [Authorize(Roles = "Admin,SuperAdmin")]
         public async Task<IActionResult> Import([FromBody] IEnumerable<CharityImportItemDto> items)
         {
             if (items == null) return BadRequest("No data provided");
@@ -255,8 +258,48 @@ namespace AtharPlatform.Controllers
             var entities = new List<Models.Charity>();
             foreach (var i in items.Where(i => !string.IsNullOrWhiteSpace(i.Name)))
             {
+                // Create a placeholder Identity account to satisfy the required FK (Charity.Id -> UserAccount.Id)
+                // Generate a unique username/email based on the charity name
+                var baseSlug = new string(i.Name.Trim()
+                    .Select(ch => char.IsLetterOrDigit(ch) ? char.ToLowerInvariant(ch) : '-')
+                    .ToArray());
+                var slug = string.Join("-", baseSlug.Split(new[]{'-'}, StringSplitOptions.RemoveEmptyEntries));
+                if (string.IsNullOrWhiteSpace(slug)) slug = $"charity-{Guid.NewGuid():N}";
+
+                var userName = slug;
+                var email = $"{userName}@scraped.local";
+
+                // Ensure uniqueness for username/email
+                int suffix = 0;
+                while (await _userManager.FindByNameAsync(userName) != null || await _userManager.FindByEmailAsync(email) != null)
+                {
+                    suffix++;
+                    userName = $"{slug}-{suffix}";
+                    email = $"{userName}@scraped.local";
+                }
+
+                var account = new UserAccount
+                {
+                    UserName = userName,
+                    Email = email,
+                    Country = null,
+                    City = null,
+                    ProfileImage = i.Image,
+                    CreatedAt = now,
+                    IsDeleted = true
+                };
+
+                // Generate a compliant random password: at least 6 chars, include digit and lowercase
+                var pwd = $"Imp0rt-{Guid.NewGuid():N}"; // e.g., Imp0rt-<32 hex>
+                var createRes = await _userManager.CreateAsync(account, pwd);
+                if (!createRes.Succeeded)
+                {
+                    return BadRequest(new { message = $"Failed to create backing account for '{i.Name}': " + string.Join(", ", createRes.Errors.Select(e => e.Description)) });
+                }
+
                 var charity = new Models.Charity
                 {
+                    Id = account.Id,
                     Name = i.Name.Trim(),
                     Description = i.Description ?? string.Empty,
                     Image = i.Image, // if provided as bytes/base64 decoded by client

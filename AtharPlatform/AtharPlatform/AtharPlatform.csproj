@@ -9,6 +9,10 @@
   <ItemGroup>
     <Compile Remove="DTO\**" />
     <Compile Remove="Hub\**" />
+    <Compile Remove="Migrations\20251102120639_init.cs" />
+    <Compile Remove="Migrations\20251102120639_init.Designer.cs" />
+    <Compile Remove="Migrations\20251116021738_PostMergeSync.cs" />
+    <Compile Remove="Migrations\20251116021738_PostMergeSync.Designer.cs" />
     <Content Remove="DTO\**" />
     <Content Remove="Hub\**" />
     <EmbeddedResource Remove="DTO\**" />

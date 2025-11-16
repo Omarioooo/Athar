@@ -118,7 +118,7 @@ namespace AtharPlatform.Controllers
                     return NotFound(new { Message = "Application not found." });
 
                 application.IsFirstTime = isFirstTime;
-                await _unitOfWork.VolunteerApplications.Update(application);
+                await _unitOfWork.VolunteerApplications.UpdateAsync(application);
                 await _unitOfWork.SaveAsync();
 
                 return NoContent();

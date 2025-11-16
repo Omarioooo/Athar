@@ -126,7 +126,7 @@ namespace AtharPlatform.Controllers
                     return NotFound(new { Message = "Offer not found." });
 
                 offer.Status = status;
-                await _unitOfWork.VendorOffers.Update(offer);
+                await _unitOfWork.VendorOffers.UpdateAsync(offer);
                 await _unitOfWork.SaveAsync();
 
                 return NoContent();
