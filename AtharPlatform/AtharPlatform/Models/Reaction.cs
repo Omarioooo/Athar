@@ -9,8 +9,7 @@ namespace AtharPlatform.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
-        public DateTime ReactionDate { get; set; }
+        public DateTime? ReactionDate { get; set; }
 
         [ForeignKey(nameof(Donor))]
         public int DonorID { get; set; }
@@ -18,6 +17,6 @@ namespace AtharPlatform.Models
 
         [ForeignKey(nameof(Content))]
         public int ContentID { get; set; }
-        public virtual Content Content { get; set; } = new();
+        public virtual Content Content { get; set; }
     }
 }

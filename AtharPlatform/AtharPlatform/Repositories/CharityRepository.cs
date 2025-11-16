@@ -1,5 +1,6 @@
-﻿using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore;
+﻿
+
+using System.Linq.Expressions;
 
 namespace AtharPlatform.Repositories
 {
@@ -7,63 +8,56 @@ namespace AtharPlatform.Repositories
     {
         public CharityRepository(Context context) : base(context) { }
 
-        public override Task<List<Charity>> GetAllAsync() => base.GetAllAsync();
-
-        public override Task<Charity?> GetAsync(int id) => base.GetAsync(id);
-
-        public override Task<Charity?> GetAsync(Expression<Func<Charity, bool>> expression) => base.GetAsync(expression);
-
-        public override Task<bool> AddAsync(Charity entity) => base.AddAsync(entity);
-
-        public override Task<bool> Update(Charity entity) => base.Update(entity);
-
-        public override Task<bool> DeleteAsync(int id) => base.DeleteAsync(id);
-
-        public async Task<List<Charity>> GetPageAsync(string? query, int page, int pageSize)
+        public async override Task<Charity?> GetAsync(int id)
         {
-            if (page <= 0) page = 1;
-            if (pageSize <= 0) pageSize = 12;
+            var charity = await _dbSet.Include(c => c.Account)
+                 .FirstOrDefaultAsync(c => c.Id == id);
 
-            var q = _dbSet.AsQueryable();
-            if (!string.IsNullOrWhiteSpace(query))
-            {
-                var term = query.Trim();
-                q = q.Where(c => c.Name.Contains(term));
-            }
-            return await q
-                .Where(c => c.IsActive)
-                .OrderBy(c => c.Name)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .Include(c => c.campaigns)
-                .Include(c => c.ScrapedInfo)
+            if (charity == null)
+                throw new KeyNotFoundException($"Charity with id {id} not found");
+
+            return charity;
+        }
+
+        public async override Task<List<Charity>> GetAllAsync()
+        {
+            var charities = await _dbSet.Include(c => c.Account)
                 .ToListAsync();
+
+            if (charities == null)
+                throw new KeyNotFoundException($"Charities not found");
+
+            return charities;
         }
 
-        public async Task<int> CountAsync(string? query)
+        public async override Task<Charity> GetWithExpressionAsync(Expression<Func<Charity, bool>> expression)
         {
-            var q = _dbSet.AsQueryable();
-            if (!string.IsNullOrWhiteSpace(query))
-            {
-                var term = query.Trim();
-                q = q.Where(c => c.Name.Contains(term));
-            }
-            return await q.Where(c => c.IsActive).CountAsync();
+            var Charitys = await _dbSet.Include(c => c.Account)
+                .FirstOrDefaultAsync(expression);
+
+            if (Charitys == null)
+                throw new KeyNotFoundException($"Charity not found");
+
+            return Charitys;
         }
 
-        public async Task<Charity?> GetWithCampaignsAsync(int id)
+        public async Task<List<int>> GetCharitySubscribersAsync(int id)
         {
-            return await _dbSet
-                .Where(c => c.IsActive)
-                .Include(c => c.campaigns)
-                .Include(c => c.ScrapedInfo)
-                .FirstOrDefaultAsync(c => c.Id == id);
+            var donorIds = await _context.Subscriptions
+                .Where(f => f.CharityId == id)
+                .Select(f => f.DonorId)
+                .ToListAsync();
+
+            return donorIds;
         }
 
-        public async Task BulkImportAsync(IEnumerable<Charity> charities)
+        public async Task<Charity> GetCharityByCampaignAsync(int campaignId)
         {
-            if (charities == null) return;
-            await _dbSet.AddRangeAsync(charities);
+            var charity = await _context.Charities
+                .Include(c => c.Campaigns)
+                .FirstOrDefaultAsync(c => c.Campaigns.Any(cm => cm.Id == campaignId));
+
+            return charity;
         }
     }
 }

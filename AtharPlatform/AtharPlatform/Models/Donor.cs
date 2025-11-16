@@ -1,28 +1,27 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using AtharPlatform.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AtharPlatform.Models
 {
-    public class Donor : UserAccount
+    public class Donor
     {
         [Key]
         [ForeignKey(nameof(Account))]
         public int Id { get; set; }
 
         [Required]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = null!;
 
         public string? LastName { get; set; }
 
-        public string? Country { get; set; }
 
-        public string? City { get; set; }
+        public RolesEnum Role { get; set; } = RolesEnum.Donor;
 
-        public string StripCustomerId { get; set; }
-
-        public virtual UserAccount Account { get; set; }
-        public virtual List<CampaignDonation> Donations { get; set; } = new();
-        public virtual List<Reaction> Reactions { get; set; } = new();
-        public virtual List<Subscription> Subscriptions { get; set; } = new();
+        public virtual UserAccount Account { get; set; } = null!;
+        public virtual List<CampaignDonation> Donations { get; set; } = null!;
+        public virtual List<Reaction> Reactions { get; set; } = null!;
+        public virtual List<Subscription> Subscriptions { get; set; } = null!;
+        public virtual List<Follow> Follows { get; set; } = null!;
     }
 }

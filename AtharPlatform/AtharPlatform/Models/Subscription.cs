@@ -8,26 +8,22 @@ namespace AtharPlatform.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
-        public DateTime StartDate { get; set; } = DateTime.UtcNow;
-
-        [Required]
-        public double Amount { get; set; }
+        [ForeignKey(nameof(Donor))]
+        public int DonorId { get; set; }
+        public virtual Donor Donor { get; set; } = null!;
 
         [ForeignKey(nameof(Charity))]
-        public int charityID { get; set; }
-        public Charity Charity { get; set; }
+        public int CharityId { get; set; }
+        public virtual Charity Charity { get; set; } = null!;
 
+        [Required]
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Amount { get; set; }
 
-        [ForeignKey(nameof(Donor))]
-        public int donornID { get; set; }
-        public Donor Donor { get; set; }
+        public string Frequency { get; set; } = "Monthly";
 
-
-        [ForeignKey(nameof(SubscribtionType))]
-        public int TypeId { get; set; }
-        public SubscribtionType SubscribtionType { get; set; }
-
-
+        public DateTime StartDate { get; set; } = DateTime.UtcNow;
+        public DateTime? LastPaymentDate { get; set; }
+        public DateTime? NextPaymentDate { get; set; }
     }
 }

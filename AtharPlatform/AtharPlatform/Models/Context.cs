@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit;
 
 namespace AtharPlatform.Models
 {
@@ -12,11 +11,11 @@ namespace AtharPlatform.Models
         // Users and Charities
         public DbSet<Donor> Donors { get; set; }
         public DbSet<Charity> Charities { get; set; }
-    public DbSet<CharityExternalInfo> CharityExternalInfos { get; set; }
+        public DbSet<CharityExternalInfo> CharityExternalInfos { get; set; }
 
         // Subscriptions
+        public DbSet<Follow> Follows { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
-        public DbSet<SubscribtionType> SubscriptionTypes { get; set; }
 
         // Content & Reactions
         public DbSet<Content> Contents { get; set; }
@@ -24,7 +23,6 @@ namespace AtharPlatform.Models
 
         // Campaigns
         public DbSet<Campaign> Campaigns { get; set; }
-        public DbSet<CampaignContent> CampaignContents { get; set; }
 
         // Donations
         public DbSet<Donation> Donations { get; set; }
@@ -46,8 +44,26 @@ namespace AtharPlatform.Models
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            // Composite PK for NotificationReceiver (many-to-many Notification <-> Receiver)
             builder.Entity<NotificationReceiver>()
-                .HasKey(a => new { a.NotificationId, a.ReceiverId });
+                .HasKey(nr => new { nr.NotificationId, nr.ReceiverId });
+
+            // 1:1 Notification -> NotificationSender
+            builder.Entity<Notification>()
+                .HasOne(n => n.Sender)
+                .WithOne(ns => ns.Notification)
+                .HasForeignKey<NotificationSender>(ns => ns.NotificationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Unique indices for Follow and Subscription to prevent duplicates
+            builder.Entity<Follow>()
+                .HasIndex(f => new { f.DonorId, f.CharityId })
+                .IsUnique();
+
+            builder.Entity<Subscription>()
+                .HasIndex(s => new { s.DonorId, s.CharityId })
+                .IsUnique();
 
             // Charity 1:1 external info
             builder.Entity<Charity>()
@@ -56,6 +72,5 @@ namespace AtharPlatform.Models
                 .HasForeignKey<CharityExternalInfo>(e => e.CharityId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
-
     }
 }
