@@ -1,4 +1,7 @@
 using AtharPlatform.Dtos;
+using AtharPlatform.DTOs;
+using AtharPlatform.DTO;
+
 using AtharPlatform.Repositories;
 using AtharPlatform.Services;
 using Microsoft.AspNetCore.Authorization;
