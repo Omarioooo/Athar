@@ -1,12 +1,9 @@
 ﻿using AtharPlatform.DTO;
-using AtharPlatform.DTO;
 using AtharPlatform.Models.Enums;
 using AtharPlatform.Repositories;
 using AtharPlatform.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
-using System.Data;
+
 
 namespace AtharPlatform.Controllers
 {
@@ -26,7 +23,6 @@ namespace AtharPlatform.Controllers
         [HttpPost("[action]")]
         public async Task<IActionResult> DonorRegister([FromForm] PersonRegisterDto model)
         {
-
             if (!ModelState.IsValid)
                 return BadRequest(new { message = "Invalid registration data." });
 
@@ -52,7 +48,6 @@ namespace AtharPlatform.Controllers
             {
                 return StatusCode(500, new { message = "An unexpected error occurred during donor registration." });
             }
-
         }
 
         [HttpPost("[action]")]
@@ -64,6 +59,7 @@ namespace AtharPlatform.Controllers
             try
             {
                 var registerResult = await _accountService.PersonRegisterAsync(model, RolesEnum.Admin);
+
 
                 if (!registerResult.Succeeded)
                     return BadRequest(new { message = "Registration failed.", errors = registerResult.Errors });

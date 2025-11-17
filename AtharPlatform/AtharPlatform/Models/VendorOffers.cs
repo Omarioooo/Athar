@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AtharPlatform.Models.Enums;
 
 namespace AtharPlatform.Models
 {
@@ -36,7 +37,10 @@ namespace AtharPlatform.Models
 
         [Required]
         [Column(TypeName = "decimal(18,2)")]
-        public decimal PriceBeAfterDiscount { get; set; }
+        public decimal PriceAfterDiscount { get; set; }
+
+        [Required]
+        public OfferStatus Status { get; set; }= OfferStatus.Pending;
 
         [Required]
         [ForeignKey(nameof(CharityVendorOffer))]

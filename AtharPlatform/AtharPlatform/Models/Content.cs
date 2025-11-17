@@ -20,6 +20,7 @@ namespace AtharPlatform.Models
         public byte[]? PostImage { get; set; }
 
         [ForeignKey(nameof(Campaign))]
+
         public int CampaignId { get; set; }
         public virtual Campaign Campaign { get; set; } = null!;
 

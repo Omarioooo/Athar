@@ -10,12 +10,12 @@ namespace AtharPlatform.Services
     public class SubscriptionService : ISubscriptionService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IPaymentService<PaymobService> _paymentService;
+        private readonly IPaymentService _paymentService;
         private readonly IAccountContextService _accountContextService;
         private readonly INotificationService _notificationService;
 
         public SubscriptionService(IUnitOfWork unitOfWork,
-                 IPaymentService<PaymobService> paymentService,
+                 IPaymentService paymentService,
                  IAccountContextService accountContextService,
                  INotificationService notificationService)
         {

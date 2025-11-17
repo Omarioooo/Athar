@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AtharPlatform.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20251102120639_init")]
-    partial class init
+    [Migration("20251117130734_updatemodels")]
+    partial class updatemodels
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,9 +39,6 @@ namespace AtharPlatform.Migrations
                     b.Property<int>("CharityID")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -49,10 +46,17 @@ namespace AtharPlatform.Migrations
                     b.Property<int>("Duration")
                         .HasColumnType("int");
 
+                    b.Property<string>("ExternalId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<double>("GoalAmount")
                         .HasColumnType("float");
 
                     b.Property<byte[]>("Image")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
@@ -65,8 +69,14 @@ namespace AtharPlatform.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime>("StartingDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
+
+                    b.Property<string>("SupportingCharitiesJson")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -110,9 +120,24 @@ namespace AtharPlatform.Migrations
                     b.Property<decimal?>("Balance")
                         .HasColumnType("decimal(18, 4)");
 
+                    b.Property<DateTime?>("DeactivatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ExternalId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ImportedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsScraped")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -143,6 +168,25 @@ namespace AtharPlatform.Migrations
                     b.HasIndex("charityID");
 
                     b.ToTable("CharityDonations");
+                });
+
+            modelBuilder.Entity("AtharPlatform.Models.CharityExternalInfo", b =>
+                {
+                    b.Property<int>("CharityId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ExternalWebsiteUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MegaKheirUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CharityId");
+
+                    b.ToTable("CharityExternalInfos");
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.CharityMaterialDonation", b =>
@@ -251,6 +295,9 @@ namespace AtharPlatform.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CampaignId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("CharityId")
                         .HasColumnType("int");
@@ -631,13 +678,16 @@ namespace AtharPlatform.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("PriceBeAfterDiscount")
+                    b.Property<decimal>("PriceAfterDiscount")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("PriceBeforDiscount")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<string>("VendorName")
@@ -890,6 +940,17 @@ namespace AtharPlatform.Migrations
                     b.Navigation("Charity");
 
                     b.Navigation("Donation");
+                });
+
+            modelBuilder.Entity("AtharPlatform.Models.CharityExternalInfo", b =>
+                {
+                    b.HasOne("AtharPlatform.Models.Charity", "Charity")
+                        .WithOne("ScrapedInfo")
+                        .HasForeignKey("AtharPlatform.Models.CharityExternalInfo", "CharityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Charity");
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.CharityMaterialDonation", b =>
@@ -1159,6 +1220,8 @@ namespace AtharPlatform.Migrations
                     b.Navigation("Donations");
 
                     b.Navigation("Follows");
+
+                    b.Navigation("ScrapedInfo");
 
                     b.Navigation("Subscriptions");
                 });
