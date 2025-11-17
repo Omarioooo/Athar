@@ -1,5 +1,4 @@
 ﻿
-
 namespace AtharPlatform.Repositories
 {
     public class UnitOfWork : IUnitOfWork
@@ -12,6 +11,10 @@ namespace AtharPlatform.Repositories
         public IReactionRepository Reactions { get; private set; }
         public INotificationRepository Notifications { get; private set; }
         public IFollowRepository Follows { get; private set; }
+        public IVendorOfferRepository VendorOffers { get; }
+        public IVolunteerApplicationRepository VolunteerApplications { get; private set; }
+        public IDonationRepository PaymentDonations { get; private set; }
+        public ICampaignDonation PaymentCampaignDonations { get; private set; }
 
 
         // Computed Property
@@ -31,6 +34,10 @@ namespace AtharPlatform.Repositories
             Reactions = new ReactionRepository(_context);
             Notifications = new NotificationRepository(_context);
             Follows = new FollowRepository(_context);
+            VendorOffers = new VendorOfferRepository(_context);
+            VolunteerApplications = new VolunteerApplicationRepository(_context);
+            PaymentDonations = new DonationRepository(_context);
+            PaymentCampaignDonations = new CampaignDonationRepository(_context);
         }
 
         public async Task SaveAsync()

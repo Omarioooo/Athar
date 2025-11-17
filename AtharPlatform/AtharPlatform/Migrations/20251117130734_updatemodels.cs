@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AtharPlatform.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class updatemodels : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -187,7 +187,12 @@ namespace AtharPlatform.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Balance = table.Column<decimal>(type: "decimal(18,4)", nullable: true),
                     VerificationDocument = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false)
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    IsScraped = table.Column<bool>(type: "bit", nullable: false),
+                    ExternalId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ImportedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    DeactivatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -285,10 +290,13 @@ namespace AtharPlatform.Migrations
                     GoalAmount = table.Column<double>(type: "float", nullable: false),
                     RaisedAmount = table.Column<double>(type: "float", nullable: false),
                     IsInKindDonation = table.Column<bool>(type: "bit", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    StartingDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Category = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    CharityID = table.Column<int>(type: "int", nullable: false)
+                    ExternalId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SupportingCharitiesJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CharityID = table.Column<int>(type: "int", nullable: false),
+                    ImageUrl = table.Column<byte[]>(type: "varbinary(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -296,6 +304,26 @@ namespace AtharPlatform.Migrations
                     table.ForeignKey(
                         name: "FK_Campaigns_Charities_CharityID",
                         column: x => x.CharityID,
+                        principalTable: "Charities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CharityExternalInfos",
+                columns: table => new
+                {
+                    CharityId = table.Column<int>(type: "int", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ExternalWebsiteUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MegaKheirUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CharityExternalInfos", x => x.CharityId);
+                    table.ForeignKey(
+                        name: "FK_CharityExternalInfos_Charities_CharityId",
+                        column: x => x.CharityId,
                         principalTable: "Charities",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
@@ -369,14 +397,15 @@ namespace AtharPlatform.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DonorId = table.Column<int>(type: "int", nullable: false),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CampaignId = table.Column<int>(type: "int", nullable: true),
+                    CharityId = table.Column<int>(type: "int", nullable: true),
                     NetAmountToCharity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DonationStatus = table.Column<int>(type: "int", nullable: false),
                     PaymentID = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MerchantOrderId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TransactionId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CharityId = table.Column<int>(type: "int", nullable: true)
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -518,7 +547,8 @@ namespace AtharPlatform.Migrations
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PriceBeforDiscount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PriceBeAfterDiscount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PriceAfterDiscount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     CharityVendorOfferId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -809,6 +839,9 @@ namespace AtharPlatform.Migrations
 
             migrationBuilder.DropTable(
                 name: "CharityDonations");
+
+            migrationBuilder.DropTable(
+                name: "CharityExternalInfos");
 
             migrationBuilder.DropTable(
                 name: "Follows");

@@ -9,6 +9,7 @@ namespace AtharPlatform.Models
         // Users and Charities
         public DbSet<Donor> Donors { get; set; }
         public DbSet<Charity> Charities { get; set; }
+        public DbSet<CharityExternalInfo> CharityExternalInfos { get; set; }
 
         // Subscriptions
         public DbSet<Follow> Follows { get; set; }
@@ -42,9 +43,12 @@ namespace AtharPlatform.Models
         {
             base.OnModelCreating(builder);
 
-            // Many-to-Many Relation with composite PK
-            builder.Entity<NotificationReceiver>()
-                .HasKey(a => new { a.NotificationId, a.ReceiverId });
+            // Charity 1:1 external info
+            builder.Entity<Charity>()
+                .HasOne(c => c.ScrapedInfo)
+                .WithOne(e => e.Charity)
+                .HasForeignKey<CharityExternalInfo>(e => e.CharityId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Many-to-Many Relation with composite PK
             builder.Entity<NotificationReceiver>()
@@ -62,9 +66,8 @@ namespace AtharPlatform.Models
                .IsUnique();
 
             builder.Entity<Subscription>()
-       .HasIndex(s => new { s.DonorId, s.CharityId })
-       .IsUnique();
-
+              .HasIndex(s => new { s.DonorId, s.CharityId })
+              .IsUnique();
         }
     }
 }

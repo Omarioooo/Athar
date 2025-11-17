@@ -1,23 +1,22 @@
-using AtharPlatform.Hubs;
+﻿using AtharPlatform.Hubs;
 using AtharPlatform.Repositories;
 using AtharPlatform.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using X.Paymob.CashIn;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Controllers
+// Add Controllers
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 
-// Database
+// Inject Database
 builder.Services.AddDbContext<Context>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MSSConnection"))
-);
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MSSConnection")));
 
-// Repositories
+// Inject Repositories
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IDonorRepository, DonorRepository>();
@@ -26,32 +25,35 @@ builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
 builder.Services.AddScoped<IContentRepository, ContentRepository>();
 builder.Services.AddScoped<IFollowRepository, FollowRepository>();
 builder.Services.AddScoped<IReactionRepository, ReactionRepository>();
+builder.Services.AddScoped<IVendorOfferRepository, VendorOfferRepository>();
+builder.Services.AddScoped<IVolunteerApplicationRepository, VolunteerApplicationRepository>();
 
-// Services
+
+// Inject Services
 builder.Services.AddScoped<IJWTService, JWTService>();
-builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddScoped<IPaymentService<PaymobService>, PaymobService>();
 builder.Services.AddScoped<IAccountContextService, AccountContextService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IPaymentService, PaymobService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<IFollowService, FollowService>();
 builder.Services.AddScoped<IReactionService, ReactionService>();
 builder.Services.AddScoped<IDonationService, DonationService>();
 builder.Services.AddScoped<IDonorService, DonorService>();
-
-// Hub
-builder.Services.AddScoped<INotificationHub, NotificationHub>();
+builder.Services.AddScoped<ICampaignService, CampaignService>();
 
 // SignalR
 builder.Services.AddSignalR();
+builder.Services.AddScoped<INotificationHub, NotificationHub>();
 
-// Identity
+
+// Identity Settings
 builder.Services
     .AddIdentity<UserAccount, IdentityRole<int>>()
     .AddEntityFrameworkStores<Context>()
     .AddDefaultTokenProviders();
 
-// Password settings
+// Identity Password settings
 builder.Services.Configure<IdentityOptions>(options =>
 {
     options.Password.RequireDigit = true;
@@ -61,13 +63,12 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.Password.RequireNonAlphanumeric = false;
 });
 
-// JWT Auth
+// JWT Auth Settings
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
+}).AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -82,7 +83,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// CORS
+// CORS Settings
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -95,15 +96,23 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Paymob
-builder.Services.AddPaymobCashIn(config =>
-{
-    config.ApiKey = builder.Configuration["Paymob:ApiKey"];
-    config.Hmac = builder.Configuration["Paymob:Hmac"];
-});
+//Paymob Setting
+//builder.Services.AddPaymobCashIn(config =>
+//{
+//    config.ApiKey = builder.Configuration["Paymob:ApiKey"];
+//    config.IntegrationId = int.Parse(builder.Configuration["Paymob:IntegrationId"]);
+//    config.Iframe = builder.Configuration["Paymob:IframeId"];
+//});
+builder.Services.AddHttpClient();
+builder.Services.Configure<PaymentSettings>(builder.Configuration.GetSection("Paymob"));
+
+
 
 // Build app
 var app = builder.Build();
+
+
+
 
 if (app.Environment.IsDevelopment())
 {

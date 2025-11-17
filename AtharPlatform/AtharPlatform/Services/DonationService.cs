@@ -7,11 +7,11 @@ namespace AtharPlatform.Services
     public class DonationService : IDonationService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IPaymentService<PaymobService> _paymobService;
+        private readonly IPaymentService _paymobService;
 
         public DonationService(
             IUnitOfWork unitOfWork,
-            IPaymentService<PaymobService> paymobService,
+            IPaymentService paymobService,
             IAccountContextService accountContextService)
         {
             _unitOfWork = unitOfWork;
@@ -36,7 +36,7 @@ namespace AtharPlatform.Services
             var donation = new Donation
             {
                 DonorId = model.DonorId,
-                TotalAmount = model.TotalAmount,
+                TotalAmount =(decimal)model.TotalAmount,
                 NetAmountToCharity = model.TotalAmount - (model.TotalAmount * 0.02m),
                 Currency = "EGP",
                 MerchantOrderId = Guid.NewGuid().ToString(),
@@ -90,7 +90,7 @@ namespace AtharPlatform.Services
             var donation = new Donation
             {
                 DonorId = model.DonorId,
-                TotalAmount = model.TotalAmount,
+                TotalAmount = (decimal)model.TotalAmount,
                 NetAmountToCharity = model.TotalAmount - (model.TotalAmount * 0.02m),
                 Currency = "EGP",
                 MerchantOrderId = Guid.NewGuid().ToString(),

@@ -14,6 +14,12 @@
         DbSet<CharityDonation> CharityDonations { get; }
         DbSet<CampaignDonation> CampaignDonations { get; }
         DbSet<Subscription> Subscriptions { get; }
+        IVendorOfferRepository VendorOffers { get; }
+        IVolunteerApplicationRepository VolunteerApplications { get; }
+
+        IDonationRepository PaymentDonations { get; }
+        ICampaignDonation PaymentCampaignDonations { get; }
+
         Task SaveAsync();
-    }
+    }       
 }
