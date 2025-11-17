@@ -2,7 +2,7 @@
 {
     public class PaginatedResultDto<T>
     {
-        public List<T> Items { get; set; } = null!;
+        public IEnumerable<T> Items { get; set; } = null!;
         public int Page { get; set; }
         public int PageSize { get; set; }
         public int Total { get; set; }
