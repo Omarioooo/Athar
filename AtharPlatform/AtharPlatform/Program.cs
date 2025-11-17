@@ -203,153 +203,7 @@ using (var scope = app.Services.CreateScope())
         Console.WriteLine($"[Startup] Role seeding failed: {rex.Message}");
     }
 
-    // Seed scraped data from JSON files on first run (idempotent)
-    try
-    {
-        var db = scope.ServiceProvider.GetRequiredService<Context>();
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserAccount>>();
-        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-
-        var contentRoot = app.Environment.ContentRootPath;
-        var seedDir = Path.Combine(contentRoot, "SeedData");
-        Directory.CreateDirectory(seedDir);
-
-        int charityCount = await db.Charities.CountAsync();
-        int campaignCount = await db.Campaigns.CountAsync();
-
-        // Helper to read first matching JSON file by keyword
-        string? FindJson(string keyword)
-        {
-            if (!Directory.Exists(seedDir)) return null;
-            var files = Directory.EnumerateFiles(seedDir, "*.json", SearchOption.TopDirectoryOnly)
-                .Where(f => Path.GetFileName(f).Contains(keyword, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-            return files.FirstOrDefault();
-        }
-
-        if (charityCount < 100)
-        {
-            var charitiesPath = FindJson("charit");
-            if (charitiesPath != null)
-            {
-                Console.WriteLine($"[Seed] Importing charities from {Path.GetFileName(charitiesPath)} ...");
-                var json = await File.ReadAllTextAsync(charitiesPath);
-                var items = JsonSerializer.Deserialize<List<CharityImportItemDto>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
-                var now = DateTime.UtcNow;
-                var toAdd = new List<Charity>();
-                foreach (var i in items.Where(i => !string.IsNullOrWhiteSpace(i.Name)))
-                {
-                    // Use safe ASCII-only usernames/emails regardless of charity display name (Arabic allowed in Charity.Name)
-                    var uname = $"charity_{Guid.NewGuid():N}";
-                    var email = $"{uname}@charity.local";
-                    var account = new UserAccount { UserName = uname, Email = email, EmailConfirmed = true };
-                    var pwd = $"{Guid.NewGuid():N}!Aa1";
-                    var res = await userManager.CreateAsync(account, pwd);
-                    if (!res.Succeeded) { continue; }
-
-                    var charity = new Charity
-                    {
-                        Id = account.Id,
-                        Account = account,
-                        Name = i.Name.Trim(),
-                        Description = i.Description ?? string.Empty,
-                        IsScraped = true,
-                        ExternalId = i.ExternalId,
-                        ImportedAt = now,
-                        VerificationDocument = Array.Empty<byte>()
-                    };
-                    if (i.ImageUrl != null || i.ExternalWebsiteUrl != null)
-                    {
-                        charity.ScrapedInfo = new CharityExternalInfo
-                        {
-                            ImageUrl = i.ImageUrl,
-                            ExternalWebsiteUrl = i.ExternalWebsiteUrl
-                        };
-                    }
-                    toAdd.Add(charity);
-                }
-                if (toAdd.Count > 0)
-                {
-                    await unitOfWork.Charities.BulkImportAsync(toAdd);
-                    await unitOfWork.SaveAsync();
-                    Console.WriteLine($"[Seed] Imported {toAdd.Count} charities.");
-                    charityCount += toAdd.Count;
-                }
-            }
-            else
-            {
-                Console.WriteLine($"[Seed] No charities JSON found in {seedDir}. Skipping charity seed.");
-            }
-        }
-
-        if (campaignCount < 23)
-        {
-            var campaignsPath = FindJson("campagin") ?? FindJson("campaign");
-            if (campaignsPath != null)
-            {
-                Console.WriteLine($"[Seed] Importing campaigns from {Path.GetFileName(campaignsPath)} ...");
-                var json = await File.ReadAllTextAsync(campaignsPath);
-                var items = JsonSerializer.Deserialize<List<CampaignImportItemDto>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
-                var now = DateTime.UtcNow;
-                var added = 0;
-                foreach (var i in items)
-                {
-                    if (string.IsNullOrWhiteSpace(i?.Title) || string.IsNullOrWhiteSpace(i?.Description)) continue;
-                    string? nameHint = i.CharityName;
-                    if (string.IsNullOrWhiteSpace(nameHint) && (i.SupportingCharities?.Any() ?? false))
-                        nameHint = i.SupportingCharities!.FirstOrDefault();
-                    if (string.IsNullOrWhiteSpace(nameHint)) continue;
-
-                    var nm = nameHint.Trim();
-                    Charity? charity = null;
-                    try
-                    {
-                        charity = await unitOfWork.Charities.GetWithExpressionAsync(c => c.IsScraped && (c.Name == nm || c.Name.Contains(nm)));
-                    }
-                    catch { }
-                    if (charity == null) continue;
-
-                    var cat = CampaignCategoryEnum.Other;
-                    if (!string.IsNullOrWhiteSpace(i.Category) && Enum.TryParse<CampaignCategoryEnum>(i.Category, true, out var parsed))
-                        cat = parsed;
-
-                    var campaign = new Campaign
-                    {
-                        Title = i.Title!.Trim(),
-                        Description = i.Description!.Trim(),
-                        ImageUrl = i.ImageUrl,
-                        isCritical = i.IsCritical ?? false,
-                        StartDate = i.StartDate ?? now,
-                        Duration = i.DurationDays ?? 30,
-                        GoalAmount = i.GoalAmount ?? 0,
-                        RaisedAmount = i.RaisedAmount ?? 0,
-                        IsInKindDonation = false,
-                        Category = cat,
-                        Status = CampainStatusEnum.inProgress,
-                        CharityID = charity.Id,
-                        ExternalId = i.ExternalId,
-                        SupportingCharitiesJson = (i.SupportingCharities != null && i.SupportingCharities.Any()) ? JsonSerializer.Serialize(i.SupportingCharities) : null
-                    };
-
-                    await unitOfWork.Campaigns.AddAsync(campaign);
-                    added++;
-                }
-                if (added > 0)
-                {
-                    await unitOfWork.SaveAsync();
-                    Console.WriteLine($"[Seed] Imported {added} campaigns.");
-                }
-            }
-            else
-            {
-                Console.WriteLine($"[Seed] No campaigns JSON found in {seedDir}. Skipping campaign seed.");
-            }
-        }
-    }
-    catch (Exception seedEx)
-    {
-        Console.WriteLine($"[Seed] Seeding failed: {seedEx.Message}");
-    }
+    // Data seeding removed after initial import per request.
 }
 if (app.Environment.IsDevelopment())
 {
@@ -357,9 +211,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Always redirect HTTP->HTTPS; we will trust the dev cert locally
+app.UseHttpsRedirection();
 app.UseCors("AllowAll");
-// Temporarily disable HTTPS redirection to simplify local health checks
-// app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -371,13 +225,13 @@ app.MapGet("/health", () => Results.Ok(new { status = "ok", time = DateTime.UtcN
    .WithName("HealthCheck");
 
 app.MapControllers();
-Console.WriteLine("[Startup] Starting web host...");
+
 try
 {
+    Console.WriteLine("[Startup] Starting web host...");
     app.Run();
 }
 catch (Exception runEx)
 {
-    Console.WriteLine($"[Startup] Host terminated unexpectedly: {runEx.Message}");
-    throw;
+    Console.WriteLine($"[Startup] Host terminated unexpectedly: {runEx}");
 }
