@@ -68,6 +68,63 @@ namespace AtharPlatform.Models
             builder.Entity<Subscription>()
               .HasIndex(s => new { s.DonorId, s.CharityId })
               .IsUnique();
+
+            // Configure delete behaviors to avoid multiple cascade paths
+            builder.Entity<Follow>()
+                .HasOne(f => f.Donor)
+                .WithMany(d => d.Follows)
+                .HasForeignKey(f => f.DonorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Follow>()
+                .HasOne(f => f.Charity)
+                .WithMany(c => c.Follows)
+                .HasForeignKey(f => f.CharityId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Subscription>()
+                .HasOne(s => s.Donor)
+                .WithMany(d => d.Subscriptions)
+                .HasForeignKey(s => s.DonorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Subscription>()
+                .HasOne(s => s.Charity)
+                .WithMany(c => c.Subscriptions)
+                .HasForeignKey(s => s.CharityId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure Donation relationships to avoid multiple cascade paths
+            builder.Entity<Donation>()
+                .HasMany(d => d.CampaignDonations)
+                .WithOne(cd => cd.Donation)
+                .HasForeignKey(cd => cd.DonationId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Donation>()
+                .HasMany(d => d.CharityDonations)
+                .WithOne(cd => cd.Donation)
+                .HasForeignKey(cd => cd.DonationId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<CampaignDonation>()
+                .HasOne(cd => cd.Campaign)
+                .WithMany(c => c.CampaignDonations)
+                .HasForeignKey(cd => cd.CampaignId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Reactions: prevent cascade from Donor + Content simultaneously
+            builder.Entity<Reaction>()
+                .HasOne(r => r.Donor)
+                .WithMany(d => d.Reactions)
+                .HasForeignKey(r => r.DonorID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Reaction>()
+                .HasOne(r => r.Content)
+                .WithMany(c => c.Reactions)
+                .HasForeignKey(r => r.ContentID)
+                .OnDelete(DeleteBehavior.Cascade); // only content cascade allowed
         }
     }
 }

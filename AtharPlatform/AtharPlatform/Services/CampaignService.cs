@@ -39,6 +39,7 @@ namespace AtharPlatform.Services
                 StartDate = c.StartDate,
                 EndDate = c.EndDate,
                 Category = c.Category,
+                CharityID = c.CharityID,
                 CharityName = c.Charity?.Name ?? ""
             }).ToList(); ;
         }
@@ -60,6 +61,7 @@ namespace AtharPlatform.Services
                 StartDate = campaign.StartDate,
                 EndDate = campaign.EndDate,
                 Category = campaign.Category,
+                CharityID = campaign.CharityID,
                 CharityName = campaign.Charity?.Name ?? ""
             };
         }
@@ -81,6 +83,7 @@ namespace AtharPlatform.Services
                 StartDate = c.StartDate,
                 EndDate = c.EndDate,
                 Category = c.Category,
+                CharityID = c.CharityID,
                 CharityName = c.Charity?.Name ?? ""
             }).ToList();
         }
@@ -114,6 +117,7 @@ namespace AtharPlatform.Services
                 StartDate = c.StartDate,
                 EndDate = c.EndDate,
                 Category = c.Category,
+                CharityID = c.CharityID,
                 CharityName = c.Charity?.Name ?? ""
             }).ToList();
         }
@@ -140,6 +144,7 @@ namespace AtharPlatform.Services
                 StartDate = c.StartDate,
                 EndDate = c.EndDate,
                 Category = c.Category,
+                CharityID = c.CharityID,
                 CharityName = c.Charity?.Name ?? ""
             }).ToList();
         }

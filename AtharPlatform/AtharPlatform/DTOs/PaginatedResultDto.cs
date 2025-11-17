@@ -1,11 +1,14 @@
-﻿namespace AtharPlatform.DTOs
+﻿using System;
+using System.Collections.Generic;
+
+namespace AtharPlatform.Dtos
 {
-    public class PaginatedResultDto<T>
-    {
-        public List<T> Items { get; set; } = null!;
-        public int Page { get; set; }
-        public int PageSize { get; set; }
-        public int Total { get; set; }
-        public int TotalPages => (int)Math.Ceiling((double)Total / Math.Max(1, PageSize));
-    }
+	public class PaginatedResultDto<T>
+	{
+		public IEnumerable<T> Items { get; set; } = Array.Empty<T>();
+		public int Page { get; set; }
+		public int PageSize { get; set; }
+		public int Total { get; set; }
+		public int TotalPages => (int)Math.Ceiling((double)Total / Math.Max(1, PageSize));
+	}
 }
