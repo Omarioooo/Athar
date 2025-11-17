@@ -81,6 +81,37 @@ namespace AtharPlatform.Controllers
             }
         }
 
+        // JSON-friendly variant for automation (PowerShell 5.1 lacks -Form)
+        [HttpPost("AdminRegisterJson")]
+        public async Task<IActionResult> AdminRegisterJson([FromBody] PersonRegisterDto model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new { message = "Invalid registration data." });
+
+            try
+            {
+                var registerResult = await _accountService.PersonRegisterAsync(model, RolesEnum.Admin);
+
+                if (!registerResult.Succeeded)
+                    return BadRequest(new { message = "Registration failed.", errors = registerResult.Errors });
+
+                await _unitOfWork.SaveAsync();
+                return Ok(new { message = "Admin registered successfully." });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "An unexpected error occurred during admin registration." });
+            }
+        }
+
         [HttpPost("[action]")]
         public async Task<IActionResult> CharityRegister([FromForm] CharityRegisterDto model)
         {
