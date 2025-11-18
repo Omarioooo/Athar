@@ -72,24 +72,18 @@ namespace SeedData
                         continue;
                     }
                     // Create placeholder Identity account to satisfy FK (Charity.Id == UserAccount.Id)
-                    var unameBase = (safeName.Length > 0 ? safeName : $"charity_{Guid.NewGuid():N}").Replace(" ", "_");
-                    var uname = unameBase;
-                    var email = $"{uname.ToLowerInvariant()}@charity.local";
+                    // Use sanitized GUID-based username to avoid issues with Arabic/special characters
+                    var guidPart = Guid.NewGuid().ToString("N")[..12]; // first 12 chars of GUID
+                    var uname = $"charity_{guidPart}";
+                    var email = $"{uname}@charity.local";
                     var account = new UserAccount { UserName = uname, Email = email, EmailConfirmed = true };
                     var pwd = $"{Guid.NewGuid():N}!Aa1";
 
                     var createRes = await userManager.CreateAsync(account, pwd);
                     if (!createRes.Succeeded)
                     {
-                        uname = $"{unameBase}_{Guid.NewGuid().ToString("N")[..6]}";
-                        email = $"{uname.ToLowerInvariant()}@charity.local";
-                        account = new UserAccount { UserName = uname, Email = email, EmailConfirmed = true };
-                        createRes = await userManager.CreateAsync(account, pwd);
-                        if (!createRes.Succeeded)
-                        {
-                            logger?.LogWarning("[Seeder] Skipping charity '{Name}' due to identity creation errors: {Err}", safeName, string.Join(';', createRes.Errors.Select(e => e.Description)));
-                            continue;
-                        }
+                        logger?.LogWarning("[Seeder] Skipping charity '{Name}' due to identity creation errors: {Err}", safeName, string.Join(';', createRes.Errors.Select(e => e.Description)));
+                        continue;
                     }
 
                     var charity = new Charity
