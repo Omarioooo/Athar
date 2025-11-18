@@ -21,10 +21,10 @@ namespace AtharPlatform.Models
         [NotMapped]
         public decimal PlatformFee { get; set; } = 0.02m;
 
-        // ⚠️  هنا ضيفتاها
-        public int? CampaignId { get; set; }
+   
+        public int CampaignId { get; set; }
 
-        public int? CharityId { get; set; }
+        public int CharityId { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal NetAmountToCharity { get; set; }

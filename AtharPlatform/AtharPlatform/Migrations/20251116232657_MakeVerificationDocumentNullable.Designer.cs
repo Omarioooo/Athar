@@ -4,6 +4,7 @@ using AtharPlatform.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AtharPlatform.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20251116232657_MakeVerificationDocumentNullable")]
+    partial class MakeVerificationDocumentNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -95,7 +98,7 @@ namespace AtharPlatform.Migrations
                     b.Property<int>("CampaignId")
                         .HasColumnType("int");
 
-                    b.Property<int>("DonorId")
+                    b.Property<int?>("DonorId")
                         .HasColumnType("int");
 
                     b.HasKey("DonationId");
@@ -290,10 +293,7 @@ namespace AtharPlatform.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CampaignId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CharityId")
+                    b.Property<int?>("CharityId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("CreatedAt")
@@ -897,17 +897,13 @@ namespace AtharPlatform.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("AtharPlatform.Models.Donor", "Donor")
+                    b.HasOne("AtharPlatform.Models.Donor", null)
                         .WithMany("Donations")
-                        .HasForeignKey("DonorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("DonorId");
 
                     b.Navigation("Campaign");
 
                     b.Navigation("Donation");
-
-                    b.Navigation("Donor");
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.Charity", b =>
@@ -999,9 +995,7 @@ namespace AtharPlatform.Migrations
                 {
                     b.HasOne("AtharPlatform.Models.Charity", null)
                         .WithMany("Donations")
-                        .HasForeignKey("CharityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CharityId");
 
                     b.HasOne("AtharPlatform.Models.Donor", "Donor")
                         .WithMany()
