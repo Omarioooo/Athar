@@ -1,5 +1,5 @@
 param(
-  [string]$BaseUrl = "http://localhost:5290",
+  [string]$BaseUrl = "https://localhost:7032",
   [string]$AdminEmail = "admin@athar.local",
   [string]$AdminPassword = "Admin#123",
   # Default to full dataset
@@ -29,10 +29,10 @@ if (-not (Wait-ServerReady -url $BaseUrl -timeoutSeconds 60)) {
   exit 1
 }
 
-# 1) Register Admin (idempotent)
+# 1) Register Admin (idempotent) — uses current AdminRegister [FromForm]
 try {
-  $adminBody = @{ FirstName='Admin'; LastName='User'; Email=$AdminEmail; Password=$AdminPassword; Country='EG'; City='Cairo' } | ConvertTo-Json
-  $regRes = Invoke-RestMethod -Method Post -Uri "$BaseUrl/api/Account/AdminRegisterJson" -Body $adminBody -ContentType 'application/json'
+  $adminForm = @{ FirstName='Admin'; LastName='User'; Email=$AdminEmail; Password=$AdminPassword; Country='EG'; City='Cairo' }
+  $regRes = Invoke-RestMethod -Method Post -Uri "$BaseUrl/api/Account/AdminRegister" -Body $adminForm -ContentType 'application/x-www-form-urlencoded'
   Write-Host "Admin registration:" ($regRes | ConvertTo-Json -Depth 5)
 } catch {
   Write-Warning "Admin registration may have failed or already exists: $($_.Exception.Message)"
