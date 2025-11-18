@@ -1,4 +1,4 @@
-using AtharPlatform.Hubs;
+﻿using AtharPlatform.Hubs;
 using AtharPlatform.Repositories;
 using AtharPlatform.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -47,7 +47,7 @@ builder.Services.AddScoped<IVolunteerApplicationRepository, VolunteerApplication
 builder.Services.AddScoped<IJWTService, JWTService>();
 builder.Services.AddScoped<IAccountContextService, AccountContextService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddScoped<IPaymentService<PaymobService>, PaymobService>();
+builder.Services.AddScoped<IPaymentService, PaymobService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<IFollowService, FollowService>();
@@ -110,12 +110,17 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Paymob Setting
-builder.Services.AddPaymobCashIn(config =>
-{
-    config.ApiKey = builder.Configuration["Paymob:ApiKey"];
-    config.Hmac = builder.Configuration["Paymob:Hmac"];
-});
+//Paymob Setting
+//builder.Services.AddPaymobCashIn(config =>
+//{
+//    config.ApiKey = builder.Configuration["Paymob:ApiKey"];
+//    config.IntegrationId = int.Parse(builder.Configuration["Paymob:IntegrationId"]);
+//    config.Iframe = builder.Configuration["Paymob:IframeId"];
+//});
+builder.Services.AddHttpClient();
+builder.Services.Configure<PaymentSettings>(builder.Configuration.GetSection("Paymob"));
+
+
 
 // Build app
 Console.WriteLine("[Startup] Building web application...");
@@ -205,6 +210,7 @@ using (var scope = app.Services.CreateScope())
 
     // Data seeding removed after initial import per request.
 }
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

@@ -13,6 +13,9 @@ namespace AtharPlatform.Repositories
         public IFollowRepository Follows { get; private set; }
         public IVendorOfferRepository VendorOffers { get; }
         public IVolunteerApplicationRepository VolunteerApplications { get; private set; }
+        public IDonationRepository PaymentDonations { get; private set; }
+        public ICampaignDonation PaymentCampaignDonations { get; private set; }
+
 
         // Computed Property
         public DbSet<Donation> Donations => _context.Donations;
@@ -33,6 +36,8 @@ namespace AtharPlatform.Repositories
             Follows = new FollowRepository(_context);
             VendorOffers = new VendorOfferRepository(_context);
             VolunteerApplications = new VolunteerApplicationRepository(_context);
+            PaymentDonations = new DonationRepository(_context);
+            PaymentCampaignDonations = new CampaignDonationRepository(_context);
         }
 
         public async Task SaveAsync()
