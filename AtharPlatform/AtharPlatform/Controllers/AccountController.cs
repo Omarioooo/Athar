@@ -81,6 +81,8 @@ namespace AtharPlatform.Controllers
             }
         }
 
+        
+
         [HttpPost("[action]")]
         public async Task<IActionResult> CharityRegister([FromForm] CharityRegisterDto model)
         {

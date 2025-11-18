@@ -1,0 +1,420 @@
+[
+  {
+    "title": "الإغاثة العاجلة",
+    "description": "الإغاثة العاجلة أحد الأذرع التنفيذية لبرامج الجمعيات الخيرية، والتي تنصب أعمالها على تقديم العون المباشر والعاجل للمتضررين والمنكوبين حول العالم من الزلازل، والفيضانات، والسيول الجارفة، والأعاصير المدمرة، وغيرها من المآسي والنكبات، بتقديم العون الإنساني العاجل بكل أشكاله من أمن غذائي وإصحاح بيئي والمأوى والرعاية الصحية.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/65ad305502c1a7d22fd3bfd5_01-07.avif",
+    "supporting_charities": [
+      "جمعية الهلال الأحمر المصرى",
+      "مؤسسة مرسال للأعمال الخيرية",
+      "جمعية رسالة",
+      "مؤسسة مصر الخير",
+      "بنك الطعام المصرى",
+      "اتحاد الأطباء العرب - لجنة الإغاثة",
+      "مؤسسة الإغاثة والطوارئ",
+      "مؤسسة حياة كريمة",
+      "مؤسسة عمار الأرض"
+    ],
+    "goal_amount": 750000,
+    "raised_amount": 312450,
+    "is_critical": false,
+    "start_date": "2025-02-03",
+    "duration_days": 60,
+    "category": "Shelter",
+    "external_id": "emergency-response"
+  },
+  {
+    "title": "إطعام",
+    "description": "ساهم في توفير غذاء يومي للأسر الأكثر احتياجًا عبر دعم سلال غذائية ووجبات ساخنة ومشروعات توزيع لحوم، لضمان أمن غذائي كريم ومستدام.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/65ad315871adb408478cc63a_01-12.avif",
+    "supporting_charities": [
+      "بنك الطعام المصرى",
+      "جمعية الأورمان",
+      "مؤسسة مصر الخير",
+      "جمعية رسالة",
+      "مؤسسة صناع الحياة"
+    ],
+    "goal_amount": 300000,
+    "raised_amount": 145750,
+    "is_critical": false,
+    "start_date": "2025-01-25",
+    "duration_days": 45,
+    "category": "Food",
+    "external_id": "food"
+  },
+  {
+    "title": "صدقة جارية",
+    "description": "صدقتك الجارية تظل أثرها مستمرًا: حفر آبار، بناء وتجهيز مراكز طبية وتعليمية، أو توفير أدوات مستدامة تنفع الناس وتديم الأثر.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/65ad3b2dd0522b00d6df8ec1_main%20cover%20ll%20website%20causes%20part2-18.jpg",
+    "supporting_charities": [
+      "جمعية رسالة",
+      "مؤسسة مصر الخير",
+      "جمعية الأورمان",
+      "مؤسسة حياة كريمة",
+      "مؤسسة عمار الأرض"
+    ],
+    "goal_amount": 420000,
+    "raised_amount": 98000,
+    "is_critical": false,
+    "start_date": "2025-01-20",
+    "duration_days": 90,
+    "category": "Other",
+    "external_id": "sadaqa"
+  },
+  {
+    "title": "سقي الماء",
+    "description": "تبرعك يساهم في حفر الآبار وتوصيل المياه النظيفة وصيانة الشبكات للأسر والمناطق الأكثر احتياجًا، لترفع عنهم العطش وتقيهم الأمراض.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/65ad30440a658ed663df0313_01-06.avif",
+    "supporting_charities": [
+      "مؤسسة صناع الحياة",
+      "جمعية الأورمان",
+      "مؤسسة مصر الخير",
+      "جمعية رسالة"
+    ],
+    "goal_amount": 180000,
+    "raised_amount": 90500,
+    "is_critical": false,
+    "start_date": "2025-02-10",
+    "duration_days": 50,
+    "category": "Other",
+    "external_id": "water"
+  },
+  {
+    "title": "الصحة",
+    "description": "عالج مريضًا وساهم في توفير الدواء والجراحات والدعم الطبي للحالات الحرجة، وتمويل القوافل الطبية وتجهيز العيادات والمستشفيات.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/65ad312671adb408478ca391_01-09.avif",
+    "supporting_charities": [
+      "مستشفى سرطان الأطفال 57357",
+      "مؤسسة مستشفى بهية",
+      "مستشفى الناس",
+      "مؤسسة مجدي يعقوب للقلب",
+      "مستشفيات شفا الأورمان (لصعيد بلا سرطان)",
+      "مؤسسة أصدقاء المعهد القومي للأورام"
+    ],
+    "goal_amount": 600000,
+    "raised_amount": 221300,
+    "is_critical": false,
+    "start_date": "2025-02-01",
+    "duration_days": 70,
+    "category": "Health",
+    "external_id": "healthcare"
+  },
+  {
+    "title": "غارمين",
+    "description": "ساهم في فك كرب الغارمين والغارمات وسداد المديونيات القانونية لصون الكرامة ولمّ الشمل، وفق الضوابط المعمول بها مع الجمعيات الموثوقة.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/65ad3a83fb3843129010606f_main%20cover%20ll%20website%20causes%20part2-16.jpg",
+    "supporting_charities": [
+      "مؤسسة مصر الخير",
+      "جمعية الأورمان",
+      "جمعية رسالة"
+    ],
+    "goal_amount": 200000,
+    "raised_amount": 75250,
+    "is_critical": false,
+    "start_date": "2025-01-28",
+    "duration_days": 60,
+    "category": "Other",
+    "external_id": "fines"
+  },
+  {
+    "title": "زكاة المال",
+    "description": "أخرج زكاة مالك في مصارفها الشرعية لدعم الفقراء والمساكين والغارمين والمرضى، عبر قنوات موثوقة تحقق الأثر وتصل للمستحقين.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/65ad3cc5cfc039c341ff9a07_main%20cover%20ll%20website%20causes%20part2-19.jpg",
+    "supporting_charities": [
+      "مؤسسة مصر الخير",
+      "جمعية الأورمان",
+      "جمعية رسالة",
+      "مؤسسة حياة كريمة"
+    ],
+    "goal_amount": 500000,
+    "raised_amount": 156000,
+    "is_critical": false,
+    "start_date": "2025-02-05",
+    "duration_days": 90,
+    "category": "Other",
+    "external_id": "zakat"
+  },
+  {
+    "title": "إنقاذ مشردين",
+    "description": "كن عونًا لإنقاذ المشردين بتوفير مأوى آمن، ووجبات ساخنة، وملبس، ورعاية صحية ونفسية، لإعادتهم إلى حياة كريمة ومستقرة.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/65ad3a4c9a3198aab7fcb08b_main%20cover%20ll%20website%20causes%20part2-15.jpg",
+    "supporting_charities": [
+      "جمعية رسالة",
+      "مؤسسة مصر الخير",
+      "مؤسسة حياة كريمة"
+    ],
+    "goal_amount": 240000,
+    "raised_amount": 112000,
+    "is_critical": false,
+    "start_date": "2025-02-07",
+    "duration_days": 75,
+    "category": "Shelter",
+    "external_id": "rescue-homeless"
+  },
+  {
+    "title": "علاج قلب",
+    "description": "ادعم عمليات وجراحات القلب، وتجهيز وحدات الرعاية القلبية للأطفال والكبار، وتوفير الأدوية والمتابعة للحالات الحرجة.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/65ad39b29a3198aab7fc447f_main%20cover%20ll%20website%20causes%20part2-13.avif",
+    "supporting_charities": [
+      "مؤسسة مجدي يعقوب للقلب",
+      "مستشفى الناس",
+      "مستشفيات شفا الأورمان (لصعيد بلا سرطان)",
+      "مؤسسة مرسال للأعمال الخيرية"
+    ],
+    "goal_amount": 650000,
+    "raised_amount": 203400,
+    "is_critical": false,
+    "start_date": "2025-02-01",
+    "duration_days": 80,
+    "category": "Health",
+    "external_id": "heart-surgery"
+  },
+  {
+    "title": "بناء وتطوير مساجد",
+    "description": "ساهم في بناء وترميم وتجهيز المساجد وبيوت الله بما يلزم من فرش وإضاءات ومرافق، في القرى والمناطق الأكثر احتياجًا.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/675f0efc59413730653fd70c_Cover.avif",
+    "supporting_charities": [
+      "جمعية الأورمان",
+      "جمعية رسالة",
+      "مؤسسة مصر الخير"
+    ],
+    "goal_amount": 280000,
+    "raised_amount": 99000,
+    "is_critical": false,
+    "start_date": "2025-02-12",
+    "duration_days": 100,
+    "category": "Other",
+    "external_id": "building-developing-mosques"
+  },
+  {
+    "title": "علاج سرطان",
+    "description": "قدّم أملًا لمرضى السرطان بتمويل العلاج والأدوية والفحوصات والدعم النفسي، والمساهمة في تجهيز المراكز المتخصصة.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/65ad3135b64ddb1d52ff8ba0_01-10.avif",
+    "supporting_charities": [
+      "مستشفى سرطان الأطفال 57357",
+      "مؤسسة مستشفى بهية",
+      "مستشفيات شفا الأورمان (لصعيد بلا سرطان)",
+      "مؤسسة مرسال للأعمال الخيرية"
+    ],
+    "goal_amount": 700000,
+    "raised_amount": 305600,
+    "is_critical": false,
+    "start_date": "2025-01-22",
+    "duration_days": 85,
+    "category": "Health",
+    "external_id": "cancer"
+  },
+  {
+    "title": "تعليم",
+    "description": "التعليم حق ومصعد للفرص: ساهم في سداد مصروفات الطلاب، وتجهيز الفصول، وتقديم منح وأنشطة دعم تعليمي في المناطق الأشد احتياجًا.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/65ad3a0afb384312900ff862_main%20cover%20ll%20website%20causes%20part2-14.avif",
+    "supporting_charities": [
+      "مؤسسة حياة كريمة",
+      "جمعية رسالة",
+      "مؤسسة مصر الخير"
+    ],
+    "goal_amount": 260000,
+    "raised_amount": 129500,
+    "is_critical": false,
+    "start_date": "2025-01-30",
+    "duration_days": 75,
+    "category": "Education",
+    "external_id": "education"
+  },
+  {
+    "title": "بناء وتجهيز مستشفي",
+    "description": "ساهم في إنشاء وتطوير وتجهيز المستشفيات والعيادات ووحدات الرعاية، لتقديم خدمة صحية لائقة للمحتاجين.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/65ad309459457ca19ee3709a_01-08.avif",
+    "supporting_charities": [
+      "مستشفى الناس",
+      "مستشفى سرطان الأطفال 57357",
+      "مؤسسة مصر الخير",
+      "مؤسسة مستشفى 25 يناير"
+    ],
+    "goal_amount": 800000,
+    "raised_amount": 327000,
+    "is_critical": false,
+    "start_date": "2025-02-09",
+    "duration_days": 120,
+    "category": "Health",
+    "external_id": "building-equipping-hospitals"
+  },
+  {
+    "title": "ذوي الاحتياجات الخاصة",
+    "description": "ادعم دمج وتمكين ذوي الإعاقة عبر العلاج والتأهيل والأجهزة التعويضية والدعم التعليمي والمهني، لصناعة استقلالية وكرامة.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/65ad3028e2a8d1037d851fb2_01-04.avif",
+    "supporting_charities": [
+      "مؤسسة ويانا الدولية للتوعية ودمج الحالات الخاصة في المجتمع",
+      "مؤسسة صناع الحياة",
+      "جمعية رسالة"
+    ],
+    "goal_amount": 220000,
+    "raised_amount": 104000,
+    "is_critical": false,
+    "start_date": "2025-02-06",
+    "duration_days": 70,
+    "category": "Health",
+    "external_id": "special-needs"
+  },
+  {
+    "title": "دعم مشاريع وتعمير قرى",
+    "description": "شارك في تنمية القرى والمجتمعات الأشد احتياجًا عبر ترميم المنازل، وتطوير البنية الأساسية، ودعم المشروعات الصغيرة وفرص العمل.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/65ad3145ce0001848e5c169a_01-11.avif",
+    "supporting_charities": [
+      "مؤسسة حياة كريمة",
+      "جمعية الأورمان",
+      "مؤسسة مصر الخير"
+    ],
+    "goal_amount": 500000,
+    "raised_amount": 201250,
+    "is_critical": false,
+    "start_date": "2025-01-27",
+    "duration_days": 110,
+    "category": "Shelter",
+    "external_id": "building-construction"
+  },
+  {
+    "title": "إنقاذ طفل",
+    "description": "ادعم إنقاذ حياة الأطفال عبر تمويل الجراحات والأدوية والعناية المركزة والتنقلات والرعاية النفسية للأكثر احتياجًا.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/65ad301be6e96d86b1b4ac8b_01-03.avif",
+    "supporting_charities": [
+      "مستشفى سرطان الأطفال 57357",
+      "مؤسسة مرسال للأعمال الخيرية",
+      "مستشفى الناس"
+    ],
+    "goal_amount": 350000,
+    "raised_amount": 173000,
+    "is_critical": false,
+    "start_date": "2025-02-04",
+    "duration_days": 65,
+    "category": "Health",
+    "external_id": "save-child"
+  },
+  {
+    "title": "تيسير زواج",
+    "description": "ساهم في تجهيز العرائس ومساعدة الشباب على الزواج الكريم عبر توفير الاحتياجات الأساسية وبناء أسر مستقرة.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/65ad300ce6e96d86b1b4a2a3_01-02.avif",
+    "supporting_charities": [
+      "جمعية الأورمان",
+      "جمعية رسالة",
+      "مؤسسة مصر الخير"
+    ],
+    "goal_amount": 240000,
+    "raised_amount": 89000,
+    "is_critical": false,
+    "start_date": "2025-01-29",
+    "duration_days": 80,
+    "category": "Other",
+    "external_id": "marriage"
+  },
+  {
+    "title": "كبار السن",
+    "description": "كن سندًا لكبار السن بتوفير العلاج والرعاية المنزلية والغذاء والكساء وأدوات المعيشة، لتخفيف الوحدة والأعباء عنهم.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/65b023790f244ef10d2ea402_fix.avif",
+    "supporting_charities": [
+      "جمعية رسالة",
+      "مؤسسة مصر الخير",
+      "جمعية الأورمان"
+    ],
+    "goal_amount": 210000,
+    "raised_amount": 102500,
+    "is_critical": false,
+    "start_date": "2025-02-08",
+    "duration_days": 60,
+    "category": "Other",
+    "external_id": "elderly"
+  },
+  {
+    "title": "كفالة سرير وعناية مركزة",
+    "description": "ساهم في كفالة أسِرّة الرعاية المركزة وتجهيزها بالأجهزة الحيوية والأدوية والدعم التشغيلي لإنقاذ أرواح الحالات الحرجة.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/65ad303732c24f1d74785fbc_01-05.avif",
+    "supporting_charities": [
+      "مستشفى الناس",
+      "مستشفى سرطان الأطفال 57357",
+      "مؤسسة مصر الخير"
+    ],
+    "goal_amount": 550000,
+    "raised_amount": 190000,
+    "is_critical": false,
+    "start_date": "2025-01-26",
+    "duration_days": 95,
+    "category": "Health",
+    "external_id": "icu"
+  },
+  {
+    "title": "كفالة يتيم",
+    "description": "بكفالتك لليتيم تضمن له الغذاء والتعليم والرعاية الصحية والدعم النفسي، وترسم له مستقبلاً أكثر استقرارًا.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/65ad3ab09a6c0cb333473b5c_main%20cover%20ll%20website%20causes%20part2-17.jpg",
+    "supporting_charities": [
+      "جمعية الأورمان",
+      "جمعية رسالة",
+      "مؤسسة مصر الخير"
+    ],
+    "goal_amount": 270000,
+    "raised_amount": 118500,
+    "is_critical": false,
+    "start_date": "2025-02-02",
+    "duration_days": 90,
+    "category": "Orphans",
+    "external_id": "sponsor-orphan"
+  },
+  {
+    "title": "حملات الشتاء",
+    "description": "دفئ شتاء المحتاجين عبر البطاطين والملابس والأحذية والدفايات وصيانة المنازل ضد البرد القارس والأمطار.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/676d1f8c1afc7d531aa060b4_Cover%20(1).avif",
+    "supporting_charities": [
+      "جمعية الأورمان",
+      "جمعية رسالة",
+      "مؤسسة مصر الخير"
+    ],
+    "goal_amount": 230000,
+    "raised_amount": 121000,
+    "is_critical": false,
+    "start_date": "2025-01-21",
+    "duration_days": 55,
+    "category": "Shelter",
+    "external_id": "winter-campaigns"
+  },
+  {
+    "title": "صكوك الأضاحي",
+    "description": "شارك في توزيع لحوم الأضاحي على الأسر الأكثر احتياجًا وفق الضوابط الشرعية، لضمان وصول الغذاء والفرحة في موسم العيد.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/664631532b400d39479c158d_Untitled%20design%20(4).avif",
+    "supporting_charities": [
+      "بنك الطعام المصرى",
+      "جمعية الأورمان",
+      "مؤسسة مصر الخير"
+    ],
+    "goal_amount": 900000,
+    "raised_amount": 402500,
+    "is_critical": false,
+    "start_date": "2025-03-15",
+    "duration_days": 70,
+    "category": "Food",
+    "external_id": "adahi"
+  },
+  {
+    "title": "عيد الفطر",
+    "description": "شاركنا فرحة العيد عبر كسوة العيد و\"عيدية\" للأطفال والأسر المستحقة، وتقديم وجبات وهدايا تُدخل البهجة وتكتمل بها سعادة العيد.",
+    "image_url": "https://cdn.prod.website-files.com/64c7f4cbdcc768b8275308ea/67b220a2040723aed5e5939a_Cover.avif",
+    "supporting_charities": [
+      "مؤسسة مصر الخير",
+      "مؤسسة مرسال للأعمال الخيرية",
+      "مؤسسة شباب الخير بميت فضالة",
+      "مؤسسة ديارنا للتنمية",
+      "مؤسسة حياة كريمة",
+      "جمعية بنكمل بعض",
+      "جمعية مصر المحروسة بلدى",
+      "جمعية بداية للأعمال الخيرية",
+      "جمعية خير أمة",
+      "مؤسسة مستشفى 25 يناير",
+      "بوابتك للخير",
+      "مؤسسة شبرا الخير"
+    ],
+    "goal_amount": 450000,
+    "raised_amount": 187200,
+    "is_critical": false,
+    "start_date": "2025-02-20",
+    "duration_days": 40,
+    "category": "Other",
+    "external_id": "eid-fitr"
+  }
+]

@@ -19,6 +19,9 @@ namespace AtharPlatform.Dtos
         public DateTime EndDate { get; set; }
         public bool IsCritical { get; set; }
 
+        // Owning charity identifier for direct linkage
+        public int CharityID { get; set; }
+
         // For manually-created campaigns (single owning charity)
         [JsonPropertyName("charity_name")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

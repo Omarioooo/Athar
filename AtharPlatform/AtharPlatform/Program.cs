@@ -4,6 +4,13 @@ using AtharPlatform.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using X.Paymob.CashIn;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
+using System.Text.Json;
+using AtharPlatform.Dtos;
+using AtharPlatform.Models;
+using AtharPlatform.Models.Enum;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +21,14 @@ builder.Services.AddSwaggerGen();
 
 // Inject Database
 builder.Services.AddDbContext<Context>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MSSConnection")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("MSSConnection"),
+        sql =>
+        {
+            // Add basic resiliency for transient SQL errors
+            sql.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(5), errorNumbersToAdd: null);
+        }
+    ));
 
 // Inject Repositories
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -109,10 +123,114 @@ builder.Services.Configure<PaymentSettings>(builder.Configuration.GetSection("Pa
 
 
 // Build app
+Console.WriteLine("[Startup] Building web application...");
 var app = builder.Build();
+Console.WriteLine("[Startup] Build complete. Beginning DB init...");
 
+// Global exception diagnostics
+AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+{
+    Console.WriteLine($"[UnhandledException] {(e.ExceptionObject is Exception ex ? ex.ToString() : e.ExceptionObject)}");
+};
+TaskScheduler.UnobservedTaskException += (s, e) =>
+{
+    Console.WriteLine($"[UnobservedTaskException] {e.Exception}");
+    e.SetObserved();
+};
 
+// Host lifetime diagnostics
+try
+{
+    var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
+    lifetime.ApplicationStarted.Register(() => Console.WriteLine("[Lifetime] ApplicationStarted"));
+    lifetime.ApplicationStopping.Register(() => Console.WriteLine("[Lifetime] ApplicationStopping"));
+    lifetime.ApplicationStopped.Register(() => Console.WriteLine("[Lifetime] ApplicationStopped"));
+}
+catch (Exception lfEx)
+{
+    Console.WriteLine($"[Startup] Failed to wire lifetime diagnostics: {lfEx.Message}");
+}
 
+// Ensure database is created and migrations are applied at startup
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<Context>();
+        var hasMigrations = db.Database.GetMigrations().Any();
+        Console.WriteLine($"[Startup] Migrations detected: {hasMigrations}");
+        if (hasMigrations)
+        {
+            Console.WriteLine("[Startup] Applying migrations...");
+            db.Database.Migrate();
+            Console.WriteLine("[Startup] Migrations applied.");
+        }
+        else
+        {
+            Console.WriteLine("[Startup] No migrations found. Ensuring database created...");
+            db.Database.EnsureCreated();
+            try
+            {
+                db.Database.ExecuteSqlRaw("SELECT 1 FROM [AspNetUsers]");
+                Console.WriteLine("[Startup] Identity tables already exist.");
+            }
+            catch (Exception idEx)
+            {
+                Console.WriteLine($"[Startup] Identity table check failed ({idEx.Message}). Creating tables explicitly...");
+                var creator = db.GetService<IRelationalDatabaseCreator>();
+                creator.CreateTables();
+                Console.WriteLine("[Startup] Tables created explicitly.");
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[Startup] Database initialization failed: {ex.Message}");
+    }
+
+    // Seed required Identity roles
+    try
+    {
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
+        var roles = new[] { "Admin", "SuperAdmin", "CharityAdmin", "Donor" };
+        foreach (var r in roles)
+        {
+            if (!await roleManager.RoleExistsAsync(r))
+            {
+                var createRes = await roleManager.CreateAsync(new IdentityRole<int> { Name = r });
+                Console.WriteLine(createRes.Succeeded
+                    ? $"[Startup] Role '{r}' created." : $"[Startup] Failed to create role '{r}': {string.Join(',', createRes.Errors.Select(e => e.Description))}");
+            }
+        }
+    }
+    catch (Exception rex)
+    {
+        Console.WriteLine($"[Startup] Role seeding failed: {rex.Message}");
+    }
+
+    // Development-only scraped data seeding (idempotent). Imports 101 charities and 23 campaigns once per local DB.
+    // Runs synchronously during startup so data is guaranteed present before first HTTP request.
+    try
+    {
+        var env = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
+        var flag = Environment.GetEnvironmentVariable("SKIP_SCRAPED_SEED");
+        if (string.IsNullOrWhiteSpace(flag) || (!flag.Equals("1", StringComparison.OrdinalIgnoreCase) && !flag.Equals("true", StringComparison.OrdinalIgnoreCase)))
+        {
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            Console.WriteLine("[Seeder] Starting scraped data import...");
+            await SeedData.DevelopmentScrapedSeeder.SeedAsync(scope.ServiceProvider, env);
+            Console.WriteLine($"[Seeder] Seeding completed in {sw.Elapsed.TotalSeconds:F2}s.");
+        }
+        else
+        {
+            Console.WriteLine("[Seeder] SKIP_SCRAPED_SEED set; skipping scraped data import.");
+        }
+    }
+    catch (Exception seedEx)
+    {
+        Console.WriteLine($"[Seeder] Seed failed (non-fatal): {seedEx.Message}");
+    }
+}
 
 if (app.Environment.IsDevelopment())
 {
@@ -120,13 +238,27 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("AllowAll");
+// Always redirect HTTP->HTTPS; we will trust the dev cert locally
 app.UseHttpsRedirection();
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
 // Map SignalR Hub
 app.MapHub<NotificationHubHelper>("/notificationHub");
 
+// Lightweight health endpoint for import script and manual checks
+app.MapGet("/health", () => Results.Ok(new { status = "ok", time = DateTime.UtcNow }))
+   .WithName("HealthCheck");
+
 app.MapControllers();
-app.Run();
+
+try
+{
+    Console.WriteLine("[Startup] Starting web host...");
+    app.Run();
+}
+catch (Exception runEx)
+{
+    Console.WriteLine($"[Startup] Host terminated unexpectedly: {runEx}");
+}
