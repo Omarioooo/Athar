@@ -18,9 +18,13 @@ namespace AtharPlatform.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalAmount { get; set; }
 
-        // Platform fee is 2%
         [NotMapped]
         public decimal PlatformFee { get; set; } = 0.02m;
+
+        // ⚠️  هنا ضيفتاها
+        public int? CampaignId { get; set; }
+
+        public int? CharityId { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal NetAmountToCharity { get; set; }
@@ -29,13 +33,13 @@ namespace AtharPlatform.Models
 
         public TransactionStatusEnum DonationStatus { get; set; } = TransactionStatusEnum.PENDING;
 
-        // payment IDs from Paymob...
         public string? PaymentID { get; set; }
         public string? MerchantOrderId { get; set; }
         public string? TransactionId { get; set; }
 
         public virtual DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
-        public virtual List<CharityDonation> CharityDonations { get; set; } = null!;
-        public virtual List<CampaignDonation> CampaignDonations { get; set; } = null!;
+
+        public virtual List<CharityDonation> CharityDonations { get; set; } = new();
+        public virtual List<CampaignDonation> CampaignDonations { get; set; } = new();
     }
 }

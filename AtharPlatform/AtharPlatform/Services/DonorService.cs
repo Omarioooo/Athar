@@ -47,7 +47,7 @@ namespace AtharPlatform.Services
             var donation = new Donation
             {
                 DonorId = model.DonorId,
-                TotalAmount = model.TotalAmount,
+                TotalAmount = (decimal)model.TotalAmount,
                 NetAmountToCharity = model.TotalAmount - (0.02m * model.TotalAmount),
             };
             await _unitOfWork.SaveAsync();
