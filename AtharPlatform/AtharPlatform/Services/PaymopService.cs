@@ -118,7 +118,8 @@ namespace AtharPlatform.Services
                 DonationStatus = TransactionStatusEnum.PENDING,
                 MerchantOrderId = merchantOrderId,
                 CharityId = model.CharityId,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                CampaignId=model.CampaignId
             };
 
             await _unit.PaymentDonations.AddAsync(donation);
@@ -130,7 +131,8 @@ namespace AtharPlatform.Services
                 await _unit.PaymentCampaignDonations.AddAsync(new CampaignDonation
                 {
                     DonationId = donation.Id,
-                    CampaignId = model.CampaignId
+                    CampaignId = model.CampaignId,
+                    DonorId=model.DonorId
                 });
                 await _unit.SaveAsync();
             }

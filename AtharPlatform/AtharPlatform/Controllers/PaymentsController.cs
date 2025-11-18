@@ -19,61 +19,21 @@ public class PaymentsController : ControllerBase
         _unit = unit;
     }
 
-    // 1️⃣ Create Payment
     [HttpPost("create")]
     public async Task<IActionResult> CreatePayment([FromBody] CreatePaymentDto model)
     {
         if (model == null)
             return BadRequest("Invalid model");
 
-      
-        var donation = new Donation
-        {
-            DonorId = model.DonorId,
-            TotalAmount = (decimal)model.Amount,
-            DonationStatus = TransactionStatusEnum.PENDING,
-            Currency = "EGP",
-            CharityId = model.CharityId,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        await _unit.Donations.AddAsync(donation);
-        await _unit.SaveAsync();
-
-       
-        if (model.CampaignId != null)
-        {
-            var c = new CampaignDonation
-            {
-                DonationId = donation.Id,
-                CampaignId = model.CampaignId
-            };
-            await _unit.CampaignDonations.AddAsync(c);
-        }
-
-       
-        if (model.CharityId != null)
-        {
-            var c = new CharityDonation
-            {
-                DonationId = donation.Id,
-                charityID = model.CharityId
-            };
-            await _unit.CharityDonations.AddAsync(c);
-        }
-
-        await _unit.SaveAsync();
-
+   
         
         var result = await _paymob.CreatePaymentAsync(model);
 
-        donation.PaymentID = result.PaymentId;
-        donation.MerchantOrderId = result.MerchantOrderId;
-        await _unit.SaveAsync();
+
 
         return Ok(new
         {
-            donationId = donation.Id,
+            //donationId = model.Id,
             result.PaymentUrl,
             result.PaymentId
         });
@@ -126,8 +86,7 @@ public class PaymentsController : ControllerBase
         return Ok(new
         {
             donation.DonationStatus,
-            donation.TotalAmount,
-            donation.NetAmountToCharity
+           
         });
     }
 }
