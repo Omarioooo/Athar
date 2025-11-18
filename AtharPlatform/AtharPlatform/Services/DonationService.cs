@@ -20,19 +20,15 @@ namespace AtharPlatform.Services
 
         public async Task<string> DonateToCampaignAsync(DonationDto model)
         {
-            // Check the donor
+         
             var donor = await _unitOfWork.Donors.GetAsync(model.DonorId)
                         ?? throw new Exception($"Donor with id {model.DonorId} not found");
 
-            // Check the campagin
+            
             var campaign = await _unitOfWork.Campaigns.GetAsync(model.CharityOrCampaignId)
                           ?? throw new Exception($"Charity with id {model.CharityOrCampaignId} not found");
 
-            // Donot forget the status of the campaign
-            //if (campaign.Status != CampaignStatusEnum.Approved)
-            //    throw new Exception("Charity is not approved yet.");
-
-            // Create donation
+            
             var donation = new Donation
             {
                 DonorId = model.DonorId,
@@ -46,7 +42,7 @@ namespace AtharPlatform.Services
             await _unitOfWork.Donations.AddAsync(donation);
             await _unitOfWork.SaveAsync();
 
-            // Link donation to charity
+          
             var campaingDonation = new CampaignDonation
             {
                 DonationId = donation.Id,
@@ -56,7 +52,7 @@ namespace AtharPlatform.Services
             await _unitOfWork.CampaignDonations.AddAsync(campaingDonation);
             await _unitOfWork.SaveAsync();
 
-            // Create payment via Paymob
+           
             var paymentOutPut = await _paymobService.CreatePaymentAsync(new CreatePaymentDto
             {
                 DonorFirstName = donor.FirstName,

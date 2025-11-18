@@ -7,6 +7,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Remove="Migrations\20251117130734_updatemodels.cs" />
+		<Compile Remove="Migrations\20251117130734_updatemodels.Designer.cs" />
 		<Compile Remove="DTO\**" />
 		<Compile Remove="Hub\**" />
 		<Content Remove="DTO\**" />
@@ -38,6 +40,12 @@
 		<PackageReference Include="Xdot.Paymob.CashIn" Version="1.0.7" />
 		<PackageReference Include="Xdot.Paymob.CashIn.DependencyInjection" Version="1.0.7" />
 
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Update="SeedData\**\*.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 
 </Project>

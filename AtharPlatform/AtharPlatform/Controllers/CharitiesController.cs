@@ -6,6 +6,7 @@ using AtharPlatform.Repositories;
 using AtharPlatform.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using System.Text;
 
@@ -18,21 +19,23 @@ namespace AtharPlatform.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAccountContextService _accountContextService;
         private readonly Context _db;
+        private readonly UserManager<UserAccount> _userManager;
 
         public CharitiesController(IUnitOfWork unitOfWork, IAccountContextService accountContextService
-            , Context db)
+            , Context db, UserManager<UserAccount> userManager)
         {
             _unitOfWork = unitOfWork;
             _accountContextService = accountContextService;
             _db = db;
+            _userManager = userManager;
         }
 
 
         // (GET) /api/charities?query=&page=1&pageSize=12
         [HttpGet]
-        public async Task<ActionResult<PaginatedResultDto<CharityCardDto>>> GetAll([FromQuery] string? query, [FromQuery] int page = 1, [FromQuery] int pageSize = 12, [FromQuery] bool includeCampaigns = false)
+        public async Task<ActionResult<AtharPlatform.Dtos.PaginatedResultDto<CharityCardDto>>> GetAll([FromQuery] string? query, [FromQuery] int page = 1, [FromQuery] int pageSize = 12, [FromQuery] bool includeCampaigns = false)
         {
-            var userId = _accountContextService.GetCurrentAccountId();
+            // Public endpoint; no authentication required
 
             if (page <= 0 || pageSize <= 0)
                 return BadRequest("Page and PageSize must be greater than zero.");
@@ -42,7 +45,7 @@ namespace AtharPlatform.Controllers
             var total = await _unitOfWork.Charities.CountAsync(query);
 
             if (total == 0)// Handle empty data
-                return Ok(new PaginatedResultDto<CharityCardDto>
+                return Ok(new AtharPlatform.Dtos.PaginatedResultDto<CharityCardDto>
                 {
                     Items = new List<CharityCardDto>(),
                     Page = page,
@@ -57,7 +60,8 @@ namespace AtharPlatform.Controllers
             // 1) Direct FK (Campaign.CharityID == Charity.Id)
             // 2) Indirect support: Campaign.SupportingCharitiesJson contains the charity name
             List<(int Id, string Name, string? ImageUrl, string? ExternalWebsiteUrl, string Description)> pageCharities = items
-                .Select(c => (c.Account.Id, c.Name, c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
+                // Use the charity primary key directly; Account may not be eagerly loaded in GetPageAsync
+                .Select(c => (c.Id, c.Name, c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
                                c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null, c.Description))
                 .ToList();
 
@@ -124,7 +128,7 @@ namespace AtharPlatform.Controllers
                 }
             }
 
-            var dto = new PaginatedResultDto<CharityCardDto>
+            var dto = new AtharPlatform.Dtos.PaginatedResultDto<CharityCardDto>
             {
                 Items = pageCharities.Select(pc => new CharityCardDto
                 {
@@ -149,14 +153,14 @@ namespace AtharPlatform.Controllers
         [HttpGet("{id:int}")]
         public async Task<ActionResult<CharityCardDto>> GetById(int id)
         {
-            var userId = _accountContextService.GetCurrentAccountId();
+            // Public endpoint; no authentication required
 
             var c = await _unitOfWork.Charities.GetWithCampaignsAsync(id);
             if (c == null) return NotFound("Charity not found.");
 
             var dto = new CharityCardDto
             {
-                Id = userId,
+                Id = c.Id,
                 Name = c.Name,
                 Description = c.Description,
                 ImageUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
@@ -176,8 +180,7 @@ namespace AtharPlatform.Controllers
         [HttpGet("byName/{name}")]
         public async Task<ActionResult<CharityCardDto>> GetByName(string name)
         {
-
-            var userId = _accountContextService.GetCurrentAccountId();
+            // Public endpoint; no authentication required
 
             if (string.IsNullOrWhiteSpace(name)) return BadRequest("Name is required.");
             var trimmed = name.Trim();
@@ -200,7 +203,7 @@ namespace AtharPlatform.Controllers
 
             var dto = new CharityCardDto
             {
-                Id = userId,
+                Id = c.Id,
                 Name = c.Name,
                 Description = c.Description,
                 ImageUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
@@ -247,7 +250,7 @@ namespace AtharPlatform.Controllers
 
         // (POST) /api/charities/import - bulk import scraped data
         [HttpPost("import")]
-        [Authorize(Roles = "SuperAdmin")]
+        [Authorize(Roles = "Admin,SuperAdmin")]
         public async Task<IActionResult> Import([FromBody] IEnumerable<CharityImportItemDto> items)
         {
             if (items == null) return BadRequest("No data provided");
@@ -255,13 +258,42 @@ namespace AtharPlatform.Controllers
             var entities = new List<Models.Charity>();
             foreach (var i in items.Where(i => !string.IsNullOrWhiteSpace(i.Name)))
             {
+                // Create placeholder Identity account to satisfy shared PK FK (Charity.Id == UserAccount.Id)
+                var uname = (i.Name ?? $"charity_{Guid.NewGuid():N}").Trim().Replace(" ", "_");
+                var email = $"{uname.ToLowerInvariant()}@charity.local";
+                var account = new UserAccount
+                {
+                    UserName = uname,
+                    Email = email,
+                    EmailConfirmed = true
+                };
+
+                // Use a strong random password to satisfy Identity requirements
+                var pwd = $"{Guid.NewGuid():N}!Aa1";
+                var createRes = await _userManager.CreateAsync(account, pwd);
+                if (!createRes.Succeeded)
+                {
+                    // If username/email collision, append random suffix and retry once
+                    uname = $"{uname}_{Guid.NewGuid().ToString("N")[..6]}";
+                    email = $"{uname.ToLowerInvariant()}@charity.local";
+                    account.UserName = uname;
+                    account.Email = email;
+                    createRes = await _userManager.CreateAsync(account, pwd);
+                    if (!createRes.Succeeded)
+                        return BadRequest(new { message = "Failed to create identity account for charity.", errors = createRes.Errors });
+                }
+
                 var charity = new Models.Charity
                 {
                     Name = i.Name.Trim(),
                     Description = i.Description ?? string.Empty,
                     IsScraped = true,
                     ExternalId = i.ExternalId,
-                    ImportedAt = now
+                    ImportedAt = now,
+                    Id = account.Id,
+                    Account = account,
+                    // Provide a placeholder verification document for scraped data to satisfy [Required]
+                    VerificationDocument = Array.Empty<byte>()
                 };
 
                 if (i.ImageUrl != null || i.ExternalWebsiteUrl != null)

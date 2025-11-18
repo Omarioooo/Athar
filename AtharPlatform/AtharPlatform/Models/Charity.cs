@@ -20,7 +20,7 @@ namespace AtharPlatform.Models
         [Column(TypeName = "decimal(18, 4)")]
         public decimal? Balance { get; set; } = 0.0m;
 
-        [Required]
+        // VerificationDocument made optional for scraped imports; controller sets placeholder when available
         public byte[]? VerificationDocument { get; set; }
         public CharityStatusEnum Status { get; set; } = CharityStatusEnum.Pending;
 
