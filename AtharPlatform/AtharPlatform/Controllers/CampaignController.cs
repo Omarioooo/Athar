@@ -4,6 +4,9 @@ using AtharPlatform.Models.Enum;
 using AtharPlatform.Repositories;
 using AtharPlatform.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 
 namespace AtharPlatform.Controllers
@@ -13,21 +16,23 @@ namespace AtharPlatform.Controllers
     public class CampaignController : ControllerBase
     {
         private readonly ICampaignService _campaignService;
+        private readonly IUnitOfWork _unitOfWork;
 
         public CampaignController(ICampaignService service, IUnitOfWork unitOfWork)
         {
             _campaignService = service;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet("[action]")]
-        public async Task<ActionResult<PaginatedResultDto<CampaignDto>>>
+        public async Task<ActionResult<AtharPlatform.Dtos.PaginatedResultDto<CampaignDto>>>
             GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 12)
         {
             try
             {
                 var campaigns = await _campaignService.GetPaginatedAsync(page, pageSize, inCludeCharity: true);
 
-                var result = new PaginatedResultDto<CampaignDto>
+                var result = new AtharPlatform.Dtos.PaginatedResultDto<CampaignDto>
                 {
                     Items = campaigns,
                     Page = page,
@@ -53,6 +58,68 @@ namespace AtharPlatform.Controllers
             {
                 return StatusCode(500, new { message = "An unexpected error occurred during fetching campaigns." });
             }
+        }
+
+        [HttpPost("import")]
+        [Authorize(Roles = "Admin,SuperAdmin")]
+        public async Task<IActionResult> Import([FromBody] IEnumerable<CampaignImportItemDto> items)
+        {
+            if (items == null) return BadRequest(new { message = "No data provided" });
+
+            var now = DateTime.UtcNow;
+            var added = 0;
+            foreach (var i in items)
+            {
+                if (string.IsNullOrWhiteSpace(i?.Title) || string.IsNullOrWhiteSpace(i?.Description))
+                    continue;
+
+                int charityId = 0;
+                string? nameHint = i.CharityName;
+                if (string.IsNullOrWhiteSpace(nameHint) && (i.SupportingCharities?.Any() ?? false))
+                    nameHint = i.SupportingCharities!.FirstOrDefault();
+
+                if (!string.IsNullOrWhiteSpace(nameHint))
+                {
+                    var nm = nameHint.Trim();
+                    try
+                    {
+                        // Only link against imported charities
+                        var charity = await _unitOfWork.Charities.GetWithExpressionAsync(c => c.IsScraped && (c.Name == nm || c.Name.Contains(nm)));
+                        if (charity != null) charityId = charity.Id;
+                    }
+                    catch { /* skip if not found */ }
+                }
+
+                if (charityId == 0) continue; // skip campaigns that we can't link
+
+                var cat = CampaignCategoryEnum.Other;
+                if (!string.IsNullOrWhiteSpace(i.Category) && Enum.TryParse<CampaignCategoryEnum>(i.Category, true, out var parsed))
+                    cat = parsed;
+
+                var campaign = new Campaign
+                {
+                    Title = i.Title!.Trim(),
+                    Description = i.Description!.Trim(),
+                    ImageUrl = i.ImageUrl,
+                    isCritical = i.IsCritical ?? false,
+                    StartDate = i.StartDate ?? now,
+                    Duration = i.DurationDays ?? 30,
+                    GoalAmount = i.GoalAmount ?? 0,
+                    RaisedAmount = i.RaisedAmount ?? 0,
+                    IsInKindDonation = false,
+                    Category = cat,
+                    Status = CampainStatusEnum.inProgress,
+                    CharityID = charityId,
+                    ExternalId = i.ExternalId,
+                    SupportingCharitiesJson = (i.SupportingCharities != null && i.SupportingCharities.Any()) ? JsonSerializer.Serialize(i.SupportingCharities) : null
+                };
+
+                await _unitOfWork.Campaigns.AddAsync(campaign);
+                added++;
+            }
+
+            await _unitOfWork.SaveAsync();
+            return Ok(new { imported = added });
         }
 
         [HttpGet("[action]")]

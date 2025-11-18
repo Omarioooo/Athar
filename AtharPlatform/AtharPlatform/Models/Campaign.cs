@@ -15,8 +15,11 @@ namespace AtharPlatform.Models
         [Required]
         public string Description { get; set; } = null!;
 
-        [Required]
+        // Optional binary image for manually-created campaigns
         public byte[]? Image { get; set; }
+
+        // Optional external image URL for scraped/curated data
+        public string? ImageUrl { get; set; }
 
         public bool isCritical { get; set; } = false;
 
@@ -38,7 +41,8 @@ namespace AtharPlatform.Models
 
         public bool IsInKindDonation { get; set; } = false;
 
-        public DateTime StartingDate { get; set; } = DateTime.UtcNow;
+        // Creation/import timestamp
+        public DateTime Date { get; set; } = DateTime.UtcNow;
 
         public CampaignCategoryEnum Category { get; set; } = CampaignCategoryEnum.Other;
         public CampainStatusEnum Status { get; set; } = CampainStatusEnum.inProgress;
@@ -56,6 +60,5 @@ namespace AtharPlatform.Models
         public int CharityID { get; set; }
         public virtual Charity Charity { get; set; } = null!;
         public virtual List<CampaignDonation> CampaignDonations { get; set; } = null!;
-        public byte[] ImageUrl { get; internal set; }
     }
 }
