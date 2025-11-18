@@ -2,10 +2,10 @@ param(
   [string]$BaseUrl = "https://localhost:7032",
   [string]$AdminEmail = "admin@athar.local",
   [string]$AdminPassword = "Admin#123",
-  # Default to full dataset
-  [string]$CharitiesJson = "Athar\scrapers\megakheir\data\charities101.json",
+  # Default to repo-tracked SeedData JSONs used by the startup seeder
+  [string]$CharitiesJson = "Athar\\AtharPlatform\\AtharPlatform\\SeedData\\charities101.json",
   # Default campaigns dataset
-  [string]$CampaignsJson = "Athar\scrapers\megakheir\data\campagins23.json",
+  [string]$CampaignsJson = "Athar\\AtharPlatform\\AtharPlatform\\SeedData\\campagins23.json",
   [int]$CharityBatchSize = 25,
   [int]$CampaignBatchSize = 20
 )
