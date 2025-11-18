@@ -209,41 +209,27 @@ using (var scope = app.Services.CreateScope())
     }
 
     // Development-only scraped data seeding (idempotent). Imports 101 charities and 23 campaigns once per local DB.
-}
-
-// Background seeding after application starts to avoid blocking initial startup
-try
-{
-    var lifetime2 = app.Services.GetRequiredService<IHostApplicationLifetime>();
-    lifetime2.ApplicationStarted.Register(() =>
+    // Runs synchronously during startup so data is guaranteed present before first HTTP request.
+    try
     {
-        Task.Run(async () =>
+        var env = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
+        var flag = Environment.GetEnvironmentVariable("SKIP_SCRAPED_SEED");
+        if (string.IsNullOrWhiteSpace(flag) || (!flag.Equals("1", StringComparison.OrdinalIgnoreCase) && !flag.Equals("true", StringComparison.OrdinalIgnoreCase)))
         {
-            using var scope2 = app.Services.CreateScope();
-            var env2 = scope2.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
-            var flag = Environment.GetEnvironmentVariable("SKIP_SCRAPED_SEED");
-            if (!string.IsNullOrWhiteSpace(flag) && (flag.Equals("1", StringComparison.OrdinalIgnoreCase) || flag.Equals("true", StringComparison.OrdinalIgnoreCase)))
-            {
-                Console.WriteLine("[Seeder] SKIP_SCRAPED_SEED set; skipping scraped data import.");
-                return;
-            }
             var sw = System.Diagnostics.Stopwatch.StartNew();
-            Console.WriteLine("[Seeder] Background seeding started...");
-            try
-            {
-                await SeedData.DevelopmentScrapedSeeder.SeedAsync(scope2.ServiceProvider, env2);
-                Console.WriteLine($"[Seeder] Background seeding completed in {sw.Elapsed.TotalSeconds:F2}s.");
-            }
-            catch (Exception bEx)
-            {
-                Console.WriteLine($"[Seeder] Background seeding failed: {bEx.Message}");
-            }
-        });
-    });
-}
-catch (Exception bgEx)
-{
-    Console.WriteLine($"[Startup] Failed to register background seeding: {bgEx.Message}");
+            Console.WriteLine("[Seeder] Starting scraped data import...");
+            await SeedData.DevelopmentScrapedSeeder.SeedAsync(scope.ServiceProvider, env);
+            Console.WriteLine($"[Seeder] Seeding completed in {sw.Elapsed.TotalSeconds:F2}s.");
+        }
+        else
+        {
+            Console.WriteLine("[Seeder] SKIP_SCRAPED_SEED set; skipping scraped data import.");
+        }
+    }
+    catch (Exception seedEx)
+    {
+        Console.WriteLine($"[Seeder] Seed failed (non-fatal): {seedEx.Message}");
+    }
 }
 
 if (app.Environment.IsDevelopment())
