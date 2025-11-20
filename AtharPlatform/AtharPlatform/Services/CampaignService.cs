@@ -16,8 +16,51 @@ namespace AtharPlatform.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<int> GetCountOfCampaignsAsync()
-            => (await GetAllAsync(inProgress: true, includeCharity: false)).Count();
+        public async Task<int> GetCountOfCampaignsAsync(
+            CampainStatusEnum? status = null,
+            CampaignCategoryEnum? category = null,
+            string? search = null,
+            bool? isCritical = null,
+            double? minGoalAmount = null,
+            double? maxGoalAmount = null,
+            DateTime? startDateFrom = null,
+            DateTime? startDateTo = null,
+            int? charityId = null)
+        {
+            var query = _unitOfWork.Campaigns.GetQueryable();
+
+            // Apply filters
+            if (status.HasValue)
+                query = query.Where(c => c.Status == status.Value);
+            else
+                query = query.Where(c => c.Status == CampainStatusEnum.inProgress); // Default to in progress
+
+            if (category.HasValue)
+                query = query.Where(c => c.Category == category.Value);
+
+            if (!string.IsNullOrWhiteSpace(search))
+                query = query.Where(c => c.Title.Contains(search) || c.Description.Contains(search));
+
+            if (isCritical.HasValue)
+                query = query.Where(c => c.isCritical == isCritical.Value);
+
+            if (minGoalAmount.HasValue)
+                query = query.Where(c => c.GoalAmount >= minGoalAmount.Value);
+
+            if (maxGoalAmount.HasValue)
+                query = query.Where(c => c.GoalAmount <= maxGoalAmount.Value);
+
+            if (startDateFrom.HasValue)
+                query = query.Where(c => c.StartDate >= startDateFrom.Value);
+
+            if (startDateTo.HasValue)
+                query = query.Where(c => c.StartDate <= startDateTo.Value);
+
+            if (charityId.HasValue)
+                query = query.Where(c => c.CharityID == charityId.Value);
+
+            return await query.CountAsync();
+        }
 
         public async Task<List<CampaignDto>> GetAllAsync(bool inProgress = true, bool includeCharity = true)
         {
@@ -122,15 +165,67 @@ namespace AtharPlatform.Services
             }).ToList();
         }
 
-        public async Task<List<CampaignDto>> GetPaginatedAsync(int page, int pageSize, bool inCludeCharity = true)
+        public async Task<List<CampaignDto>> GetPaginatedAsync(
+            int page, 
+            int pageSize, 
+            CampainStatusEnum? status = null,
+            CampaignCategoryEnum? category = null,
+            string? search = null,
+            bool? isCritical = null,
+            double? minGoalAmount = null,
+            double? maxGoalAmount = null,
+            DateTime? startDateFrom = null,
+            DateTime? startDateTo = null,
+            int? charityId = null,
+            bool inCludeCharity = true)
         {
-
             if (page <= 0 || pageSize <= 0)
                 throw new ArgumentOutOfRangeException("Page and PageSize must be greater than zero.");
 
-            var campaigns = await _unitOfWork.Campaigns.GetPaginatedAsync(page, pageSize, inCludeCharity);
+            var query = _unitOfWork.Campaigns.GetQueryable();
 
-            if (campaigns == null)
+            // Apply filters
+            if (status.HasValue)
+                query = query.Where(c => c.Status == status.Value);
+            else
+                query = query.Where(c => c.Status == CampainStatusEnum.inProgress); // Default to in progress
+
+            if (category.HasValue)
+                query = query.Where(c => c.Category == category.Value);
+
+            if (!string.IsNullOrWhiteSpace(search))
+                query = query.Where(c => c.Title.Contains(search) || c.Description.Contains(search));
+
+            if (isCritical.HasValue)
+                query = query.Where(c => c.isCritical == isCritical.Value);
+
+            if (minGoalAmount.HasValue)
+                query = query.Where(c => c.GoalAmount >= minGoalAmount.Value);
+
+            if (maxGoalAmount.HasValue)
+                query = query.Where(c => c.GoalAmount <= maxGoalAmount.Value);
+
+            if (startDateFrom.HasValue)
+                query = query.Where(c => c.StartDate >= startDateFrom.Value);
+
+            if (startDateTo.HasValue)
+                query = query.Where(c => c.StartDate <= startDateTo.Value);
+
+            if (charityId.HasValue)
+                query = query.Where(c => c.CharityID == charityId.Value);
+
+            // Include charity if requested
+            if (inCludeCharity)
+                query = query.Include(c => c.Charity);
+
+            // Apply pagination
+            var campaigns = await query
+                .OrderByDescending(c => c.StartDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            if (campaigns == null || !campaigns.Any())
                 throw new KeyNotFoundException("No campaigns found");
 
             return campaigns.Select(c => new CampaignDto

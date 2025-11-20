@@ -33,7 +33,14 @@ namespace AtharPlatform.Controllers
 
         // (GET) /api/charities?query=&page=1&pageSize=12
         [HttpGet]
-        public async Task<ActionResult<AtharPlatform.Dtos.PaginatedResultDto<CharityCardDto>>> GetAll([FromQuery] string? query, [FromQuery] int page = 1, [FromQuery] int pageSize = 12, [FromQuery] bool includeCampaigns = false)
+        public async Task<ActionResult<AtharPlatform.Dtos.PaginatedResultDto<CharityCardDto>>> GetAll(
+            [FromQuery] string? query, 
+            [FromQuery] int page = 1, 
+            [FromQuery] int pageSize = 12, 
+            [FromQuery] bool includeCampaigns = false,
+            [FromQuery] bool? isActive = null,
+            [FromQuery] bool? isScraped = null,
+            [FromQuery] bool? hasExternalWebsite = null)
         {
             // Public endpoint; no authentication required
 
@@ -42,7 +49,11 @@ namespace AtharPlatform.Controllers
 
 
 
-            var total = await _unitOfWork.Charities.CountAsync(query);
+            var total = await _unitOfWork.Charities.CountAsync(
+                query, 
+                isActive, 
+                isScraped, 
+                hasExternalWebsite);
 
             if (total == 0)// Handle empty data
                 return Ok(new AtharPlatform.Dtos.PaginatedResultDto<CharityCardDto>
@@ -54,7 +65,13 @@ namespace AtharPlatform.Controllers
                 });
 
 
-            var items = await _unitOfWork.Charities.GetPageAsync(query, page, pageSize);
+            var items = await _unitOfWork.Charities.GetPageAsync(
+                query, 
+                page, 
+                pageSize,
+                isActive,
+                isScraped,
+                hasExternalWebsite);
 
             // When includeCampaigns=true, enrich each charity with campaigns derived from:
             // 1) Direct FK (Campaign.CharityID == Charity.Id)

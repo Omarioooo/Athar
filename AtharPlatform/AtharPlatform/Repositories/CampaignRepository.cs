@@ -8,6 +8,11 @@ namespace AtharPlatform.Repositories
 
         #region Query Helpers
 
+        public IQueryable<Campaign> GetQueryable()
+        {
+            return _dbSet.AsQueryable();
+        }
+
         private IQueryable<Campaign> IncludeCharityQuery(bool includeCharity = true)
         {
             var query = _dbSet.AsQueryable();

@@ -7,9 +7,18 @@ namespace AtharPlatform.Services
     public interface ICampaignService
     {
         /// <summary>
-        /// Get the total number of inProgress Campaign 
+        /// Get the total number of campaigns with optional filters
         /// </summary>
-        Task<int> GetCountOfCampaignsAsync();
+        Task<int> GetCountOfCampaignsAsync(
+            CampainStatusEnum? status = null,
+            CampaignCategoryEnum? category = null,
+            string? search = null,
+            bool? isCritical = null,
+            double? minGoalAmount = null,
+            double? maxGoalAmount = null,
+            DateTime? startDateFrom = null,
+            DateTime? startDateTo = null,
+            int? charityId = null);
 
         /// <summary>
         /// Retrieves all campaigns, optionally filtering by active (in-progress) status 
@@ -38,9 +47,21 @@ namespace AtharPlatform.Services
         Task<List<CampaignDto>> SearchAsync(string keyword, bool inCludeCharity = true);
 
         /// <summary>
-        /// Retrieves campaigns in a paginated format.
+        /// Retrieves campaigns in a paginated format with optional filters.
         /// </summary>
-        Task<List<CampaignDto>> GetPaginatedAsync(int page, int pageSize, bool inCludeCharity = true);
+        Task<List<CampaignDto>> GetPaginatedAsync(
+            int page, 
+            int pageSize, 
+            CampainStatusEnum? status = null,
+            CampaignCategoryEnum? category = null,
+            string? search = null,
+            bool? isCritical = null,
+            double? minGoalAmount = null,
+            double? maxGoalAmount = null,
+            DateTime? startDateFrom = null,
+            DateTime? startDateTo = null,
+            int? charityId = null,
+            bool inCludeCharity = true);
 
         /// <summary>
         /// Creates a new campaign based on the provided model.
