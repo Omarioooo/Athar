@@ -43,6 +43,11 @@ namespace AtharPlatform.Repositories
         /// Get paginated list of campaigns.
         /// </summary>
         Task<List<Campaign>> GetPaginatedAsync(int page, int pageSize, bool includeCharity = true);
+
+        /// <summary>
+        /// Get queryable for custom filtering.
+        /// </summary>
+        IQueryable<Campaign> GetQueryable();
     }
 
 }

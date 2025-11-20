@@ -26,18 +26,52 @@ namespace AtharPlatform.Controllers
 
         [HttpGet("[action]")]
         public async Task<ActionResult<AtharPlatform.Dtos.PaginatedResultDto<CampaignDto>>>
-            GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 12)
+            GetAll(
+                [FromQuery] int page = 1, 
+                [FromQuery] int pageSize = 12,
+                [FromQuery] CampainStatusEnum? status = null,
+                [FromQuery] CampaignCategoryEnum? category = null,
+                [FromQuery] string? search = null,
+                [FromQuery] bool? isCritical = null,
+                [FromQuery] double? minGoalAmount = null,
+                [FromQuery] double? maxGoalAmount = null,
+                [FromQuery] DateTime? startDateFrom = null,
+                [FromQuery] DateTime? startDateTo = null,
+                [FromQuery] int? charityId = null)
         {
             try
             {
-                var campaigns = await _campaignService.GetPaginatedAsync(page, pageSize, inCludeCharity: true);
+                var campaigns = await _campaignService.GetPaginatedAsync(
+                    page, 
+                    pageSize, 
+                    status,
+                    category,
+                    search,
+                    isCritical,
+                    minGoalAmount,
+                    maxGoalAmount,
+                    startDateFrom,
+                    startDateTo,
+                    charityId,
+                    inCludeCharity: true);
+
+                var total = await _campaignService.GetCountOfCampaignsAsync(
+                    status,
+                    category,
+                    search,
+                    isCritical,
+                    minGoalAmount,
+                    maxGoalAmount,
+                    startDateFrom,
+                    startDateTo,
+                    charityId);
 
                 var result = new AtharPlatform.Dtos.PaginatedResultDto<CampaignDto>
                 {
                     Items = campaigns,
                     Page = page,
                     PageSize = pageSize,
-                    Total = await _campaignService.GetCountOfCampaignsAsync()
+                    Total = total
                 };
 
                 return Ok(result);
