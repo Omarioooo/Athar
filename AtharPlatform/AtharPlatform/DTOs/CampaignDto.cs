@@ -9,7 +9,9 @@ namespace AtharPlatform.Dtos
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
 
-        public byte[] Image { get; set; } = null!;
+        public byte[]? Image { get; set; }
+
+        public string? ImageUrl { get; set; }
 
         public double GoalAmount { get; set; }
         public double RaisedAmount { get; set; }

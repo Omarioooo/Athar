@@ -1,4 +1,5 @@
 ﻿using AtharPlatform.Models.Enum;
+using AtharPlatform.Validators;
 using System.ComponentModel.DataAnnotations;
 
 public class UpdatCampaignDto
@@ -11,7 +12,16 @@ public class UpdatCampaignDto
     [Required]
     public string Description { get; set; }
 
+    /// <summary>
+    /// Binary image file (for manual uploads). Either Image or ImageUrl must be provided, but not both.
+    /// </summary>
     public IFormFile? Image { get; set; }
+
+    /// <summary>
+    /// External image URL (for campaigns with hosted images). Either Image or ImageUrl must be provided, but not both.
+    /// </summary>
+    [ValidImageUrl]
+    public string? ImageUrl { get; set; }
 
     public bool IsCritical { get; set; }
 

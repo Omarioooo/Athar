@@ -130,11 +130,16 @@ namespace AtharPlatform.Controllers
                 if (!string.IsNullOrWhiteSpace(i.Category) && Enum.TryParse<CampaignCategoryEnum>(i.Category, true, out var parsed))
                     cat = parsed;
 
+                // Validate scraped campaigns have ImageUrl (Image should be null for scraped data)
+                if (string.IsNullOrWhiteSpace(i.ImageUrl))
+                    continue; // Skip campaigns without image URL
+
                 var campaign = new Campaign
                 {
                     Title = i.Title!.Trim(),
                     Description = i.Description!.Trim(),
-                    ImageUrl = i.ImageUrl,
+                    Image = null, // Scraped campaigns should NOT have binary image data
+                    ImageUrl = i.ImageUrl.Trim(),
                     isCritical = i.IsCritical ?? false,
                     StartDate = i.StartDate ?? now,
                     Duration = i.DurationDays ?? 30,
