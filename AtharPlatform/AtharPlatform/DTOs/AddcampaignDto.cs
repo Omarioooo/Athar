@@ -1,18 +1,27 @@
 ﻿using AtharPlatform.Models.Enum;
+using AtharPlatform.Validators;
 using System.ComponentModel.DataAnnotations;
 
 namespace AtharPlatform.DTOs
 {
     public class AddCampaignDto
     {
+        [Required]
         public string Title { get; set; } = null!;
 
         [Required]
         public string Description { get; set; } = null!;
 
+        /// <summary>
+        /// Binary image file (for manual uploads). Either Image or ImageUrl must be provided, but not both.
+        /// </summary>
+        public IFormFile? Image { get; set; }
 
-        [Required]
-        public IFormFile Image { get; set; } = null!;
+        /// <summary>
+        /// External image URL (for campaigns with hosted images). Either Image or ImageUrl must be provided, but not both.
+        /// </summary>
+        [ValidImageUrl]
+        public string? ImageUrl { get; set; }
 
         public bool IsCritical { get; set; } = false;
 

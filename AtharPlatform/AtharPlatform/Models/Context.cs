@@ -125,6 +125,13 @@ namespace AtharPlatform.Models
                 .WithMany(c => c.Reactions)
                 .HasForeignKey(r => r.ContentID)
                 .OnDelete(DeleteBehavior.Cascade); // only content cascade allowed
+
+            // Campaign validation: must have either Image or ImageUrl, but not both
+            builder.Entity<Campaign>()
+                .ToTable(c => c.HasCheckConstraint(
+                    "CK_Campaign_ImageSource",
+                    "([Image] IS NOT NULL AND [ImageUrl] IS NULL) OR ([Image] IS NULL AND [ImageUrl] IS NOT NULL)"
+                ));
         }
     }
 }

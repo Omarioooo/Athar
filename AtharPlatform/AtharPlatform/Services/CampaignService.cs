@@ -77,6 +77,7 @@ namespace AtharPlatform.Services
                 Title = c.Title,
                 Description = c.Description,
                 Image = c.Image,
+                ImageUrl = c.ImageUrl,
                 GoalAmount = c.GoalAmount,
                 RaisedAmount = c.RaisedAmount,
                 StartDate = c.StartDate,
@@ -99,6 +100,7 @@ namespace AtharPlatform.Services
                 Title = campaign.Title,
                 Description = campaign.Description,
                 Image = campaign.Image,
+                ImageUrl = campaign.ImageUrl,
                 GoalAmount = campaign.GoalAmount,
                 RaisedAmount = campaign.RaisedAmount,
                 StartDate = campaign.StartDate,
@@ -121,6 +123,7 @@ namespace AtharPlatform.Services
                 Title = c.Title,
                 Description = c.Description,
                 Image = c.Image,
+                ImageUrl = c.ImageUrl,
                 GoalAmount = c.GoalAmount,
                 RaisedAmount = c.RaisedAmount,
                 StartDate = c.StartDate,
@@ -155,6 +158,7 @@ namespace AtharPlatform.Services
                 Title = c.Title,
                 Description = c.Description,
                 Image = c.Image,
+                ImageUrl = c.ImageUrl,
                 GoalAmount = c.GoalAmount,
                 RaisedAmount = c.RaisedAmount,
                 StartDate = c.StartDate,
@@ -234,6 +238,7 @@ namespace AtharPlatform.Services
                 Title = c.Title,
                 Description = c.Description,
                 Image = c.Image,
+                ImageUrl = c.ImageUrl,
                 GoalAmount = c.GoalAmount,
                 RaisedAmount = c.RaisedAmount,
                 StartDate = c.StartDate,
@@ -250,18 +255,31 @@ namespace AtharPlatform.Services
             if (model == null)
                 throw new ArgumentNullException(nameof(model), "Your model from request is null.");
 
+            // Validate that exactly one of Image or ImageUrl is provided
+            bool hasImage = model.Image != null;
+            bool hasImageUrl = !string.IsNullOrWhiteSpace(model.ImageUrl);
+
+            if (!hasImage && !hasImageUrl)
+                throw new ArgumentException("Either Image file or ImageUrl must be provided for the campaign.");
+
+            if (hasImage && hasImageUrl)
+                throw new ArgumentException("Cannot provide both Image file and ImageUrl. Please provide only one.");
+
             // Dealing with files
-            using MemoryStream stream = new MemoryStream();
-            if (model.Image != null)
+            byte[]? imageBytes = null;
+            if (hasImage)
             {
-                await model.Image.CopyToAsync(stream);
+                using MemoryStream stream = new MemoryStream();
+                await model.Image!.CopyToAsync(stream);
+                imageBytes = stream.ToArray();
             }
 
             var campaign = new Campaign
             {
                 Title = model.Title,
                 Description = model.Description,
-                Image = stream.ToArray(),
+                Image = imageBytes,
+                ImageUrl = hasImageUrl ? model.ImageUrl : null,
                 isCritical = model.IsCritical,
                 StartDate = model.StartDate ?? DateTime.UtcNow,
                 Duration = model.Duration,
@@ -286,16 +304,42 @@ namespace AtharPlatform.Services
             if (campaign == null)
                 throw new ArgumentNullException(nameof(model), "Campaign not found");
 
-            // deal with files
-            using MemoryStream stream = new MemoryStream();
-            if (model.Image != null)
+            // Validate that exactly one of Image or ImageUrl is provided
+            bool hasNewImage = model.Image != null;
+            bool hasNewImageUrl = !string.IsNullOrWhiteSpace(model.ImageUrl);
+
+            // If neither is provided, keep existing
+            bool keepExisting = !hasNewImage && !hasNewImageUrl;
+
+            if (!keepExisting)
             {
-                await model.Image.CopyToAsync(stream);
+                // If new data provided, validate only one is provided
+                if (hasNewImage && hasNewImageUrl)
+                    throw new ArgumentException("Cannot provide both Image file and ImageUrl. Please provide only one.");
+
+                // Update image data
+                if (hasNewImage)
+                {
+                    using MemoryStream stream = new MemoryStream();
+                    await model.Image!.CopyToAsync(stream);
+                    campaign.Image = stream.ToArray();
+                    campaign.ImageUrl = null; // Clear ImageUrl when uploading new image
+                }
+                else if (hasNewImageUrl)
+                {
+                    campaign.ImageUrl = model.ImageUrl;
+                    campaign.Image = null; // Clear Image when setting new ImageUrl
+                }
+            }
+            else
+            {
+                // Validate existing campaign has at least one image source
+                if (campaign.Image == null && string.IsNullOrWhiteSpace(campaign.ImageUrl))
+                    throw new ArgumentException("Campaign must have either Image or ImageUrl. Please provide one.");
             }
 
             campaign.Title = model.Title;
             campaign.Description = model.Description;
-            campaign.Image = stream.ToArray();
             campaign.isCritical = model.IsCritical;
             campaign.Duration = model.Duration;
             campaign.GoalAmount = model.GoalAmount;
