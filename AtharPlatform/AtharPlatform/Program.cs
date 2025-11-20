@@ -21,12 +21,12 @@ builder.Services.AddSwaggerGen();
 
 // Inject Database
 builder.Services.AddDbContext<Context>(options =>
-    options.UseSqlServer(
+    options.UseNpgsql(
         builder.Configuration.GetConnectionString("MSSConnection"),
-        sql =>
+        npgsql =>
         {
-            // Add basic resiliency for transient SQL errors
-            sql.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(5), errorNumbersToAdd: null);
+            // Add basic resiliency for transient connection errors
+            npgsql.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(5), errorCodesToAdd: null);
         }
     ));
 
