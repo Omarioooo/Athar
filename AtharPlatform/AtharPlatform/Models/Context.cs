@@ -130,7 +130,7 @@ namespace AtharPlatform.Models
             builder.Entity<Campaign>()
                 .ToTable(c => c.HasCheckConstraint(
                     "CK_Campaign_ImageSource",
-                    "([Image] IS NOT NULL AND [ImageUrl] IS NULL) OR ([Image] IS NULL AND [ImageUrl] IS NOT NULL)"
+                    "(\"Image\" IS NOT NULL AND \"ImageUrl\" IS NULL) OR (\"Image\" IS NULL AND \"ImageUrl\" IS NOT NULL)"
                 ));
         }
     }

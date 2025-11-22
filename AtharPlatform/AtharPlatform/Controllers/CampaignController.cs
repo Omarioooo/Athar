@@ -17,11 +17,13 @@ namespace AtharPlatform.Controllers
     {
         private readonly ICampaignService _campaignService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IAccountContextService _accountContextService;
 
-        public CampaignController(ICampaignService service, IUnitOfWork unitOfWork)
+        public CampaignController(ICampaignService service, IUnitOfWork unitOfWork, IAccountContextService accountContextService)
         {
             _campaignService = service;
             _unitOfWork = unitOfWork;
+            _accountContextService = accountContextService;
         }
 
         [HttpGet("[action]")]
@@ -277,13 +279,24 @@ namespace AtharPlatform.Controllers
 
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> CreateCampaign(AddCampaignDto model)
+        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+        public async Task<IActionResult> CreateCampaign([FromForm] AddCampaignDto model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
+                // If CharityAdmin, enforce ownership & charity approval
+                if (User.IsInRole("CharityAdmin"))
+                {
+                    var currentId = _accountContextService.GetCurrentAccountId();
+                    if (model.CharityID != currentId)
+                        return Forbid();
+                    var charity = await _unitOfWork.Charities.GetAsync(currentId);
+                    if (charity == null || charity.Status != AtharPlatform.Models.Enums.CharityStatusEnum.Approved || !charity.IsActive)
+                        return BadRequest(new { message = "Charity not approved or inactive." });
+                }
                 var isCreated = await _campaignService.CreateAsync(model);
                 if (!isCreated)
                     return BadRequest(new { message = "Failed to create campaign. Please try again later." });
@@ -309,6 +322,7 @@ namespace AtharPlatform.Controllers
         }
 
         [HttpPut("[action]/{id}")]
+        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
         public async Task<IActionResult> UpdateCampaign(UpdatCampaignDto model, [FromRoute] int id)
         {
             if (!ModelState.IsValid)
@@ -316,6 +330,13 @@ namespace AtharPlatform.Controllers
 
             try
             {
+                if (User.IsInRole("CharityAdmin"))
+                {
+                    var currentId = _accountContextService.GetCurrentAccountId();
+                    var existing = await _unitOfWork.Campaigns.GetAsync(id, includeCharity: false);
+                    if (existing == null) return NotFound(new { message = "Campaign not found." });
+                    if (existing.CharityID != currentId) return Forbid();
+                }
                 var updatedCampaign = await _campaignService.UpdateAsync(model);
 
                 if (updatedCampaign == null)
@@ -342,10 +363,18 @@ namespace AtharPlatform.Controllers
         }
 
         [HttpDelete("[action]/{id}")]
+        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
         public async Task<IActionResult> DeleteCampaign([FromRoute] int id)
         {
             try
             {
+                if (User.IsInRole("CharityAdmin"))
+                {
+                    var currentId = _accountContextService.GetCurrentAccountId();
+                    var existing = await _unitOfWork.Campaigns.GetAsync(id, includeCharity: false);
+                    if (existing == null) return NotFound(new { message = "Campaign not found." });
+                    if (existing.CharityID != currentId) return Forbid();
+                }
                 var isDeleted = await _campaignService.DeleteAsync(id);
 
                 if (!isDeleted)
