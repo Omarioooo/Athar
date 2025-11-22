@@ -250,25 +250,6 @@ namespace AtharPlatform.Controllers
             }));
         }
 
-        // (POST) /api/charities  - create manually by Charity Admin or Super Admin
-        [HttpPost]
-        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
-        public async Task<IActionResult> Create([FromBody] CharityCreateDto body)
-        {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
-            var entity = new Models.Charity
-            {
-                Name = body.Name,
-                Description = body.Description,
-                IsScraped = false
-            };
-
-            await _unitOfWork.Charities.AddAsync(entity);
-            await _unitOfWork.SaveAsync();
-            return CreatedAtAction(nameof(GetById), new { id = entity.Id }, new { entity.Id });
-        }
-
         // (POST) /api/charities/import - bulk import scraped data
         [HttpPost("import")]
         [Authorize(Roles = "Admin,SuperAdmin")]
