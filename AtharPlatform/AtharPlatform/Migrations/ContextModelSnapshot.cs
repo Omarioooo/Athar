@@ -84,7 +84,7 @@ namespace AtharPlatform.Migrations
 
                     b.HasIndex("CharityID");
 
-                    b.ToTable("Campaigns", t =>
+                    b.ToTable("Campaigns", null, t =>
                         {
                             t.HasCheckConstraint("CK_Campaign_ImageSource", "(\"Image\" IS NOT NULL AND \"ImageUrl\" IS NULL) OR (\"Image\" IS NULL AND \"ImageUrl\" IS NOT NULL)");
                         });
@@ -107,7 +107,7 @@ namespace AtharPlatform.Migrations
 
                     b.HasIndex("DonorId");
 
-                    b.ToTable("CampaignDonations");
+                    b.ToTable("CampaignDonations", (string)null);
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.Charity", b =>
@@ -149,7 +149,7 @@ namespace AtharPlatform.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Charities");
+                    b.ToTable("Charities", (string)null);
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.CharityDonation", b =>
@@ -164,7 +164,7 @@ namespace AtharPlatform.Migrations
 
                     b.HasIndex("charityID");
 
-                    b.ToTable("CharityDonations");
+                    b.ToTable("CharityDonations", (string)null);
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.CharityExternalInfo", b =>
@@ -183,7 +183,7 @@ namespace AtharPlatform.Migrations
 
                     b.HasKey("CharityId");
 
-                    b.ToTable("CharityExternalInfos");
+                    b.ToTable("CharityExternalInfos", (string)null);
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.CharityMaterialDonation", b =>
@@ -204,7 +204,7 @@ namespace AtharPlatform.Migrations
 
                     b.HasIndex("CharityId");
 
-                    b.ToTable("CharityMaterialDonation");
+                    b.ToTable("CharityMaterialDonation", (string)null);
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.CharityVendorOffer", b =>
@@ -225,7 +225,7 @@ namespace AtharPlatform.Migrations
 
                     b.HasIndex("CharityId");
 
-                    b.ToTable("CharityVendorOffers");
+                    b.ToTable("CharityVendorOffers", (string)null);
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.CharityVolunteer", b =>
@@ -246,7 +246,7 @@ namespace AtharPlatform.Migrations
 
                     b.HasIndex("CharityId");
 
-                    b.ToTable("CharityVolunteers");
+                    b.ToTable("CharityVolunteers", (string)null);
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.Content", b =>
@@ -282,7 +282,7 @@ namespace AtharPlatform.Migrations
 
                     b.HasIndex("CampaignId");
 
-                    b.ToTable("Contents");
+                    b.ToTable("Contents", (string)null);
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.Donation", b =>
@@ -333,7 +333,7 @@ namespace AtharPlatform.Migrations
 
                     b.HasIndex("DonorId");
 
-                    b.ToTable("Donations");
+                    b.ToTable("Donations", (string)null);
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.Donor", b =>
@@ -353,7 +353,7 @@ namespace AtharPlatform.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Donors");
+                    b.ToTable("Donors", (string)null);
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.Follow", b =>
@@ -380,7 +380,7 @@ namespace AtharPlatform.Migrations
                     b.HasIndex("DonorId", "CharityId")
                         .IsUnique();
 
-                    b.ToTable("Follows");
+                    b.ToTable("Follows", (string)null);
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.MaterialDonation", b =>
@@ -433,7 +433,7 @@ namespace AtharPlatform.Migrations
 
                     b.HasIndex("MaterialDonationId");
 
-                    b.ToTable("MaterialDonations");
+                    b.ToTable("MaterialDonations", (string)null);
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.Notification", b =>
@@ -456,7 +456,7 @@ namespace AtharPlatform.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notifications", (string)null);
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.NotificationReceiver", b =>
@@ -477,7 +477,7 @@ namespace AtharPlatform.Migrations
 
                     b.HasIndex("ReceiverId");
 
-                    b.ToTable("Receivers");
+                    b.ToTable("Receivers", (string)null);
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.NotificationSender", b =>
@@ -492,7 +492,7 @@ namespace AtharPlatform.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Sender");
+                    b.ToTable("Sender", (string)null);
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.Reaction", b =>
@@ -518,7 +518,7 @@ namespace AtharPlatform.Migrations
 
                     b.HasIndex("DonorID");
 
-                    b.ToTable("Reactions");
+                    b.ToTable("Reactions", (string)null);
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.Subscription", b =>
@@ -558,7 +558,7 @@ namespace AtharPlatform.Migrations
                     b.HasIndex("DonorId", "CharityId")
                         .IsUnique();
 
-                    b.ToTable("Subscriptions");
+                    b.ToTable("Subscriptions", (string)null);
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.UserAccount", b =>
@@ -694,7 +694,7 @@ namespace AtharPlatform.Migrations
 
                     b.HasIndex("CharityVendorOfferId");
 
-                    b.ToTable("VendorForms");
+                    b.ToTable("VendorForms", (string)null);
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.VolunteerApplication", b =>
@@ -738,7 +738,7 @@ namespace AtharPlatform.Migrations
 
                     b.HasIndex("CharityVolunteerId");
 
-                    b.ToTable("VolunteerForm");
+                    b.ToTable("VolunteerForm", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>

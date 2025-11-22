@@ -76,9 +76,9 @@ namespace AtharPlatform.Controllers
             // When includeCampaigns=true, enrich each charity with campaigns derived from:
             // 1) Direct FK (Campaign.CharityID == Charity.Id)
             // 2) Indirect support: Campaign.SupportingCharitiesJson contains the charity name
-            List<(int Id, string Name, string? ImageUrl, string? ExternalWebsiteUrl, string Description)> pageCharities = items
+            List<(int Id, string Name, byte[]? Image, string? ImageUrl, string? ExternalWebsiteUrl, string Description)> pageCharities = items
                 // Use the charity primary key directly; Account may not be eagerly loaded in GetPageAsync
-                .Select(c => (c.Id, c.Name, c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
+                .Select(c => (c.Id, c.Name, c.Image, c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
                                c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null, c.Description))
                 .ToList();
 
@@ -119,7 +119,7 @@ namespace AtharPlatform.Controllers
                     return string.Equals(s, n, StringComparison.Ordinal) || n.Contains(s) || s.Contains(n);
                 }
 
-                foreach (var (Id, Name, _, _, _) in pageCharities)
+                foreach (var (Id, Name, _, _, _, _) in pageCharities)
                 {
                     var set = new Dictionary<int, MiniCampaignDto>();
 
@@ -152,6 +152,7 @@ namespace AtharPlatform.Controllers
                     Id = pc.Id,
                     Name = pc.Name,
                     Description = pc.Description,
+                    Image = pc.Image,
                     ImageUrl = pc.ImageUrl,
                     ExternalWebsiteUrl = pc.ExternalWebsiteUrl,
                     CampaignsCount = includeCampaigns ? (campaignMap.TryGetValue(pc.Id, out var list) ? list.Count : 0) : 0,
@@ -180,6 +181,7 @@ namespace AtharPlatform.Controllers
                 Id = c.Id,
                 Name = c.Name,
                 Description = c.Description,
+                Image = c.Image,
                 ImageUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
                 ExternalWebsiteUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null,
                 Campaigns = (c.Campaigns ?? new()).Select(x => new MiniCampaignDto
@@ -223,6 +225,7 @@ namespace AtharPlatform.Controllers
                 Id = c.Id,
                 Name = c.Name,
                 Description = c.Description,
+                Image = c.Image,
                 ImageUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
                 ExternalWebsiteUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null
             };
@@ -240,6 +243,7 @@ namespace AtharPlatform.Controllers
                 Id = c.Id,
                 Name = c.Name,
                 Description = c.Description,
+                Image = c.Image,
                 ImageUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
                 ExternalWebsiteUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null,
                 CampaignsCount = c.Campaigns?.Count ?? 0
@@ -302,7 +306,7 @@ namespace AtharPlatform.Controllers
 
                 var charity = new Models.Charity
                 {
-                    Name = i.Name.Trim(),
+                    Name = (i.Name ?? string.Empty).Trim(),
                     Description = i.Description ?? string.Empty,
                     IsScraped = true,
                     ExternalId = i.ExternalId,
@@ -726,7 +730,9 @@ namespace AtharPlatform.Controllers
                 return NotFound();
 
             // If you later store content type, use it here. Default to JPEG.
-            return File(new byte[] { }, "image/jpeg");
+            if (charity.Image == null || charity.Image.Length == 0)
+                return NotFound();
+            return File(charity.Image, "image/jpeg");
         }
     }
 }

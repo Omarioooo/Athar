@@ -40,6 +40,7 @@ namespace AtharPlatform.Services
             {
                 await model.ProfileImage.CopyToAsync(stream);
             }
+            var profileImageBytes = stream.ToArray();
 
             // The account entity
             var account = new UserAccount
@@ -48,7 +49,7 @@ namespace AtharPlatform.Services
                 Email = model.Email.ToLowerInvariant(),
                 Country = model.Country,
                 City = model.City,
-                ProfileImage = stream.ToArray(),
+                ProfileImage = profileImageBytes,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -59,8 +60,8 @@ namespace AtharPlatform.Services
                 throw new InvalidOperationException("Failed to create user: " +
                     string.Join(", ", result.Errors.Select(e => e.Description)));
 
-            // Assign roles to the account (The account is for charity)
-            await _userManager.AddToRoleAsync(account, RolesEnum.Charity.ToString());
+            // Assign the correct platform role for charities
+            await _userManager.AddToRoleAsync(account, "CharityAdmin");
 
             // Dealing with files (verification doc)
             using MemoryStream docStream = new MemoryStream();
@@ -74,7 +75,8 @@ namespace AtharPlatform.Services
                 Id = account.Id,
                 Name = model.CharityName,
                 Description = model.Description,
-                VerificationDocument = docStream.ToArray()
+                VerificationDocument = docStream.ToArray(),
+                Image = profileImageBytes
             };
             await _unitOfWork.Charities.AddAsync(Charity);
 
@@ -84,7 +86,6 @@ namespace AtharPlatform.Services
 
             return result;
         }
-
         public async Task<IdentityResult> PersonRegisterAsync(PersonRegisterDto model, RolesEnum role)
         {
             if (model == null)
