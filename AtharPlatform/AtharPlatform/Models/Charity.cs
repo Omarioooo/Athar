@@ -12,10 +12,10 @@ namespace AtharPlatform.Models
         public int Id { get; set; }
 
         [Required]
-        public String Name { get; set; }
+        public String Name { get; set; } = string.Empty;
 
         [Required]
-        public String Description { get; set; }
+        public String Description { get; set; } = string.Empty;
 
         [Column(TypeName = "decimal(18, 4)")]
         public decimal? Balance { get; set; } = 0.0m;
@@ -23,6 +23,9 @@ namespace AtharPlatform.Models
         // VerificationDocument made optional for scraped imports; controller sets placeholder when available
         public byte[]? VerificationDocument { get; set; }
         public CharityStatusEnum Status { get; set; } = CharityStatusEnum.Pending;
+
+        // Manual uploaded profile image bytes (for platform-registered charities)
+        public byte[]? Image { get; set; }
 
         // Scrapping attributes
 
@@ -39,7 +42,7 @@ namespace AtharPlatform.Models
         public DateTime? DeactivatedAt { get; set; }
 
 
-        public virtual UserAccount Account { get; set; }
+        public virtual UserAccount? Account { get; set; }
         public virtual List<CharityVolunteer> CharityVolunteers { get; set; } = null!;
         public virtual List<CharityVendorOffer> CharityVendorOffers { get; set; } = null!;
         public virtual List<CharityMaterialDonation> CharityMaterialDonations { get; set; } = null!;

@@ -93,7 +93,7 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey missing")))
     };
 });
 
@@ -192,7 +192,7 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
-        var roles = new[] { "Admin", "SuperAdmin", "CharityAdmin", "Donor" };
+            var roles = new[] { "Admin", "SuperAdmin", "CharityAdmin", "Donor" };
         foreach (var r in roles)
         {
             if (!await roleManager.RoleExistsAsync(r))
@@ -202,6 +202,30 @@ using (var scope = app.Services.CreateScope())
                     ? $"[Startup] Role '{r}' created." : $"[Startup] Failed to create role '{r}': {string.Join(',', createRes.Errors.Select(e => e.Description))}");
             }
         }
+
+            // Ensure documented SuperAdmin user exists and is assigned role
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserAccount>>();
+            const string superAdminEmail = "admin@athar.local";
+            var superAdmin = await userManager.FindByEmailAsync(superAdminEmail);
+            if (superAdmin == null)
+            {
+                superAdmin = new UserAccount
+                {
+                    UserName = "admin",
+                    Email = superAdminEmail,
+                    EmailConfirmed = true,
+                    Country = "EG",
+                    City = "Alexandria",
+                    CreatedAt = DateTime.UtcNow
+                };
+                var create = await userManager.CreateAsync(superAdmin, "Admin#123");
+                Console.WriteLine(create.Succeeded ? "[Startup] SuperAdmin user created." : "[Startup] Failed to create SuperAdmin user: " + string.Join(',', create.Errors.Select(e => e.Description)));
+            }
+            if (!await userManager.IsInRoleAsync(superAdmin, "SuperAdmin"))
+            {
+                var addRole = await userManager.AddToRoleAsync(superAdmin, "SuperAdmin");
+                Console.WriteLine(addRole.Succeeded ? "[Startup] SuperAdmin role assigned to admin@athar.local" : "[Startup] Failed to assign SuperAdmin role: " + string.Join(',', addRole.Errors.Select(e => e.Description)));
+            }
     }
     catch (Exception rex)
     {
