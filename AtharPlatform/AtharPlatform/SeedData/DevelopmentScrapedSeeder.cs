@@ -181,13 +181,20 @@ namespace SeedData
                         if (existsByKey) { skipped++; continue; }
                     }
 
+                    // Ensure StartDate is UTC (PostgreSQL requires DateTimeKind.Utc)
+                    var startDate = i.StartDate ?? now;
+                    if (startDate.Kind == DateTimeKind.Unspecified)
+                        startDate = DateTime.SpecifyKind(startDate, DateTimeKind.Utc);
+                    else if (startDate.Kind == DateTimeKind.Local)
+                        startDate = startDate.ToUniversalTime();
+
                     var campaign = new Campaign
                     {
                         Title = i.Title!.Trim(),
                         Description = i.Description!.Trim(),
                         ImageUrl = i.ImageUrl,
                         isCritical = i.IsCritical ?? false,
-                        StartDate = i.StartDate ?? now,
+                        StartDate = startDate,
                         Duration = i.DurationDays ?? 30,
                         GoalAmount = i.GoalAmount ?? 0,
                         RaisedAmount = i.RaisedAmount ?? 0,
