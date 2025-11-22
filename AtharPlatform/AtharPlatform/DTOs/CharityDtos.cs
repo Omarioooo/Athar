@@ -105,15 +105,6 @@ namespace AtharPlatform.Dtos
         public DateTime Date { get; set; }
     }
 
-    // Used for manual creation by Charity Admins or Super Admins
-    public class CharityCreateDto
-    {
-        [Required]
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public byte[]? Image { get; set; }
-    }
-
     // Import contract for bulk-scraped charities
     public class CharityImportItemDto
     {
