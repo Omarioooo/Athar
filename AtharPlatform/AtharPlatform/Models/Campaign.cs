@@ -15,10 +15,7 @@ namespace AtharPlatform.Models
         [Required]
         public string Description { get; set; } = null!;
 
-        // Optional binary image for manually-created campaigns
-        public byte[]? Image { get; set; }
-
-        // Optional external image URL for scraped/curated data
+        // Image URL for uploaded images
         public string? ImageUrl { get; set; }
 
         public bool isCritical { get; set; } = false;

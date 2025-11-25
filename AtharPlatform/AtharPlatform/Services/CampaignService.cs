@@ -10,10 +10,12 @@ namespace AtharPlatform.Services
     {
 
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IFileService _fileService;
 
-        public CampaignService(IUnitOfWork unitOfWork)
+        public CampaignService(IUnitOfWork unitOfWork, IFileService fileService)
         {
             _unitOfWork = unitOfWork;
+            _fileService = fileService;
         }
 
         public async Task<int> GetCountOfCampaignsAsync(
@@ -76,7 +78,6 @@ namespace AtharPlatform.Services
                 Id = c.Id,
                 Title = c.Title,
                 Description = c.Description,
-                Image = c.Image,
                 ImageUrl = c.ImageUrl,
                 GoalAmount = c.GoalAmount,
                 RaisedAmount = c.RaisedAmount,
@@ -99,7 +100,6 @@ namespace AtharPlatform.Services
                 Id = campaign.Id,
                 Title = campaign.Title,
                 Description = campaign.Description,
-                Image = campaign.Image,
                 ImageUrl = campaign.ImageUrl,
                 GoalAmount = campaign.GoalAmount,
                 RaisedAmount = campaign.RaisedAmount,
@@ -122,7 +122,6 @@ namespace AtharPlatform.Services
                 Id = c.Id,
                 Title = c.Title,
                 Description = c.Description,
-                Image = c.Image,
                 ImageUrl = c.ImageUrl,
                 GoalAmount = c.GoalAmount,
                 RaisedAmount = c.RaisedAmount,
@@ -157,7 +156,6 @@ namespace AtharPlatform.Services
                 Id = c.Id,
                 Title = c.Title,
                 Description = c.Description,
-                Image = c.Image,
                 ImageUrl = c.ImageUrl,
                 GoalAmount = c.GoalAmount,
                 RaisedAmount = c.RaisedAmount,
@@ -237,7 +235,6 @@ namespace AtharPlatform.Services
                 Id = c.Id,
                 Title = c.Title,
                 Description = c.Description,
-                Image = c.Image,
                 ImageUrl = c.ImageUrl,
                 GoalAmount = c.GoalAmount,
                 RaisedAmount = c.RaisedAmount,
@@ -255,31 +252,15 @@ namespace AtharPlatform.Services
             if (model == null)
                 throw new ArgumentNullException(nameof(model), "Your model from request is null.");
 
-            // Validate that exactly one of Image or ImageUrl is provided
-            bool hasImage = model.Image != null;
-            bool hasImageUrl = !string.IsNullOrWhiteSpace(model.ImageUrl);
-
-            if (!hasImage && !hasImageUrl)
-                throw new ArgumentException("Either Image file or ImageUrl must be provided for the campaign.");
-
-            if (hasImage && hasImageUrl)
-                throw new ArgumentException("Cannot provide both Image file and ImageUrl. Please provide only one.");
-
-            // Dealing with files
-            byte[]? imageBytes = null;
-            if (hasImage)
-            {
-                using MemoryStream stream = new MemoryStream();
-                await model.Image!.CopyToAsync(stream);
-                imageBytes = stream.ToArray();
-            }
+            // Validate ImageUrl is provided
+            if (string.IsNullOrWhiteSpace(model.ImageUrl))
+                throw new ArgumentException("ImageUrl must be provided for the campaign.");
 
             var campaign = new Campaign
             {
                 Title = model.Title,
                 Description = model.Description,
-                Image = imageBytes,
-                ImageUrl = hasImageUrl ? model.ImageUrl : null,
+                ImageUrl = model.ImageUrl,
                 isCritical = model.IsCritical,
                 StartDate = model.StartDate ?? DateTime.UtcNow,
                 Duration = model.Duration,
@@ -304,38 +285,24 @@ namespace AtharPlatform.Services
             if (campaign == null)
                 throw new ArgumentNullException(nameof(model), "Campaign not found");
 
-            // Validate that exactly one of Image or ImageUrl is provided
-            bool hasNewImage = model.Image != null;
+            // If new ImageUrl provided, delete old image file if exists
             bool hasNewImageUrl = !string.IsNullOrWhiteSpace(model.ImageUrl);
 
-            // If neither is provided, keep existing
-            bool keepExisting = !hasNewImage && !hasNewImageUrl;
-
-            if (!keepExisting)
+            if (hasNewImageUrl)
             {
-                // If new data provided, validate only one is provided
-                if (hasNewImage && hasNewImageUrl)
-                    throw new ArgumentException("Cannot provide both Image file and ImageUrl. Please provide only one.");
+                // Delete old image file if exists
+                if (!string.IsNullOrEmpty(campaign.ImageUrl))
+                {
+                    _fileService.DeleteFile(campaign.ImageUrl);
+                }
 
-                // Update image data
-                if (hasNewImage)
-                {
-                    using MemoryStream stream = new MemoryStream();
-                    await model.Image!.CopyToAsync(stream);
-                    campaign.Image = stream.ToArray();
-                    campaign.ImageUrl = null; // Clear ImageUrl when uploading new image
-                }
-                else if (hasNewImageUrl)
-                {
-                    campaign.ImageUrl = model.ImageUrl;
-                    campaign.Image = null; // Clear Image when setting new ImageUrl
-                }
+                campaign.ImageUrl = model.ImageUrl;
             }
             else
             {
-                // Validate existing campaign has at least one image source
-                if (campaign.Image == null && string.IsNullOrWhiteSpace(campaign.ImageUrl))
-                    throw new ArgumentException("Campaign must have either Image or ImageUrl. Please provide one.");
+                // Validate existing campaign has ImageUrl
+                if (string.IsNullOrWhiteSpace(campaign.ImageUrl))
+                    throw new ArgumentException("Campaign must have ImageUrl. Please provide one.");
             }
 
             campaign.Title = model.Title;

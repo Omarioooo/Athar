@@ -69,6 +69,8 @@ builder.Services.AddScoped<IVolunteerApplicationRepository, VolunteerApplication
 
 
 // Inject Services
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IJWTService, JWTService>();
 builder.Services.AddScoped<IAccountContextService, AccountContextService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -289,6 +291,7 @@ if (app.Environment.IsDevelopment())
 
 // Always redirect HTTP->HTTPS; we will trust the dev cert locally
 app.UseHttpsRedirection();
+app.UseStaticFiles(); // Enable serving static files from wwwroot
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
