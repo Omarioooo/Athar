@@ -1,0 +1,71 @@
+[
+  {
+    "id": 1,
+    "title": "إطلاق حملة إنقاذ قلب طفل",
+    "isDeleted": false,
+    "description": "أول تحديث للحملة يوضح بداية التبرعات وخطة التدخل الطبي للطفل.",
+    "createdAt": "2025-02-01T10:20:00Z",
+    "postImage": "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=80",
+    "campaignId": 1,
+    "reactions": [
+      {
+        "id": 1,
+        "reactionDate": "2025-02-01T12:30:00Z",
+        "donorID": 1,
+        "contentID": 1
+      },
+      {
+        "id": 2,
+        "reactionDate": "2025-02-01T15:10:00Z",
+        "donorID": 3,
+        "contentID": 1
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "تحديث حول حملة بناء منزل لأسرة متضررة",
+    "isDeleted": false,
+    "description": "بداية تجهيز المواد لبناء المنزل وتم استلام أول دفعة من التبرعات.",
+    "createdAt": "2025-02-03T14:50:00Z",
+    "postImage": "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=80",
+    "campaignId": 2,
+    "reactions": [
+      {
+        "id": 3,
+        "reactionDate": "2025-02-03T16:00:00Z",
+        "donorID": 2,
+        "contentID": 2
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "بدء توزيع كراتين الغذاء على الأسر",
+    "isDeleted": false,
+    "description": "بدأ الفريق التطوعي في تجهيز وتوزيع كراتين الغذاء على الأسر المحتاجة.",
+    "createdAt": "2025-02-05T09:15:00Z",
+    "postImage": "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=80",
+    "campaignId": 5,
+    "reactions": [
+      {
+        "id": 4,
+        "reactionDate": "2025-02-05T10:00:00Z",
+        "donorID": 1,
+        "contentID": 3
+      },
+      {
+        "id": 5,
+        "reactionDate": "2025-02-05T11:45:00Z",
+        "donorID": 4,
+        "contentID": 3
+      },
+      {
+        "id": 6,
+        "reactionDate": "2025-02-05T13:20:00Z",
+        "donorID": 2,
+        "contentID": 3
+      }
+    ]
+  }
+]
