@@ -31,9 +31,177 @@ namespace AtharPlatform.Controllers
         }
 
 
+
+
+        // فتح باب التطوع
+        [HttpPost("open-volunteers/{charityId}")]
+        public async Task<IActionResult> OpenVolunteers(int charityId)
+        {
+            try
+            {
+                var record = (await _unitOfWork.CharityVolunteers.GetByCharityIdAsync(charityId))
+                             .FirstOrDefault();
+
+                if (record != null && record.IsOpen)
+                    return BadRequest(new { Message = "Volunteers are already open for this charity." });
+
+                if (record == null)
+                {
+                    // إنشاء record جديد
+                    record = new CharityVolunteer
+                    {
+                        CharityId = charityId,
+                        Date = DateTime.UtcNow,
+                        IsOpen = true
+                    };
+                    await _unitOfWork.CharityVolunteers.AddAsync(record);
+                }
+                else
+                {
+                    // تحديث record موجود
+                    record.IsOpen = true;
+                    record.Date = DateTime.UtcNow;
+                }
+
+                await _unitOfWork.SaveAsync();
+
+                return Ok(new
+                {
+                    Message = "Volunteers are now open.",
+                    CharityId = charityId,
+                    OpenedAt = record.Date
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Failed to open volunteers.", Error = ex.Message });
+            }
+        }
+
+        // غلق باب التطوع
+        [HttpPost("close-volunteers/{charityId}")]
+        public async Task<IActionResult> CloseVolunteers(int charityId)
+        {
+            try
+            {
+                var record = (await _unitOfWork.CharityVolunteers.GetByCharityIdAsync(charityId))
+                             .FirstOrDefault();
+
+                if (record == null || !record.IsOpen)
+                    return BadRequest(new { Message = "Volunteers are already closed for this charity." });
+
+                record.IsOpen = false;
+                await _unitOfWork.SaveAsync();
+
+                return Ok(new
+                {
+                    Message = "Volunteers are now closed.",
+                    CharityId = charityId,
+                    ClosedAt = DateTime.UtcNow
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Failed to close volunteers.", Error = ex.Message });
+            }
+        }
+
+
+
+
+
+        // فتح باب العروض للـ Vendor
+        [HttpPost("open-vendor-offers/{charityId}")]
+        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+        public async Task<IActionResult> OpenVendorOffers(int charityId)
+        {
+            try
+            {
+                // جلب record موجود للجمعية
+                var record = (await _unitOfWork.CharityVendorOffers.GetByCharityIdAsync(charityId))
+                             .FirstOrDefault();
+
+                if (record != null && record.IsOpen)
+                    return BadRequest(new { Message = "Vendor offers are already open for this charity." });
+
+                if (record == null)
+                {
+                    // إنشاء record جديد
+                    record = new CharityVendorOffer
+                    {
+                        CharityId = charityId,
+                        Date = DateTime.UtcNow,
+                        IsOpen = true
+                    };
+                    await _unitOfWork.CharityVendorOffers.AddAsync(record);
+                }
+                else
+                {
+                    // تحديث record موجود
+                    record.IsOpen = true;
+                    record.Date = DateTime.UtcNow;
+                }
+
+                await _unitOfWork.SaveAsync();
+
+                return Ok(new
+                {
+                    Message = "Vendor offers are now open.",
+                    CharityId = charityId,
+                    OpenedAt = record.Date
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Failed to open vendor offers.", Error = ex.Message });
+            }
+        }
+
+        // غلق باب العروض للـ Vendor
+        [HttpPost("close-vendor-offers/{charityId}")]
+        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+        public async Task<IActionResult> CloseVendorOffers(int charityId)
+        {
+            try
+            {
+                // جلب record موجود للجمعية
+                var record = (await _unitOfWork.VendorOffers.GetByCharityIdAsync(charityId))
+                             .FirstOrDefault();
+
+                if (record == null || !record.IsOpen)
+                    return BadRequest(new { Message = "Vendor offers are already closed for this charity." });
+
+                record.IsOpen = false;
+                await _unitOfWork.SaveAsync();
+
+                return Ok(new
+                {
+                    Message = "Vendor offers are now closed.",
+                    CharityId = charityId,
+                    ClosedAt = DateTime.UtcNow
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "Failed to close vendor offers.", Error = ex.Message });
+            }
+        }
+
+
+
+
+
+
         // (GET) /api/charities?query=&page=1&pageSize=12
         [HttpGet]
-        public async Task<ActionResult<AtharPlatform.Dtos.PaginatedResultDto<CharityCardDto>>> GetAll([FromQuery] string? query, [FromQuery] int page = 1, [FromQuery] int pageSize = 12, [FromQuery] bool includeCampaigns = false)
+        public async Task<ActionResult<AtharPlatform.Dtos.PaginatedResultDto<CharityCardDto>>> GetAll(
+            [FromQuery] string? query, 
+            [FromQuery] int page = 1, 
+            [FromQuery] int pageSize = 12, 
+            [FromQuery] bool includeCampaigns = false,
+            [FromQuery] bool? isActive = null,
+            [FromQuery] bool? isScraped = null,
+            [FromQuery] bool? hasExternalWebsite = null)
         {
             // Public endpoint; no authentication required
 
@@ -42,7 +210,11 @@ namespace AtharPlatform.Controllers
 
 
 
-            var total = await _unitOfWork.Charities.CountAsync(query);
+            var total = await _unitOfWork.Charities.CountAsync(
+                query, 
+                isActive, 
+                isScraped, 
+                hasExternalWebsite);
 
             if (total == 0)// Handle empty data
                 return Ok(new AtharPlatform.Dtos.PaginatedResultDto<CharityCardDto>
@@ -54,14 +226,20 @@ namespace AtharPlatform.Controllers
                 });
 
 
-            var items = await _unitOfWork.Charities.GetPageAsync(query, page, pageSize);
+            var items = await _unitOfWork.Charities.GetPageAsync(
+                query, 
+                page, 
+                pageSize,
+                isActive,
+                isScraped,
+                hasExternalWebsite);
 
             // When includeCampaigns=true, enrich each charity with campaigns derived from:
             // 1) Direct FK (Campaign.CharityID == Charity.Id)
             // 2) Indirect support: Campaign.SupportingCharitiesJson contains the charity name
-            List<(int Id, string Name, string? ImageUrl, string? ExternalWebsiteUrl, string Description)> pageCharities = items
+            List<(int Id, string Name,/* byte[]? Image,*/ string? ImageUrl, string? ExternalWebsiteUrl, string Description)> pageCharities = items
                 // Use the charity primary key directly; Account may not be eagerly loaded in GetPageAsync
-                .Select(c => (c.Id, c.Name, c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
+                .Select(c => (c.Id, c.Name, /*c.Image,*/ c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
                                c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null, c.Description))
                 .ToList();
 
@@ -135,6 +313,7 @@ namespace AtharPlatform.Controllers
                     Id = pc.Id,
                     Name = pc.Name,
                     Description = pc.Description,
+                   // Image = pc.Image,
                     ImageUrl = pc.ImageUrl,
                     ExternalWebsiteUrl = pc.ExternalWebsiteUrl,
                     CampaignsCount = includeCampaigns ? (campaignMap.TryGetValue(pc.Id, out var list) ? list.Count : 0) : 0,
@@ -163,6 +342,7 @@ namespace AtharPlatform.Controllers
                 Id = c.Id,
                 Name = c.Name,
                 Description = c.Description,
+               // Image = c.Image,
                 ImageUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
                 ExternalWebsiteUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null,
                 Campaigns = (c.Campaigns ?? new()).Select(x => new MiniCampaignDto
@@ -206,6 +386,7 @@ namespace AtharPlatform.Controllers
                 Id = c.Id,
                 Name = c.Name,
                 Description = c.Description,
+               // Image = c.Image,
                 ImageUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
                 ExternalWebsiteUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null
             };
@@ -223,29 +404,11 @@ namespace AtharPlatform.Controllers
                 Id = c.Id,
                 Name = c.Name,
                 Description = c.Description,
+               // Image = c.Image,
                 ImageUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
                 ExternalWebsiteUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null,
                 CampaignsCount = c.Campaigns?.Count ?? 0
             }));
-        }
-
-        // (POST) /api/charities  - create manually by Charity Admin or Super Admin
-        [HttpPost]
-        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
-        public async Task<IActionResult> Create([FromBody] CharityCreateDto body)
-        {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
-            var entity = new Models.Charity
-            {
-                Name = body.Name,
-                Description = body.Description,
-                IsScraped = false
-            };
-
-            await _unitOfWork.Charities.AddAsync(entity);
-            await _unitOfWork.SaveAsync();
-            return CreatedAtAction(nameof(GetById), new { id = entity.Id }, new { entity.Id });
         }
 
         // (POST) /api/charities/import - bulk import scraped data
@@ -285,7 +448,7 @@ namespace AtharPlatform.Controllers
 
                 var charity = new Models.Charity
                 {
-                    Name = i.Name.Trim(),
+                    Name = (i.Name ?? string.Empty).Trim(),
                     Description = i.Description ?? string.Empty,
                     IsScraped = true,
                     ExternalId = i.ExternalId,
@@ -481,7 +644,7 @@ namespace AtharPlatform.Controllers
                 Id = c.Id,
                 Title = c.Title,
                 Description = c.Description,
-                Image = c.Image,
+                //Image = c.Image,
                 GoalAmount = c.GoalAmount,
                 RaisedAmount = c.RaisedAmount,
                 StartDate = c.StartDate,
@@ -700,16 +863,21 @@ namespace AtharPlatform.Controllers
         }
 
         // (GET) /api/charities/{id}/image - serve manual image bytes as a browser-friendly URL
-        [HttpGet("{id:int}/image")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetImage(int id)
-        {
-            var charity = await _unitOfWork.Charities.GetAsync(id);
-            if (charity == null)
-                return NotFound();
+        //[HttpGet("{id:int}/image")]
+        //[AllowAnonymous]
+        //public async Task<IActionResult> GetImage(int id)
+        //{
+        //    var charity = await _unitOfWork.Charities.GetAsync(id);
+        //    if (charity == null)
+        //        return NotFound();
 
-            // If you later store content type, use it here. Default to JPEG.
-            return File(new byte[] { }, "image/jpeg");
-        }
+        //    // If you later store content type, use it here. Default to JPEG.
+        //    if (charity.Image == null || charity.Image.Length == 0)
+        //        return NotFound();
+        //    return File(charity.Image, "image/jpeg");
+        //}
+
+
+
     }
 }

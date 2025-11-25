@@ -1,12 +1,15 @@
 ﻿using AtharPlatform.DTOs;
 using AtharPlatform.Models;
 using AtharPlatform.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AtharPlatform.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class VolunteerApplicationsController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -17,33 +20,10 @@ namespace AtharPlatform.Controllers
         }
 
         /// <summary>
-        /// Get all applications for a specific campaign
-        /// </summary>
-        [HttpGet("by-campaign/{campaignId}")]
-        public async Task<IActionResult> GetByCampaign(int campaignId)
-        {
-            if (campaignId <= 0)
-                return BadRequest(new { Message = "Invalid campaign ID." });
-
-            try
-            {
-                var applications = await _unitOfWork.VolunteerApplications.GetByCampaignAsync(campaignId);
-
-                if (applications == null || !applications.Any())
-                    return NotFound(new { Message = "No volunteer applications found for this campaign." });
-
-                return Ok(applications.Select(MapToDTO).ToList());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Message = "An error occurred while fetching applications.", Error = ex.Message });
-            }
-        }
-
-        /// <summary>
         /// Get application by ID
         /// </summary>
         [HttpGet("{id}")]
+        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
         public async Task<IActionResult> GetById(int id)
         {
             if (id <= 0)
@@ -65,16 +45,28 @@ namespace AtharPlatform.Controllers
         }
 
         /// <summary>
-        /// Create a new volunteer application
+        /// Apply for a volunteer opportunity
         /// </summary>
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] VolunteerApplicationDTO dto)
+        [HttpPost("apply")]
+        [Authorize(Roles = "Donor")] 
+        public async Task<IActionResult> Apply([FromBody] VolunteerApplicationDTO dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (dto.Age <= 0)
-                return BadRequest(new { Message = "Age must be greater than 0." });
+            if (dto.Age < 11)
+                return BadRequest(new { Message = "Age must be greater than 10." });
+
+            var volunteerOpportunity = await _unitOfWork.CharityVolunteers.GetByIdAsync(dto.CharityVolunteerId);
+
+            if (volunteerOpportunity == null)
+                return NotFound(new { Message = "Volunteer opportunity not found." });
+
+          
+            var existing = await _unitOfWork.VolunteerApplications
+                .GetAllAsync();
+            if (existing.Any(a => a.PhoneNumber == dto.PhoneNumber && a.CharityVolunteerId == dto.CharityVolunteerId))
+                return BadRequest(new { Message = "You have already applied for this opportunity." });
 
             try
             {
@@ -97,42 +89,21 @@ namespace AtharPlatform.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = "An error occurred while creating the application.", Error = ex.Message });
+                return StatusCode(500, new
+                {
+                    Message = "Error creating application",
+                    Error = ex.InnerException?.Message ?? ex.Message
+                });
             }
         }
 
-        /// <summary>
-        /// Update application status (IsFirstTime)
-        /// </summary>
-        [HttpPut("{id}/status")]
-        public async Task<IActionResult> UpdateStatus(int id, [FromBody] bool isFirstTime)
-        {
-            if (id <= 0)
-                return BadRequest(new { Message = "Invalid application ID." });
-
-            try
-            {
-                var application = await _unitOfWork.VolunteerApplications.GetAsync(id);
-
-                if (application == null)
-                    return NotFound(new { Message = "Application not found." });
-
-                application.IsFirstTime = isFirstTime;
-                await _unitOfWork.VolunteerApplications.UpdateAsync(application);
-                await _unitOfWork.SaveAsync();
-
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Message = "An error occurred while updating the application status.", Error = ex.Message });
-            }
-        }
+      
 
         /// <summary>
         /// Delete an application
         /// </summary>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
         public async Task<IActionResult> Delete(int id)
         {
             if (id <= 0)
@@ -156,18 +127,52 @@ namespace AtharPlatform.Controllers
             }
         }
 
-        // Manual DTO mapping method
-        private VolunteerApplicationDTO MapToDTO(VolunteerApplication a) => new VolunteerApplicationDTO
+        [HttpGet("{id:int}/volunteer-opportunities")]
+        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+        public async Task<IActionResult> GetVolunteerOpportunitiesByCharity(int id)
         {
-            Id = a.Id,
-            FirstName = a.FirstName,
-            LastName = a.LastName,
-            Age = a.Age,
-            PhoneNumber = a.PhoneNumber,
-            Country = a.Country,
-            City = a.City,
-            IsFirstTime = a.IsFirstTime,
-            CharityVolunteerId = a.CharityVolunteerId
-        };
+            var opportunities = await _unitOfWork.CharityVolunteers.GetByCharityIdAsync(id);
+
+            if (opportunities == null || !opportunities.Any())
+                return NotFound(new { Message = "No volunteer opportunities found for this charity." });
+
+         
+            var dtoList = opportunities.Select(o => new
+            {
+                o.CharityId,
+                
+                VolunteerApplications = o.VolunteerApplications.Select(va => new
+                {
+                    va.Id,
+                    va.FirstName,
+                    va.LastName,
+                    va.Age,
+                    va.PhoneNumber,
+                    va.IsFirstTime
+                    
+                   
+                })
+
+            });
+
+            return Ok(dtoList);
+        }
+
+
+        private VolunteerApplicationDTO MapToDTO(VolunteerApplication application)
+        {
+            return new VolunteerApplicationDTO
+            {
+                Id = application.Id,
+                FirstName = application.FirstName,
+                LastName = application.LastName,
+                Age = application.Age,
+                PhoneNumber = application.PhoneNumber,
+                Country = application.Country,
+                City = application.City,
+                IsFirstTime = application.IsFirstTime,
+                CharityVolunteerId = application.CharityVolunteerId
+            };
+        }
     }
 }

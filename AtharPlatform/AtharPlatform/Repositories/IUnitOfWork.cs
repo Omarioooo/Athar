@@ -16,7 +16,8 @@
         DbSet<Subscription> Subscriptions { get; }
         IVendorOfferRepository VendorOffers { get; }
         IVolunteerApplicationRepository VolunteerApplications { get; }
-
+        ICharityVolunteerRepository CharityVolunteers { get; }
+        ICharityVendorOfferRepository CharityVendorOffers { get; }
         IDonationRepository PaymentDonations { get; }
         ICampaignDonation PaymentCampaignDonations { get; }
 

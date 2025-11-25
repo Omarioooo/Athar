@@ -17,27 +17,63 @@ namespace AtharPlatform.Controllers
     {
         private readonly ICampaignService _campaignService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IAccountContextService _accountContextService;
 
-        public CampaignController(ICampaignService service, IUnitOfWork unitOfWork)
+        public CampaignController(ICampaignService service, IUnitOfWork unitOfWork, IAccountContextService accountContextService)
         {
             _campaignService = service;
             _unitOfWork = unitOfWork;
+            _accountContextService = accountContextService;
         }
 
         [HttpGet("[action]")]
         public async Task<ActionResult<AtharPlatform.Dtos.PaginatedResultDto<CampaignDto>>>
-            GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 12)
+            GetAll(
+                [FromQuery] int page = 1, 
+                [FromQuery] int pageSize = 12,
+                [FromQuery] CampainStatusEnum? status = null,
+                [FromQuery] CampaignCategoryEnum? category = null,
+                [FromQuery] string? search = null,
+                [FromQuery] bool? isCritical = null,
+                [FromQuery] double? minGoalAmount = null,
+                [FromQuery] double? maxGoalAmount = null,
+                [FromQuery] DateTime? startDateFrom = null,
+                [FromQuery] DateTime? startDateTo = null,
+                [FromQuery] int? charityId = null)
         {
             try
             {
-                var campaigns = await _campaignService.GetPaginatedAsync(page, pageSize, inCludeCharity: true);
+                var campaigns = await _campaignService.GetPaginatedAsync(
+                    page, 
+                    pageSize, 
+                    status,
+                    category,
+                    search,
+                    isCritical,
+                    minGoalAmount,
+                    maxGoalAmount,
+                    startDateFrom,
+                    startDateTo,
+                    charityId,
+                    inCludeCharity: true);
+
+                var total = await _campaignService.GetCountOfCampaignsAsync(
+                    status,
+                    category,
+                    search,
+                    isCritical,
+                    minGoalAmount,
+                    maxGoalAmount,
+                    startDateFrom,
+                    startDateTo,
+                    charityId);
 
                 var result = new AtharPlatform.Dtos.PaginatedResultDto<CampaignDto>
                 {
                     Items = campaigns,
                     Page = page,
                     PageSize = pageSize,
-                    Total = await _campaignService.GetCountOfCampaignsAsync()
+                    Total = total
                 };
 
                 return Ok(result);
@@ -96,11 +132,15 @@ namespace AtharPlatform.Controllers
                 if (!string.IsNullOrWhiteSpace(i.Category) && Enum.TryParse<CampaignCategoryEnum>(i.Category, true, out var parsed))
                     cat = parsed;
 
+                // Validate scraped campaigns have ImageUrl (Image should be null for scraped data)
+                if (string.IsNullOrWhiteSpace(i.ImageUrl))
+                    continue; // Skip campaigns without image URL
+
                 var campaign = new Campaign
                 {
                     Title = i.Title!.Trim(),
                     Description = i.Description!.Trim(),
-                    ImageUrl = i.ImageUrl,
+                    ImageUrl = i.ImageUrl.Trim(),
                     isCritical = i.IsCritical ?? false,
                     StartDate = i.StartDate ?? now,
                     Duration = i.DurationDays ?? 30,
@@ -238,13 +278,24 @@ namespace AtharPlatform.Controllers
 
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> CreateCampaign(AddCampaignDto model)
+        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+        public async Task<IActionResult> CreateCampaign([FromForm] AddCampaignDto model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
+                // If CharityAdmin, enforce ownership & charity approval
+                if (User.IsInRole("CharityAdmin"))
+                {
+                    var currentId = _accountContextService.GetCurrentAccountId();
+                    if (model.CharityID != currentId)
+                        return Forbid();
+                    var charity = await _unitOfWork.Charities.GetAsync(currentId);
+                    if (charity == null || charity.Status != AtharPlatform.Models.Enums.CharityStatusEnum.Approved || !charity.IsActive)
+                        return BadRequest(new { message = "Charity not approved or inactive." });
+                }
                 var isCreated = await _campaignService.CreateAsync(model);
                 if (!isCreated)
                     return BadRequest(new { message = "Failed to create campaign. Please try again later." });
@@ -270,6 +321,7 @@ namespace AtharPlatform.Controllers
         }
 
         [HttpPut("[action]/{id}")]
+        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
         public async Task<IActionResult> UpdateCampaign(UpdatCampaignDto model, [FromRoute] int id)
         {
             if (!ModelState.IsValid)
@@ -277,6 +329,13 @@ namespace AtharPlatform.Controllers
 
             try
             {
+                if (User.IsInRole("CharityAdmin"))
+                {
+                    var currentId = _accountContextService.GetCurrentAccountId();
+                    var existing = await _unitOfWork.Campaigns.GetAsync(id, includeCharity: false);
+                    if (existing == null) return NotFound(new { message = "Campaign not found." });
+                    if (existing.CharityID != currentId) return Forbid();
+                }
                 var updatedCampaign = await _campaignService.UpdateAsync(model);
 
                 if (updatedCampaign == null)
@@ -303,10 +362,18 @@ namespace AtharPlatform.Controllers
         }
 
         [HttpDelete("[action]/{id}")]
+        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
         public async Task<IActionResult> DeleteCampaign([FromRoute] int id)
         {
             try
             {
+                if (User.IsInRole("CharityAdmin"))
+                {
+                    var currentId = _accountContextService.GetCurrentAccountId();
+                    var existing = await _unitOfWork.Campaigns.GetAsync(id, includeCharity: false);
+                    if (existing == null) return NotFound(new { message = "Campaign not found." });
+                    if (existing.CharityID != currentId) return Forbid();
+                }
                 var isDeleted = await _campaignService.DeleteAsync(id);
 
                 if (!isDeleted)

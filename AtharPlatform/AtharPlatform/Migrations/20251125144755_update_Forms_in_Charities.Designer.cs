@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AtharPlatform.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20251118151052_Edit-Payment")]
-    partial class EditPayment
+    [Migration("20251125144755_update_Forms_in_Charities")]
+    partial class update_Forms_in_Charities
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -87,7 +87,10 @@ namespace AtharPlatform.Migrations
 
                     b.HasIndex("CharityID");
 
-                    b.ToTable("Campaigns");
+                    b.ToTable("Campaigns", t =>
+                        {
+                            t.HasCheckConstraint("CK_Campaign_ImageSource", "(\"Image\" IS NOT NULL AND \"ImageUrl\" IS NULL) OR (\"Image\" IS NULL AND \"ImageUrl\" IS NOT NULL)");
+                        });
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.CampaignDonation", b =>
@@ -127,6 +130,9 @@ namespace AtharPlatform.Migrations
 
                     b.Property<string>("ExternalId")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<DateTime?>("ImportedAt")
                         .HasColumnType("datetime2");
@@ -221,6 +227,9 @@ namespace AtharPlatform.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsOpen")
+                        .HasColumnType("bit");
+
                     b.HasKey("CharityVendorOfferId");
 
                     b.HasIndex("CharityId");
@@ -241,6 +250,9 @@ namespace AtharPlatform.Migrations
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsOpen")
+                        .HasColumnType("bit");
 
                     b.HasKey("CharityVolunteerId");
 

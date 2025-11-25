@@ -1,5 +1,4 @@
-﻿
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using AtharPlatform.Models.Enums;
 
 namespace AtharPlatform.DTOs
@@ -36,7 +35,6 @@ namespace AtharPlatform.DTOs
         [Required]
         public decimal PriceAfterDiscount { get; set; }
 
-        // ممكن نخلي الـStatus للـAdmin فقط
         public OfferStatus Status { get; set; } = OfferStatus.Pending;
 
         [Required]

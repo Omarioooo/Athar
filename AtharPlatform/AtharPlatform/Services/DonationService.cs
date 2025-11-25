@@ -55,6 +55,9 @@ namespace AtharPlatform.Services
            
             var paymentOutPut = await _paymobService.CreatePaymentAsync(new CreatePaymentDto
             {
+                DonorId=model.DonorId,
+                CharityId=model.CharityOrCampaignId,
+                CampaignId = model.CharityOrCampaignId,
                 DonorFirstName = donor.FirstName,
                 DonorLastName = donor.LastName,
                 DonorEmail = donor.Account.Email,

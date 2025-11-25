@@ -10,9 +10,7 @@ namespace AtharPlatform.Dtos
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        // Manual image bytes (for charities created inside the platform)
-        public byte[]? Image { get; set; }
-        // Scraped image URL (from external sources)
+        // Image URL (both manual and scraped charities use file URLs now)
         public string? ImageUrl { get; set; }
         public string? ExternalWebsiteUrl { get; set; }
         public int CampaignsCount { get; set; }
@@ -24,7 +22,6 @@ namespace AtharPlatform.Dtos
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public byte[]? Image { get; set; }
         public string? ImageUrl { get; set; }
         public int CampaignsCount { get; set; }
     }
@@ -35,7 +32,6 @@ namespace AtharPlatform.Dtos
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public byte[]? Image { get; set; }
         public string? ImageUrl { get; set; }
         public string? ExternalWebsiteUrl { get; set; }
         public IEnumerable<MiniCampaignDto> Campaigns { get; set; } = Array.Empty<MiniCampaignDto>();
@@ -103,15 +99,6 @@ namespace AtharPlatform.Dtos
         public string Country { get; set; } = string.Empty;
         public string City { get; set; } = string.Empty;
         public DateTime Date { get; set; }
-    }
-
-    // Used for manual creation by Charity Admins or Super Admins
-    public class CharityCreateDto
-    {
-        [Required]
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public byte[]? Image { get; set; }
     }
 
     // Import contract for bulk-scraped charities

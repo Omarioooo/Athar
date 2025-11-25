@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AtharPlatform.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20251117130734_updatemodels")]
-    partial class updatemodels
+    [Migration("20251125073544_Init_MSSQL")]
+    partial class Init_MSSQL
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,6 +39,9 @@ namespace AtharPlatform.Migrations
                     b.Property<int>("CharityID")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -53,12 +56,10 @@ namespace AtharPlatform.Migrations
                         .HasColumnType("float");
 
                     b.Property<byte[]>("Image")
-                        .IsRequired()
                         .HasColumnType("varbinary(max)");
 
-                    b.Property<byte[]>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsInKindDonation")
                         .HasColumnType("bit");
@@ -67,9 +68,6 @@ namespace AtharPlatform.Migrations
                         .HasColumnType("float");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("StartingDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Status")
@@ -89,7 +87,10 @@ namespace AtharPlatform.Migrations
 
                     b.HasIndex("CharityID");
 
-                    b.ToTable("Campaigns");
+                    b.ToTable("Campaigns", t =>
+                        {
+                            t.HasCheckConstraint("CK_Campaign_ImageSource", "(\"Image\" IS NOT NULL AND \"ImageUrl\" IS NULL) OR (\"Image\" IS NULL AND \"ImageUrl\" IS NOT NULL)");
+                        });
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.CampaignDonation", b =>
@@ -100,7 +101,7 @@ namespace AtharPlatform.Migrations
                     b.Property<int>("CampaignId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("DonorId")
+                    b.Property<int>("DonorId")
                         .HasColumnType("int");
 
                     b.HasKey("DonationId");
@@ -130,6 +131,9 @@ namespace AtharPlatform.Migrations
                     b.Property<string>("ExternalId")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<DateTime?>("ImportedAt")
                         .HasColumnType("datetime2");
 
@@ -147,7 +151,6 @@ namespace AtharPlatform.Migrations
                         .HasColumnType("int");
 
                     b.Property<byte[]>("VerificationDocument")
-                        .IsRequired()
                         .HasColumnType("varbinary(max)");
 
                     b.HasKey("Id");
@@ -296,10 +299,10 @@ namespace AtharPlatform.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("CampaignId")
+                    b.Property<int>("CampaignId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CharityId")
+                    b.Property<int>("CharityId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("CreatedAt")
@@ -900,16 +903,20 @@ namespace AtharPlatform.Migrations
                     b.HasOne("AtharPlatform.Models.Donation", "Donation")
                         .WithMany("CampaignDonations")
                         .HasForeignKey("DonationId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("AtharPlatform.Models.Donor", null)
+                    b.HasOne("AtharPlatform.Models.Donor", "Donor")
                         .WithMany("Donations")
-                        .HasForeignKey("DonorId");
+                        .HasForeignKey("DonorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Campaign");
 
                     b.Navigation("Donation");
+
+                    b.Navigation("Donor");
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.Charity", b =>
@@ -928,7 +935,7 @@ namespace AtharPlatform.Migrations
                     b.HasOne("AtharPlatform.Models.Donation", "Donation")
                         .WithMany("CharityDonations")
                         .HasForeignKey("DonationId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("AtharPlatform.Models.Charity", "Charity")
@@ -1001,7 +1008,9 @@ namespace AtharPlatform.Migrations
                 {
                     b.HasOne("AtharPlatform.Models.Charity", null)
                         .WithMany("Donations")
-                        .HasForeignKey("CharityId");
+                        .HasForeignKey("CharityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("AtharPlatform.Models.Donor", "Donor")
                         .WithMany()
@@ -1028,13 +1037,13 @@ namespace AtharPlatform.Migrations
                     b.HasOne("AtharPlatform.Models.Charity", "Charity")
                         .WithMany("Follows")
                         .HasForeignKey("CharityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("AtharPlatform.Models.Donor", "Donor")
                         .WithMany("Follows")
                         .HasForeignKey("DonorId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Charity");
@@ -1102,7 +1111,7 @@ namespace AtharPlatform.Migrations
                     b.HasOne("AtharPlatform.Models.Donor", "Donor")
                         .WithMany("Reactions")
                         .HasForeignKey("DonorID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Content");
@@ -1115,13 +1124,13 @@ namespace AtharPlatform.Migrations
                     b.HasOne("AtharPlatform.Models.Charity", "Charity")
                         .WithMany("Subscriptions")
                         .HasForeignKey("CharityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("AtharPlatform.Models.Donor", "Donor")
                         .WithMany("Subscriptions")
                         .HasForeignKey("DonorId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Charity");

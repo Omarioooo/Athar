@@ -12,23 +12,66 @@ using AtharPlatform.Dtos;
 using AtharPlatform.Models;
 using AtharPlatform.Models.Enum;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add Controllers
 builder.Services.AddControllers();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Enter 'Bearer' [space] and then your token"
+    });
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
-// Inject Database
+/* Shared Db */
+//// Inject Database    
+//builder.Services.AddDbContext<Context>(options =>
+//    options.UseNpgsql(
+//        builder.Configuration.GetConnectionString("MSSConnection"),
+//        npgsql =>
+//        {
+//            // Add basic resiliency for transient connection errors
+//            npgsql.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(5), errorCodesToAdd: null);
+//        }
+//    ));
+
+
+
+/*local Db*/
 builder.Services.AddDbContext<Context>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("MSSConnection"),
-        sql =>
+        sqlServerOptions =>
         {
-            // Add basic resiliency for transient SQL errors
-            sql.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(5), errorNumbersToAdd: null);
+           
+            sqlServerOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(5),
+                errorNumbersToAdd: null
+            );
         }
-    ));
+    )
+);
 
 // Inject Repositories
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -44,6 +87,8 @@ builder.Services.AddScoped<IVolunteerApplicationRepository, VolunteerApplication
 
 
 // Inject Services
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IJWTService, JWTService>();
 builder.Services.AddScoped<IAccountContextService, AccountContextService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -93,7 +138,7 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey missing")))
     };
 });
 
@@ -119,6 +164,10 @@ builder.Services.AddCors(options =>
 //});
 builder.Services.AddHttpClient();
 builder.Services.Configure<PaymentSettings>(builder.Configuration.GetSection("Paymob"));
+builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(o =>
+{
+    o.MultipartBodyLengthLimit = long.MaxValue;
+});
 
 
 
@@ -192,7 +241,7 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
-        var roles = new[] { "Admin", "SuperAdmin", "CharityAdmin", "Donor" };
+            var roles = new[] { "Admin", "SuperAdmin", "CharityAdmin", "Donor" };
         foreach (var r in roles)
         {
             if (!await roleManager.RoleExistsAsync(r))
@@ -202,6 +251,30 @@ using (var scope = app.Services.CreateScope())
                     ? $"[Startup] Role '{r}' created." : $"[Startup] Failed to create role '{r}': {string.Join(',', createRes.Errors.Select(e => e.Description))}");
             }
         }
+
+            // Ensure documented SuperAdmin user exists and is assigned role
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserAccount>>();
+            const string superAdminEmail = "admin@athar.local";
+            var superAdmin = await userManager.FindByEmailAsync(superAdminEmail);
+            if (superAdmin == null)
+            {
+                superAdmin = new UserAccount
+                {
+                    UserName = "admin",
+                    Email = superAdminEmail,
+                    EmailConfirmed = true,
+                    Country = "EG",
+                    City = "Alexandria",
+                    CreatedAt = DateTime.UtcNow
+                };
+                var create = await userManager.CreateAsync(superAdmin, "Admin#123");
+                Console.WriteLine(create.Succeeded ? "[Startup] SuperAdmin user created." : "[Startup] Failed to create SuperAdmin user: " + string.Join(',', create.Errors.Select(e => e.Description)));
+            }
+            if (!await userManager.IsInRoleAsync(superAdmin, "SuperAdmin"))
+            {
+                var addRole = await userManager.AddToRoleAsync(superAdmin, "SuperAdmin");
+                Console.WriteLine(addRole.Succeeded ? "[Startup] SuperAdmin role assigned to admin@athar.local" : "[Startup] Failed to assign SuperAdmin role: " + string.Join(',', addRole.Errors.Select(e => e.Description)));
+            }
     }
     catch (Exception rex)
     {
@@ -240,6 +313,7 @@ if (app.Environment.IsDevelopment())
 
 // Always redirect HTTP->HTTPS; we will trust the dev cert locally
 app.UseHttpsRedirection();
+app.UseStaticFiles(); // Enable serving static files from wwwroot
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();

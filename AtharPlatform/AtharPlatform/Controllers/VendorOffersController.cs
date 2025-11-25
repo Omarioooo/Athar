@@ -2,6 +2,7 @@
 using AtharPlatform.Models;
 using AtharPlatform.Models.Enums;
 using AtharPlatform.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AtharPlatform.Controllers
@@ -17,59 +18,39 @@ namespace AtharPlatform.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        /// <summary>
-        /// Get all offers for a specific campaign
-        /// </summary>
-        [HttpGet("by-campaign/{campaignId}")]
-        public async Task<IActionResult> GetByCampaign(int campaignId)
+        [HttpGet("by-campaign/{charityVendorOfferId}")]
+        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+        public async Task<IActionResult> GetByCampaign(int charityVendorOfferId)
         {
-            if (campaignId <= 0)
+            if (charityVendorOfferId <= 0)
                 return BadRequest(new { Message = "Invalid campaign ID." });
 
-            try
-            {
-                var offers = await _unitOfWork.VendorOffers.GetByCampaignAsync(campaignId);
+            var offers = await _unitOfWork.VendorOffers.GetByCampaignAsync(charityVendorOfferId);
 
-                if (offers == null || !offers.Any())
-                    return NotFound(new { Message = "No offers found for this campaign." });
+            if (offers == null || !offers.Any())
+                return NotFound(new { Message = "No offers found for this campaign." });
 
-                var offersDto = offers.Select(o => MapToDTO(o)).ToList();
-                return Ok(offersDto);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Message = "An error occurred while fetching offers.", Error = ex.Message });
-            }
+            var offersDto = offers.Select(MapToDTO).ToList();
+            return Ok(offersDto);
         }
 
-        /// <summary>
-        /// Get offer by Id
-        /// </summary>
         [HttpGet("{id}")]
+        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
         public async Task<IActionResult> GetById(int id)
         {
             if (id <= 0)
                 return BadRequest(new { Message = "Invalid offer ID." });
 
-            try
-            {
-                var offer = await _unitOfWork.VendorOffers.GetAsync(id);
+            var offer = await _unitOfWork.VendorOffers.GetAsync(id);
 
-                if (offer == null)
-                    return NotFound(new { Message = "Offer not found." });
+            if (offer == null)
+                return NotFound(new { Message = "Offer not found." });
 
-                return Ok(MapToDTO(offer));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Message = "An error occurred while fetching the offer.", Error = ex.Message });
-            }
+            return Ok(MapToDTO(offer));
         }
 
-        /// <summary>
-        /// Create a new vendor offer
-        /// </summary>
         [HttpPost]
+        [Authorize(Roles = "Donor")]
         public async Task<IActionResult> Create([FromBody] VendorOfferDTO offerDto)
         {
             if (!ModelState.IsValid)
@@ -81,90 +62,62 @@ namespace AtharPlatform.Controllers
             if (offerDto.PriceBeforDiscount < 0 || offerDto.PriceAfterDiscount < 0)
                 return BadRequest(new { Message = "Price values cannot be negative." });
 
-            try
+            var offer = new VendorOffers
             {
-                var offer = new VendorOffers
-                {
-                    VendorName = offerDto.VendorName,
-                    PhoneNumber = offerDto.PhoneNumber,
-                    Country = offerDto.Country,
-                    City = offerDto.City,
-                    ItemName = offerDto.ItemName,
-                    Quantity = offerDto.Quantity,
-                    Description = offerDto.Description,
-                    PriceBeforDiscount = offerDto.PriceBeforDiscount,
-                    PriceAfterDiscount = offerDto.PriceAfterDiscount,
-                    CharityVendorOfferId = offerDto.CharityVendorOfferId,
-                    Status = OfferStatus.Pending
-                };
+                VendorName = offerDto.VendorName,
+                PhoneNumber = offerDto.PhoneNumber,
+                Country = offerDto.Country,
+                City = offerDto.City,
+                ItemName = offerDto.ItemName,
+                Quantity = offerDto.Quantity,
+                Description = offerDto.Description,
+                PriceBeforDiscount = offerDto.PriceBeforDiscount,
+                PriceAfterDiscount = offerDto.PriceAfterDiscount,
+                CharityVendorOfferId = offerDto.CharityVendorOfferId,
+                Status = OfferStatus.Pending
+            };
 
-                await _unitOfWork.VendorOffers.AddAsync(offer);
-                await _unitOfWork.SaveAsync();
+            await _unitOfWork.VendorOffers.AddAsync(offer);
+            await _unitOfWork.SaveAsync();
 
-                return CreatedAtAction(nameof(GetById), new { id = offer.Id }, MapToDTO(offer));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Message = "An error occurred while creating the offer.", Error = ex.Message });
-            }
+            return CreatedAtAction(nameof(GetById), new { id = offer.Id }, MapToDTO(offer));
         }
 
-        /// <summary>
-        /// Update offer status (Approve / Reject)
-        /// </summary>
         [HttpPut("{id}/status")]
+        [Authorize(Roles = "CharityAdmin")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] OfferStatus status)
         {
             if (id <= 0)
                 return BadRequest(new { Message = "Invalid offer ID." });
 
-            try
-            {
-                var offer = await _unitOfWork.VendorOffers.GetAsync(id);
+            var offer = await _unitOfWork.VendorOffers.GetAsync(id);
+            if (offer == null)
+                return NotFound(new { Message = "Offer not found." });
 
-                if (offer == null)
-                    return NotFound(new { Message = "Offer not found." });
+            offer.Status = status;
+            await _unitOfWork.VendorOffers.UpdateAsync(offer);
+            await _unitOfWork.SaveAsync();
 
-                offer.Status = status;
-                await _unitOfWork.VendorOffers.UpdateAsync(offer);
-                await _unitOfWork.SaveAsync();
-
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Message = "An error occurred while updating the offer status.", Error = ex.Message });
-            }
+            return NoContent();
         }
 
-        /// <summary>
-        /// Delete an offer
-        /// </summary>
         [HttpDelete("{id}")]
+        [Authorize(Roles = "CharityAdmin")]
         public async Task<IActionResult> Delete(int id)
         {
             if (id <= 0)
                 return BadRequest(new { Message = "Invalid offer ID." });
 
-            try
-            {
-                var offer = await _unitOfWork.VendorOffers.GetAsync(id);
+            var offer = await _unitOfWork.VendorOffers.GetAsync(id);
+            if (offer == null)
+                return NotFound(new { Message = "Offer not found." });
 
-                if (offer == null)
-                    return NotFound(new { Message = "Offer not found." });
+            await _unitOfWork.VendorOffers.DeleteAsync(id);
+            await _unitOfWork.SaveAsync();
 
-                await _unitOfWork.VendorOffers.DeleteAsync(id);
-                await _unitOfWork.SaveAsync();
-
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Message = "An error occurred while deleting the offer.", Error = ex.Message });
-            }
+            return NoContent();
         }
 
-        // Manual DTO mapping method to reduce repetition
         private VendorOfferDTO MapToDTO(VendorOffers o) => new VendorOfferDTO
         {
             Id = o.Id,

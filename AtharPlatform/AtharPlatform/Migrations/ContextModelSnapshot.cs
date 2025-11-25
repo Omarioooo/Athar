@@ -52,9 +52,12 @@ namespace AtharPlatform.Migrations
                     b.Property<double>("GoalAmount")
                         .HasColumnType("float");
 
-                    b.Property<byte[]>("Image")
-                        .HasColumnType("varbinary(max)");
+//<<<<<<< HEAD
+//                    b.Property<byte[]>("Image")
+//                        .HasColumnType("varbinary(max)");
 
+//=======
+//>>>>>>> 4ee5d5cdc6a923d714c78c925f5d4d71385f611f
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
@@ -84,7 +87,10 @@ namespace AtharPlatform.Migrations
 
                     b.HasIndex("CharityID");
 
-                    b.ToTable("Campaigns");
+                    b.ToTable("Campaigns", t =>
+                        {
+                            t.HasCheckConstraint("CK_Campaign_ImageSource", "(\"Image\" IS NOT NULL AND \"ImageUrl\" IS NULL) OR (\"Image\" IS NULL AND \"ImageUrl\" IS NOT NULL)");
+                        });
                 });
 
             modelBuilder.Entity("AtharPlatform.Models.CampaignDonation", b =>
@@ -124,6 +130,12 @@ namespace AtharPlatform.Migrations
 
                     b.Property<string>("ExternalId")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("ImportedAt")
                         .HasColumnType("datetime2");
@@ -218,6 +230,9 @@ namespace AtharPlatform.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsOpen")
+                        .HasColumnType("bit");
+
                     b.HasKey("CharityVendorOfferId");
 
                     b.HasIndex("CharityId");
@@ -238,6 +253,9 @@ namespace AtharPlatform.Migrations
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsOpen")
+                        .HasColumnType("bit");
 
                     b.HasKey("CharityVolunteerId");
 
