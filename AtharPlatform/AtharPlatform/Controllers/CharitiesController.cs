@@ -30,6 +30,22 @@ namespace AtharPlatform.Controllers
             _userManager = userManager;
         }
 
+        // Helper method to convert relative URLs to full URLs
+        private string? ToFullUrl(string? imageUrl)
+        {
+            if (string.IsNullOrEmpty(imageUrl))
+                return null;
+            
+            // If already a full URL (external), return as-is
+            if (imageUrl.StartsWith("http://") || imageUrl.StartsWith("https://"))
+                return imageUrl;
+            
+            // Convert relative path to full URL
+            var request = HttpContext.Request;
+            var baseUrl = $"{request.Scheme}://{request.Host}";
+            return $"{baseUrl}{imageUrl}";
+        }
+
 
 
 
@@ -242,7 +258,7 @@ namespace AtharPlatform.Controllers
             List<(int Id, string Name,/* byte[]? Image,*/ string? ImageUrl, string? ExternalWebsiteUrl, string Description)> pageCharities = items
                 // Use the charity primary key directly; Account may not be eagerly loaded in GetPageAsync
                 .Select(c => (c.Id, c.Name, /*c.Image,*/ 
-                               c.ImageUrl ?? (c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null),
+                               ToFullUrl(c.ImageUrl ?? (c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null)),
                                c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null, c.Description))
                 .ToList();
 
@@ -647,7 +663,7 @@ namespace AtharPlatform.Controllers
                 Id = c.Id,
                 Title = c.Title,
                 Description = c.Description,
-                //Image = c.Image,
+                ImageUrl = ToFullUrl(c.ImageUrl),
                 GoalAmount = c.GoalAmount,
                 RaisedAmount = c.RaisedAmount,
                 StartDate = c.StartDate,
