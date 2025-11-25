@@ -95,7 +95,8 @@ namespace SeedData
                         IsScraped = true,
                         ExternalId = i.ExternalId,
                         ImportedAt = now,
-                        VerificationDocument = Array.Empty<byte>()
+                        VerificationDocument = Array.Empty<byte>(),
+                        ImageUrl = i.ImageUrl  // FIX: Copy ImageUrl to main Charity entity
                     };
 
                     if (i.ImageUrl != null || i.ExternalWebsiteUrl != null)

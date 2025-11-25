@@ -24,8 +24,8 @@ namespace AtharPlatform.Models
         public byte[]? VerificationDocument { get; set; }
         public CharityStatusEnum Status { get; set; } = CharityStatusEnum.Pending;
 
-        // Manual uploaded profile image bytes (for platform-registered charities)
-        public byte[]? Image { get; set; }
+        // Profile image URL
+        public string? ImageUrl { get; set; }
 
         // Scrapping attributes
 
