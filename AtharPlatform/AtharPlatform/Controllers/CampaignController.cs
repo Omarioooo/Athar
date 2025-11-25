@@ -26,6 +26,22 @@ namespace AtharPlatform.Controllers
             _accountContextService = accountContextService;
         }
 
+        // Helper method to convert relative URLs to full URLs
+        private string? ToFullUrl(string? imageUrl)
+        {
+            if (string.IsNullOrEmpty(imageUrl))
+                return null;
+            
+            // If already a full URL (external), return as-is
+            if (imageUrl.StartsWith("http://") || imageUrl.StartsWith("https://"))
+                return imageUrl;
+            
+            // Convert relative path to full URL
+            var request = HttpContext.Request;
+            var baseUrl = $"{request.Scheme}://{request.Host}";
+            return $"{baseUrl}{imageUrl}";
+        }
+
         [HttpGet("[action]")]
         public async Task<ActionResult<AtharPlatform.Dtos.PaginatedResultDto<CampaignDto>>>
             GetAll(
@@ -67,6 +83,12 @@ namespace AtharPlatform.Controllers
                     startDateFrom,
                     startDateTo,
                     charityId);
+
+                // Convert relative ImageUrls to full URLs
+                foreach (var campaign in campaigns)
+                {
+                    campaign.ImageUrl = ToFullUrl(campaign.ImageUrl);
+                }
 
                 var result = new AtharPlatform.Dtos.PaginatedResultDto<CampaignDto>
                 {
