@@ -241,7 +241,8 @@ namespace AtharPlatform.Controllers
             // 2) Indirect support: Campaign.SupportingCharitiesJson contains the charity name
             List<(int Id, string Name,/* byte[]? Image,*/ string? ImageUrl, string? ExternalWebsiteUrl, string Description)> pageCharities = items
                 // Use the charity primary key directly; Account may not be eagerly loaded in GetPageAsync
-                .Select(c => (c.Id, c.Name, /*c.Image,*/ c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
+                .Select(c => (c.Id, c.Name, /*c.Image,*/ 
+                               c.ImageUrl ?? (c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null),
                                c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null, c.Description))
                 .ToList();
 

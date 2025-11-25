@@ -252,15 +252,28 @@ namespace AtharPlatform.Services
             if (model == null)
                 throw new ArgumentNullException(nameof(model), "Your model from request is null.");
 
-            // Validate ImageUrl is provided
-            if (string.IsNullOrWhiteSpace(model.ImageUrl))
-                throw new ArgumentException("ImageUrl must be provided for the campaign.");
+            // Handle image: either uploaded file or external URL
+            string? imageUrl = null;
+            if (model.Image != null)
+            {
+                // Save uploaded image file
+                imageUrl = await _fileService.SaveFileAsync(model.Image, "campaigns");
+            }
+            else if (!string.IsNullOrWhiteSpace(model.ImageUrl))
+            {
+                // Use provided external URL
+                imageUrl = model.ImageUrl;
+            }
+            else
+            {
+                throw new ArgumentException("Either Image or ImageUrl must be provided for the campaign.");
+            }
 
             var campaign = new Campaign
             {
                 Title = model.Title,
                 Description = model.Description,
-                ImageUrl = model.ImageUrl,
+                ImageUrl = imageUrl,
                 isCritical = model.IsCritical,
                 StartDate = model.StartDate ?? DateTime.UtcNow,
                 Duration = model.Duration,
@@ -285,18 +298,28 @@ namespace AtharPlatform.Services
             if (campaign == null)
                 throw new ArgumentNullException(nameof(model), "Campaign not found");
 
-            // If new ImageUrl provided, delete old image file if exists
-            bool hasNewImageUrl = !string.IsNullOrWhiteSpace(model.ImageUrl);
-
-            if (hasNewImageUrl)
+            // Handle image update: either uploaded file or external URL
+            string? newImageUrl = null;
+            if (model.Image != null)
             {
-                // Delete old image file if exists
-                if (!string.IsNullOrEmpty(campaign.ImageUrl))
+                // Save new uploaded image file
+                newImageUrl = await _fileService.SaveFileAsync(model.Image, "campaigns");
+            }
+            else if (!string.IsNullOrWhiteSpace(model.ImageUrl))
+            {
+                // Use provided external URL
+                newImageUrl = model.ImageUrl;
+            }
+
+            if (newImageUrl != null)
+            {
+                // Delete old image file if it exists and is a local file (starts with /)
+                if (!string.IsNullOrEmpty(campaign.ImageUrl) && campaign.ImageUrl.StartsWith("/"))
                 {
                     _fileService.DeleteFile(campaign.ImageUrl);
                 }
 
-                campaign.ImageUrl = model.ImageUrl;
+                campaign.ImageUrl = newImageUrl;
             }
             else
             {
