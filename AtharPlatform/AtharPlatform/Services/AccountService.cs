@@ -14,14 +14,16 @@ namespace AtharPlatform.Services
         private readonly IJWTService _jwtServices;
         private readonly UserManager<UserAccount> _userManager;
         private readonly INotificationService _notificationService;
+        private readonly IFileService _fileService;
 
         public AccountService(IUnitOfWork unitOfWork, IJWTService jwtServices,
-            UserManager<UserAccount> userManager, INotificationService notificationService)
+            UserManager<UserAccount> userManager, INotificationService notificationService, IFileService fileService)
         {
             _unitOfWork = unitOfWork;
             _jwtServices = jwtServices;
             _userManager = userManager;
             _notificationService = notificationService;
+            _fileService = fileService;
         }
 
         public async Task<IdentityResult> CharityRegisterAsync(CharityRegisterDto model)
@@ -34,13 +36,12 @@ namespace AtharPlatform.Services
             if (string.IsNullOrWhiteSpace(model.Email) || string.IsNullOrWhiteSpace(model.Password))
                 throw new ArgumentException("Email and Password are required.");
 
-            // Dealing with files (ProfileImage)
-            using MemoryStream stream = new MemoryStream();
+            // Save profile image as file
+            string? profileImageUrl = null;
             if (model.ProfileImage != null)
             {
-                await model.ProfileImage.CopyToAsync(stream);
+                profileImageUrl = await _fileService.SaveFileAsync(model.ProfileImage, "charities");
             }
-            var profileImageBytes = stream.ToArray();
 
             // The account entity
             var account = new UserAccount
@@ -49,7 +50,7 @@ namespace AtharPlatform.Services
                 Email = model.Email.ToLowerInvariant(),
                 Country = model.Country,
                 City = model.City,
-                ProfileImage = profileImageBytes,
+                ProfileImage = null, // No longer storing in UserAccount
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -63,7 +64,7 @@ namespace AtharPlatform.Services
             // Assign the correct platform role for charities
             await _userManager.AddToRoleAsync(account, "CharityAdmin");
 
-            // Dealing with files (verification doc)
+            // Dealing with files (verification doc) - keep as byte array for now
             using MemoryStream docStream = new MemoryStream();
             if (model.VerificationDocument != null)
             {
@@ -76,7 +77,7 @@ namespace AtharPlatform.Services
                 Name = model.CharityName,
                 Description = model.Description,
                 VerificationDocument = docStream.ToArray(),
-                Image = profileImageBytes
+                ImageUrl = profileImageUrl
             };
             await _unitOfWork.Charities.AddAsync(Charity);
 
