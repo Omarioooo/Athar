@@ -305,6 +305,37 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+// Fix charity image URLs
+try
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<Context>();
+    Console.WriteLine("[Startup] Fixing charity 107 ImageUrl...");
+    
+    // Check current value using EF
+    var charity107 = db.Charities.FirstOrDefault(c => c.Id == 107);
+    if (charity107 != null)
+    {
+        Console.WriteLine($"[Startup] Charity 107 found. Current ImageUrl: '{charity107.ImageUrl ?? "NULL"}'");
+        
+        // Update using raw SQL
+        var fixedCount = db.Database.ExecuteSqlRaw(@"
+            UPDATE ""Charities"" 
+            SET ""ImageUrl"" = '/uploads/charities/charity_107_20251124_233717.jpg'
+            WHERE ""Id"" = 107;
+        ");
+        Console.WriteLine($"[Startup] Updated {fixedCount} row(s).");
+    }
+    else
+    {
+        Console.WriteLine("[Startup] Charity 107 not found in database!");
+    }
+}
+catch (Exception fixEx)
+{
+    Console.WriteLine($"[Startup] Failed to fix charity image URLs: {fixEx.Message}");
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
