@@ -7,6 +7,11 @@ namespace AtharPlatform.Repositories
     {
         public DonorRepository(Context context) : base(context) { }
 
+
+        public async Task<bool> ExistsAsync(int id)
+        {
+            return await _context.Set<Donor>().AnyAsync(d => d.Id == id);
+        }
         public async override Task<Donor> GetAsync(int id)
         {
             var donor = await _dbSet.Include(d => d.Account)

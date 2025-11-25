@@ -9,13 +9,17 @@ namespace AtharPlatform.Repositories
         public override async Task<List<VolunteerApplication>> GetAllAsync()
         {
             return await _dbSet
-                 .Include(v => v.CharityVolunteer)
-                 .ToListAsync();
+                .Include(v => v.CharityVolunteer)
+                .ToListAsync();
         }
 
-        public Task<List<VolunteerApplication>> GetByCampaignAsync(int id)
+        // Get all applications for a specific volunteer opportunity
+        public async Task<List<VolunteerApplication>> GetByCampaignAsync(int charityVolunteerId)
         {
-            throw new NotImplementedException();
+            return await _dbSet
+                .Where(v => v.CharityVolunteerId == charityVolunteerId)
+                .Include(v => v.CharityVolunteer)
+                .ToListAsync();
         }
     }
 

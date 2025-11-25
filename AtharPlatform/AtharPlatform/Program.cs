@@ -12,7 +12,6 @@ using AtharPlatform.Dtos;
 using AtharPlatform.Models;
 using AtharPlatform.Models.Enum;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add Controllers
@@ -44,16 +43,35 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Inject Database
+/* Shared Db */
+//// Inject Database    
+//builder.Services.AddDbContext<Context>(options =>
+//    options.UseNpgsql(
+//        builder.Configuration.GetConnectionString("MSSConnection"),
+//        npgsql =>
+//        {
+//            // Add basic resiliency for transient connection errors
+//            npgsql.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(5), errorCodesToAdd: null);
+//        }
+//    ));
+
+
+
+/*local Db*/
 builder.Services.AddDbContext<Context>(options =>
-    options.UseNpgsql(
+    options.UseSqlServer(
         builder.Configuration.GetConnectionString("MSSConnection"),
-        npgsql =>
+        sqlServerOptions =>
         {
-            // Add basic resiliency for transient connection errors
-            npgsql.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(5), errorCodesToAdd: null);
+           
+            sqlServerOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(5),
+                errorNumbersToAdd: null
+            );
         }
-    ));
+    )
+);
 
 // Inject Repositories
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -144,6 +162,10 @@ builder.Services.AddCors(options =>
 //});
 builder.Services.AddHttpClient();
 builder.Services.Configure<PaymentSettings>(builder.Configuration.GetSection("Paymob"));
+builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(o =>
+{
+    o.MultipartBodyLengthLimit = long.MaxValue;
+});
 
 
 
