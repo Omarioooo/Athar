@@ -7,6 +7,13 @@ namespace AtharPlatform.Repositories
         //private readonly Context _context;
         public DonationRepository(Context context) : base(context) { }
 
+
+        public async Task<bool> ExistsAsync(int id)
+        {
+            return await _context.Set<Donor>().AnyAsync(d => d.Id == id);
+        }
+
+
         public async Task<bool> AddAsync(Donation entity)
         {
             await _context.Set<Donation>().AddAsync(entity);

@@ -58,19 +58,46 @@ namespace AtharPlatform.Repositories
             return charity;
         }
 
-        public async Task<List<Charity>> GetPageAsync(string? query, int page, int pageSize)
+        public async Task<List<Charity>> GetPageAsync(
+            string? query, 
+            int page, 
+            int pageSize,
+            bool? isActive = null,
+            bool? isScraped = null,
+            bool? hasExternalWebsite = null)
         {
             if (page <= 0) page = 1;
             if (pageSize <= 0) pageSize = 12;
 
             var q = _dbSet.AsQueryable();
+            
+            // Apply name search
             if (!string.IsNullOrWhiteSpace(query))
             {
                 var term = query.Trim();
-                q = q.Where(c => c.Name.Contains(term));
+                q = q.Where(c => c.Name.Contains(term) || c.Description.Contains(term));
             }
+
+            // Apply isActive filter (default to active charities if not specified)
+            if (isActive.HasValue)
+                q = q.Where(c => c.IsActive == isActive.Value);
+            else
+                q = q.Where(c => c.IsActive);
+
+            // Apply isScraped filter
+            if (isScraped.HasValue)
+                q = q.Where(c => c.IsScraped == isScraped.Value);
+
+            // Apply hasExternalWebsite filter
+            if (hasExternalWebsite.HasValue)
+            {
+                if (hasExternalWebsite.Value)
+                    q = q.Where(c => c.ScrapedInfo != null && c.ScrapedInfo.ExternalWebsiteUrl != null);
+                else
+                    q = q.Where(c => c.ScrapedInfo == null || c.ScrapedInfo.ExternalWebsiteUrl == null);
+            }
+
             return await q
-                .Where(c => c.IsActive)
                 .OrderBy(c => c.Name)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -79,15 +106,41 @@ namespace AtharPlatform.Repositories
                 .ToListAsync();
         }
 
-        public async Task<int> CountAsync(string? query)
+        public async Task<int> CountAsync(
+            string? query,
+            bool? isActive = null,
+            bool? isScraped = null,
+            bool? hasExternalWebsite = null)
         {
             var q = _dbSet.AsQueryable();
+            
+            // Apply name search
             if (!string.IsNullOrWhiteSpace(query))
             {
                 var term = query.Trim();
-                q = q.Where(c => c.Name.Contains(term));
+                q = q.Where(c => c.Name.Contains(term) || c.Description.Contains(term));
             }
-            return await q.Where(c => c.IsActive).CountAsync();
+
+            // Apply isActive filter (default to active charities if not specified)
+            if (isActive.HasValue)
+                q = q.Where(c => c.IsActive == isActive.Value);
+            else
+                q = q.Where(c => c.IsActive);
+
+            // Apply isScraped filter
+            if (isScraped.HasValue)
+                q = q.Where(c => c.IsScraped == isScraped.Value);
+
+            // Apply hasExternalWebsite filter
+            if (hasExternalWebsite.HasValue)
+            {
+                if (hasExternalWebsite.Value)
+                    q = q.Where(c => c.ScrapedInfo != null && c.ScrapedInfo.ExternalWebsiteUrl != null);
+                else
+                    q = q.Where(c => c.ScrapedInfo == null || c.ScrapedInfo.ExternalWebsiteUrl == null);
+            }
+
+            return await q.CountAsync();
         }
 
         public async Task<Charity?> GetWithCampaignsAsync(int id)

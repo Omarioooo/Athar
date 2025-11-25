@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AtharPlatform.Migrations
 {
     /// <inheritdoc />
-    public partial class InitSchema : Migration
+    public partial class Init_MSSQL : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -90,7 +90,7 @@ namespace AtharPlatform.Migrations
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -111,7 +111,7 @@ namespace AtharPlatform.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -131,7 +131,7 @@ namespace AtharPlatform.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -149,13 +149,13 @@ namespace AtharPlatform.Migrations
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_AspNetUserRoles_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -175,7 +175,7 @@ namespace AtharPlatform.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -186,8 +186,9 @@ namespace AtharPlatform.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Balance = table.Column<decimal>(type: "decimal(18,4)", nullable: true),
-                    VerificationDocument = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    VerificationDocument = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
+                    Image = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     IsScraped = table.Column<bool>(type: "bit", nullable: false),
                     ExternalId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ImportedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -202,7 +203,7 @@ namespace AtharPlatform.Migrations
                         column: x => x.Id,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -222,7 +223,7 @@ namespace AtharPlatform.Migrations
                         column: x => x.Id,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -242,13 +243,13 @@ namespace AtharPlatform.Migrations
                         column: x => x.ReceiverId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_Receivers_Notifications_NotificationId",
                         column: x => x.NotificationId,
                         principalTable: "Notifications",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -266,13 +267,13 @@ namespace AtharPlatform.Migrations
                         column: x => x.SenderId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_Sender_Notifications_NotificationId",
                         column: x => x.NotificationId,
                         principalTable: "Notifications",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -301,12 +302,13 @@ namespace AtharPlatform.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Campaigns", x => x.Id);
+                    table.CheckConstraint("CK_Campaign_ImageSource", "(\"Image\" IS NOT NULL AND \"ImageUrl\" IS NULL) OR (\"Image\" IS NULL AND \"ImageUrl\" IS NOT NULL)");
                     table.ForeignKey(
                         name: "FK_Campaigns_Charities_CharityID",
                         column: x => x.CharityID,
                         principalTable: "Charities",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -326,7 +328,7 @@ namespace AtharPlatform.Migrations
                         column: x => x.CharityId,
                         principalTable: "Charities",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -346,7 +348,7 @@ namespace AtharPlatform.Migrations
                         column: x => x.CharityId,
                         principalTable: "Charities",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -366,7 +368,7 @@ namespace AtharPlatform.Migrations
                         column: x => x.CharityId,
                         principalTable: "Charities",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -386,7 +388,7 @@ namespace AtharPlatform.Migrations
                         column: x => x.CharityId,
                         principalTable: "Charities",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -397,14 +399,15 @@ namespace AtharPlatform.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DonorId = table.Column<int>(type: "int", nullable: false),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CampaignId = table.Column<int>(type: "int", nullable: false),
+                    CharityId = table.Column<int>(type: "int", nullable: false),
                     NetAmountToCharity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DonationStatus = table.Column<int>(type: "int", nullable: false),
                     PaymentID = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MerchantOrderId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TransactionId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CharityId = table.Column<int>(type: "int", nullable: true)
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -413,13 +416,14 @@ namespace AtharPlatform.Migrations
                         name: "FK_Donations_Charities_CharityId",
                         column: x => x.CharityId,
                         principalTable: "Charities",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_Donations_Donors_DonorId",
                         column: x => x.DonorId,
                         principalTable: "Donors",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -501,7 +505,7 @@ namespace AtharPlatform.Migrations
                         column: x => x.CampaignId,
                         principalTable: "Campaigns",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -529,7 +533,7 @@ namespace AtharPlatform.Migrations
                         column: x => x.MaterialDonationId,
                         principalTable: "CharityMaterialDonation",
                         principalColumn: "MaterialDonationId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -558,7 +562,7 @@ namespace AtharPlatform.Migrations
                         column: x => x.CharityVendorOfferId,
                         principalTable: "CharityVendorOffers",
                         principalColumn: "CharityVendorOfferId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -584,7 +588,7 @@ namespace AtharPlatform.Migrations
                         column: x => x.CharityVolunteerId,
                         principalTable: "CharityVolunteers",
                         principalColumn: "CharityVolunteerId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -593,7 +597,7 @@ namespace AtharPlatform.Migrations
                 {
                     DonationId = table.Column<int>(type: "int", nullable: false),
                     CampaignId = table.Column<int>(type: "int", nullable: false),
-                    DonorId = table.Column<int>(type: "int", nullable: true)
+                    DonorId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -603,7 +607,7 @@ namespace AtharPlatform.Migrations
                         column: x => x.CampaignId,
                         principalTable: "Campaigns",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_CampaignDonations_Donations_DonationId",
                         column: x => x.DonationId,
@@ -614,7 +618,8 @@ namespace AtharPlatform.Migrations
                         name: "FK_CampaignDonations_Donors_DonorId",
                         column: x => x.DonorId,
                         principalTable: "Donors",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -632,7 +637,7 @@ namespace AtharPlatform.Migrations
                         column: x => x.charityID,
                         principalTable: "Charities",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_CharityDonations_Donations_DonationId",
                         column: x => x.DonationId,
@@ -659,7 +664,7 @@ namespace AtharPlatform.Migrations
                         column: x => x.ContentID,
                         principalTable: "Contents",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_Reactions_Donors_DonorID",
                         column: x => x.DonorID,

@@ -7,7 +7,7 @@ namespace AtharPlatform.Models
     {
         [Key]
         public int CharityVolunteerId { get; set; }
-
+        public bool IsOpen { get; set; } = true;
         [Required]
         public DateTime Date { get; set; } = DateTime.UtcNow;
 

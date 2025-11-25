@@ -1,4 +1,6 @@
 ﻿
+using AtharPlatform.Models;
+
 namespace AtharPlatform.Repositories
 {
     public class UnitOfWork : IUnitOfWork
@@ -13,9 +15,11 @@ namespace AtharPlatform.Repositories
         public IFollowRepository Follows { get; private set; }
         public IVendorOfferRepository VendorOffers { get; }
         public IVolunteerApplicationRepository VolunteerApplications { get; private set; }
+        public ICharityVolunteerRepository CharityVolunteers { get; private set; }
         public IDonationRepository PaymentDonations { get; private set; }
         public ICampaignDonation PaymentCampaignDonations { get; private set; }
 
+        public ICharityVendorOfferRepository CharityVendorOffers { get; private set; }
 
         // Computed Property
         public DbSet<Donation> Donations => _context.Donations;
@@ -36,8 +40,10 @@ namespace AtharPlatform.Repositories
             Follows = new FollowRepository(_context);
             VendorOffers = new VendorOfferRepository(_context);
             VolunteerApplications = new VolunteerApplicationRepository(_context);
+            CharityVolunteers = new CharityVolunteerRepository(_context);
             PaymentDonations = new DonationRepository(_context);
             PaymentCampaignDonations = new CampaignDonationRepository(_context);
+            CharityVendorOffers = new CharityVendorOfferRepository(_context);
         }
 
         public async Task SaveAsync()

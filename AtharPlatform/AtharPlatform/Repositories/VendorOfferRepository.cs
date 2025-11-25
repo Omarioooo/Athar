@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Linq.Expressions;
 using AtharPlatform.Models;
 
@@ -9,16 +8,29 @@ namespace AtharPlatform.Repositories
     {
         public VendorOfferRepository(Context context) : base(context) { }
 
-        public async override Task<List<VendorOffers>> GetAllAsync()
+        public async Task<VendorOffers> GetAsync(int id)
         {
             return await _context.VendorForms
-                .Include(v => v.CharityVendorOffer)
-                .ToListAsync();
+                .FirstOrDefaultAsync(v => v.Id == id);
         }
 
-        public Task<List<VendorOffers>> GetByCampaignAsync(int charityVendorOfferId)
+        public async Task<List<VendorOffers>> GetByCampaignAsync(int charityVendorOfferId)
         {
-            throw new NotImplementedException();
+            return await _context.VendorForms
+                .Where(v => v.CharityVendorOfferId == charityVendorOfferId)
+                .ToListAsync();
         }
+        public async Task<IEnumerable<CharityVendorOffer>> GetByCharityIdAsync(int charityId)
+        {
+            return await _context.CharityVendorOffers
+                                 .Where(c => c.CharityId == charityId)
+                                 .ToListAsync();
+        }
+
+        public async Task AddAsync(CharityVendorOffer entity)
+        {
+            await _context.CharityVendorOffers.AddAsync(entity);
+        }
+
     }
 }
