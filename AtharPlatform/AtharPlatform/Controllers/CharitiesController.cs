@@ -35,6 +35,7 @@ namespace AtharPlatform.Controllers
 
         // فتح باب التطوع
         [HttpPost("open-volunteers/{charityId}")]
+        [Authorize(Roles = "CharityAdmin")]
         public async Task<IActionResult> OpenVolunteers(int charityId)
         {
             try
@@ -80,6 +81,7 @@ namespace AtharPlatform.Controllers
 
         // غلق باب التطوع
         [HttpPost("close-volunteers/{charityId}")]
+        [Authorize(Roles = "CharityAdmin")]
         public async Task<IActionResult> CloseVolunteers(int charityId)
         {
             try
@@ -112,7 +114,7 @@ namespace AtharPlatform.Controllers
 
         // فتح باب العروض للـ Vendor
         [HttpPost("open-vendor-offers/{charityId}")]
-        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+        [Authorize(Roles = "CharityAdmin")]
         public async Task<IActionResult> OpenVendorOffers(int charityId)
         {
             try
@@ -159,7 +161,7 @@ namespace AtharPlatform.Controllers
 
         // غلق باب العروض للـ Vendor
         [HttpPost("close-vendor-offers/{charityId}")]
-        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+        [Authorize(Roles = "CharityAdmin")]
         public async Task<IActionResult> CloseVendorOffers(int charityId)
         {
             try
