@@ -354,6 +354,57 @@ namespace AtharPlatform.Controllers
             return NoContent();
         }
 
+        // (DELETE) /api/charities/{id}/hard-delete - permanent delete with campaigns
+        [HttpDelete("{id:int}/hard-delete")]
+        [Authorize(Roles = "SuperAdmin")]
+        public async Task<IActionResult> HardDelete(int id)
+        {
+            var charity = await _db.Charities
+                .Include(c => c.Campaigns)
+                .Include(c => c.ScrapedInfo)
+                .FirstOrDefaultAsync(c => c.Id == id);
+            
+            if (charity == null) 
+                return NotFound(new { message = "Charity not found." });
+
+            try
+            {
+                // Delete all campaigns for this charity
+                if (charity.Campaigns?.Any() == true)
+                {
+                    _db.Campaigns.RemoveRange(charity.Campaigns);
+                }
+
+                // Delete charity external info if exists
+                if (charity.ScrapedInfo != null)
+                {
+                    _db.CharityExternalInfos.Remove(charity.ScrapedInfo);
+                }
+
+                // Delete the charity itself
+                _db.Charities.Remove(charity);
+
+                // Delete the associated user account
+                var userAccount = await _db.Users.FindAsync(id);
+                if (userAccount != null)
+                {
+                    await _userManager.DeleteAsync(userAccount);
+                }
+
+                await _db.SaveChangesAsync();
+
+                return Ok(new { 
+                    message = "Charity and all related data deleted successfully.",
+                    charityId = id,
+                    campaignsDeleted = charity.Campaigns?.Count ?? 0
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error deleting charity.", error = ex.Message });
+            }
+        }
+
         // Approve / Reject (SuperAdmin only)
         [HttpPost("{id:int}/approve")]
         [Authorize(Roles = "SuperAdmin")]
