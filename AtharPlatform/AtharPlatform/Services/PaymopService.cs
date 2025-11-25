@@ -102,42 +102,94 @@ namespace AtharPlatform.Services
             return data.token;
         }
 
+        //نسخه قديمة
         // =================== Payment Creation ===================
+        //public async Task<PaymentOutPutDto> CreatePaymentAsync(CreatePaymentDto model)
+        //{
+        //    string merchantOrderId = Guid.NewGuid().ToString();
+
+        //    int amountCents = (int)(model.Amount * 100);
+
+        //    // 1) Create Donation in DB First
+        //    var donation = new Donation
+        //    {
+        //        DonorId = model.DonorId,
+        //        TotalAmount = model.Amount,
+        //        NetAmountToCharity = model.Amount * 0.98m,
+        //        DonationStatus = TransactionStatusEnum.PENDING,
+        //        MerchantOrderId = merchantOrderId,
+        //        CharityId = model.CharityId,
+        //        CreatedAt = DateTime.UtcNow,
+        //        CampaignId=model.CampaignId
+        //    };
+
+        //    await _unit.PaymentDonations.AddAsync(donation);
+        //    await _unit.SaveAsync();
+
+        //    // 2) Link to Campaign if exists
+        //    if (model.CampaignId>0)
+        //    {
+        //        await _unit.PaymentCampaignDonations.AddAsync(new CampaignDonation
+        //        {
+        //            DonationId = donation.Id,
+        //            CampaignId = model.CampaignId,
+        //            DonorId=model.DonorId
+        //        });
+        //        await _unit.SaveAsync();
+        //    }
+
+        //    // 3) Paymob Auth & Order
+        //    string token = await GetAuthToken();
+        //    int orderId = await CreateOrder(token, amountCents, merchantOrderId);
+
+        //    donation.PaymentID = orderId.ToString();
+        //    await _unit.PaymentDonations.UpdateAsync(donation);
+        //    await _unit.SaveAsync();
+
+        //    // 4) Generate Payment Key
+        //    string paymentKey = await CreatePaymentKey(token, orderId, amountCents, model.DonorEmail);
+
+        //    string paymentUrl =
+        //        $"https://accept.paymob.com/api/acceptance/iframes/{_settings.IFrameId}?payment_token={paymentKey}";
+
+        //    // ---- FIXED: Correct return values ----
+        //    return new PaymentOutPutDto
+        //    {
+        //        PaymentId = orderId.ToString(),
+        //        MerchantOrderId = merchantOrderId,
+        //        PaymentUrl = paymentUrl
+        //    };
+        //}
+
+
+        // =================== HMAC Verification ===================
         public async Task<PaymentOutPutDto> CreatePaymentAsync(CreatePaymentDto model)
         {
-            string merchantOrderId = Guid.NewGuid().ToString();
+            // 1️⃣ تأكيد وجود الدونور قبل ما تعمل أي Insert
+            var donorExists = await _unit.Donors.ExistsAsync(model.DonorId);
+            if (!donorExists)
+                throw new Exception("Donor does not exist");
 
+            string merchantOrderId = Guid.NewGuid().ToString();
             int amountCents = (int)(model.Amount * 100);
 
-            // 1) Create Donation in DB First
+            
             var donation = new Donation
             {
                 DonorId = model.DonorId,
+                CharityId = model.CharityId,
+                CampaignId = model.CampaignId,
                 TotalAmount = model.Amount,
                 NetAmountToCharity = model.Amount * 0.98m,
                 DonationStatus = TransactionStatusEnum.PENDING,
                 MerchantOrderId = merchantOrderId,
-                CharityId = model.CharityId,
-                CreatedAt = DateTime.UtcNow,
-                CampaignId=model.CampaignId
+                CreatedAt = DateTime.UtcNow
             };
 
             await _unit.PaymentDonations.AddAsync(donation);
-            await _unit.SaveAsync();
+            await _unit.SaveAsync(); // UnitOfWork بيحفظ
 
-            // 2) Link to Campaign if exists
-            if (model.CampaignId>0)
-            {
-                await _unit.PaymentCampaignDonations.AddAsync(new CampaignDonation
-                {
-                    DonationId = donation.Id,
-                    CampaignId = model.CampaignId,
-                    DonorId=model.DonorId
-                });
-                await _unit.SaveAsync();
-            }
-
-            // 3) Paymob Auth & Order
+           
             string token = await GetAuthToken();
             int orderId = await CreateOrder(token, amountCents, merchantOrderId);
 
@@ -145,23 +197,21 @@ namespace AtharPlatform.Services
             await _unit.PaymentDonations.UpdateAsync(donation);
             await _unit.SaveAsync();
 
-            // 4) Generate Payment Key
+            // 4️⃣ Get Payment Key
             string paymentKey = await CreatePaymentKey(token, orderId, amountCents, model.DonorEmail);
 
             string paymentUrl =
                 $"https://accept.paymob.com/api/acceptance/iframes/{_settings.IFrameId}?payment_token={paymentKey}";
 
-            // ---- FIXED: Correct return values ----
             return new PaymentOutPutDto
             {
+                DonationId = donation.Id,
                 PaymentId = orderId.ToString(),
                 MerchantOrderId = merchantOrderId,
                 PaymentUrl = paymentUrl
             };
         }
 
-
-        // =================== HMAC Verification ===================
         public bool VerifyHmac(Dictionary<string, string> data, string receivedHmac)
         {
             var ordered = data
@@ -181,11 +231,12 @@ namespace AtharPlatform.Services
         // =================== Webhook Handling ===================
         public async Task HandleWebHookAsync(Dictionary<string, string> data)
         {
-            string orderId = data["order"];
-            bool success = data["success"] == "true";
+            //string orderId = data["order"];
+            string merchantOrderId = data["order_merchant_order_id"];
+            bool success = data["success"].ToLower() == "true";
             string transactionId = data["id"];
 
-            var donation = await _unit.PaymentDonations.GetWithExpressionAsync(d => d.MerchantOrderId == orderId);
+            var donation = await _unit.PaymentDonations.GetWithExpressionAsync(d => d.MerchantOrderId == merchantOrderId);
             if (donation == null) return;
 
             donation.TransactionId = transactionId;

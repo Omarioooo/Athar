@@ -7,8 +7,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Remove="Migrations\20251117130734_updatemodels.cs" />
-		<Compile Remove="Migrations\20251117130734_updatemodels.Designer.cs" />
 		<Compile Remove="DTO\**" />
 		<Compile Remove="Hub\**" />
 		<Content Remove="DTO\**" />

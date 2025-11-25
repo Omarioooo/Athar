@@ -4,6 +4,7 @@ using AtharPlatform.Models;
 using AtharPlatform.Models.Enums;
 using AtharPlatform.Repositories;
 using AtharPlatform.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -20,6 +21,7 @@ public class PaymentsController : ControllerBase
     }
 
     [HttpPost("create")]
+    [Authorize(Roles = "Donor")]
     public async Task<IActionResult> CreatePayment([FromBody] CreatePaymentDto model)
     {
         if (model == null)
@@ -33,7 +35,7 @@ public class PaymentsController : ControllerBase
 
         return Ok(new
         {
-            //donationId = model.Id,
+           result.DonationId ,
             result.PaymentUrl,
             result.PaymentId
         });
@@ -73,7 +75,7 @@ public class PaymentsController : ControllerBase
 
         await _unit.SaveAsync();
 
-        return Ok("received");
+        return Ok($"received\nTotalAmount: {donation.TotalAmount}\nNetAmountToCharity: {donation.NetAmountToCharity}");
     }
 
     
