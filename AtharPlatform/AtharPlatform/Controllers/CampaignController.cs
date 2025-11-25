@@ -140,7 +140,6 @@ namespace AtharPlatform.Controllers
                 {
                     Title = i.Title!.Trim(),
                     Description = i.Description!.Trim(),
-                    Image = null, // Scraped campaigns should NOT have binary image data
                     ImageUrl = i.ImageUrl.Trim(),
                     isCritical = i.IsCritical ?? false,
                     StartDate = i.StartDate ?? now,

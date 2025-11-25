@@ -3,6 +3,7 @@ using System;
 using AtharPlatform.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AtharPlatform.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20251124212000_AddImageUrlToCharity")]
+    partial class AddImageUrlToCharity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,6 +54,9 @@ namespace AtharPlatform.Migrations
 
                     b.Property<double>("GoalAmount")
                         .HasColumnType("double precision");
+
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("bytea");
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("text");
@@ -124,6 +130,9 @@ namespace AtharPlatform.Migrations
 
                     b.Property<string>("ExternalId")
                         .HasColumnType("text");
+
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("bytea");
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("text");
