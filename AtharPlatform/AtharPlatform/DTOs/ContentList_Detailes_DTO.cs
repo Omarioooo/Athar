@@ -13,5 +13,8 @@
         public string CampaignTitle { get; set; }
         public int CharityId { get; set; }
         public string CharityName { get; set; }
+
+        public string ShareLink { get; set; }
+
     }
 }

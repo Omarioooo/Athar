@@ -36,6 +36,8 @@ namespace AtharPlatform.Controllers
         }
 
 
+
+
         [HttpGet("followed/{donorId}/paged")]
         [Authorize(Roles = "CharityAdmin,Donor")]
         public async Task<IActionResult> GetFollowedContent(int donorId, int page = 1, int pageSize = 12)
@@ -172,6 +174,18 @@ namespace AtharPlatform.Controllers
             return Ok(results);
         }
 
+
+
+        [HttpGet("/content/{id:int}")]
+        public async Task<IActionResult> OpenPublicContent(int id)
+        {
+            var content = await _contentService.GetByIdAsync(id);
+
+            if (content == null)
+                return NotFound("Content not found");
+
+            return Ok(content);
+        }
 
     }
 

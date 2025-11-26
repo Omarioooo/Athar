@@ -9,7 +9,7 @@ namespace AtharPlatform.DTOs
         public string Description { get; set; }
         [Required(ErrorMessage = "CampaignId is required")]
         public int CampaignId { get; set; }
-
+        public string ShareLink { get; set; }
         public IFormFile? PostImage { get; set; }  
     }
 }

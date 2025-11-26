@@ -44,7 +44,9 @@ namespace AtharPlatform.Services
                     CampaignId = c.CampaignId,
                     CampaignTitle = c.Campaign.Title,
                     CharityId = c.Campaign.CharityID,
-                    CharityName = c.Campaign.Charity.Name
+                    CharityName = c.Campaign.Charity.Name,
+                    ShareLink = $"{baseUrl}/content/{c.Id}"
+
                 })
                 .ToListAsync();
 
@@ -103,7 +105,9 @@ namespace AtharPlatform.Services
                     CampaignId = c.CampaignId,
                     CampaignTitle = c.Campaign.Title,
                     CharityId = c.Campaign.CharityID,
-                    CharityName = c.Campaign.Charity.Name
+                    CharityName = c.Campaign.Charity.Name,
+                    ShareLink = $"{baseUrl}/content/{c.Id}"
+
                 })
                 .ToListAsync();
 
@@ -176,7 +180,9 @@ namespace AtharPlatform.Services
                 Title = c.Title,
                 Description = c.Description,
                 CreatedAt = c.CreatedAt,
-                ImageUrl = $"{baseUrl}/api/content/image/{c.Id}"
+                ImageUrl = $"{baseUrl}/api/content/image/{c.Id}",
+                ShareLink = $"{baseUrl}/content/{c.Id}"
+
             }).ToList();
         }
 
@@ -199,7 +205,9 @@ namespace AtharPlatform.Services
                 Title = c.Title,
                 Description = c.Description,
                 CreatedAt = c.CreatedAt,
-                ImageUrl = $"{baseUrl}/api/content/image/{c.Id}"
+                ImageUrl = $"{baseUrl}/api/content/image/{c.Id}",
+                ShareLink = $"{baseUrl}/content/{c.Id}"
+
             }).ToList();
 
             return new PagingResponse<ContentListDTO>
@@ -272,7 +280,9 @@ namespace AtharPlatform.Services
                 Title = c.Title,
                 Description = c.Description,
                 CreatedAt = c.CreatedAt,
-                ImageUrl = $"{baseUrl}/api/content/image/{c.Id}"
+                ImageUrl = $"{baseUrl}/api/content/image/{c.Id}",
+                ShareLink = $"{baseUrl}/content/{c.Id}"
+
             }).ToList();
 
             return new PagingResponse<ContentListDTO>
@@ -308,6 +318,8 @@ namespace AtharPlatform.Services
                 Description = c.Description,
                 CreatedAt = c.CreatedAt,
                 ImageUrl = $"{baseUrl}/api/content/image/{c.Id}",
+                ShareLink = $"{baseUrl}/content/{c.Id}"
+
 
             }).ToList();
 
