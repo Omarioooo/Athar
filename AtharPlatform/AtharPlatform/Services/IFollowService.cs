@@ -19,5 +19,9 @@
         /// <returns>A task that represents the asynchronous operation. The task result contains <see langword="true"/> if the
         /// unfollow operation was successful; otherwise, <see langword="false"/>.</returns>
         Task<bool> UnFollowAsync(int donorId, int charityId);
+
+
+        Task<int> GetFollowersCountAsync(int charityId);
+
     }
 }

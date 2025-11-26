@@ -81,5 +81,19 @@ namespace AtharPlatform.Controllers
                 return StatusCode(500, new { message = "An unexpected error occurred while trying to unfollow the charity." });
             }
         }
+
+        [HttpGet("{id}/followers/count")]
+        public async Task<IActionResult> GetFollowersCount(int id)
+        {
+           
+            var count = await _followService.GetFollowersCountAsync(id);
+
+            if (count < 0) // مثلا لو الـ charity مش موجودة
+                return NotFound(new { message = "Charity not found." });
+
+            return Ok(count);
+        }
+
+
     }
 }

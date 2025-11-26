@@ -100,6 +100,10 @@ builder.Services.AddScoped<IReactionService, ReactionService>();
 builder.Services.AddScoped<IDonationService, DonationService>();
 builder.Services.AddScoped<IDonorService, DonorService>();
 builder.Services.AddScoped<ICampaignService, CampaignService>();
+builder.Services.AddScoped<IContentService, ContentService>();
+builder.Services.AddHttpContextAccessor();
+
+
 
 // SignalR
 builder.Services.AddSignalR();

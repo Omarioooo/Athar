@@ -57,5 +57,15 @@ namespace AtharPlatform.Services
 
             return true;
         }
+
+        public async Task<int> GetFollowersCountAsync(int charityId)
+        {
+            var charity = await _unitOfWork.Charities.GetAsync(charityId);
+            if (charity == null) return -1;
+
+            return await _unitOfWork.Follows.GetAll()
+                .CountAsync(f => f.CharityId == charityId);
+        }
+
     }
 }
