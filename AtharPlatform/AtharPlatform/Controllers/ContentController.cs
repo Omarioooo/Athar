@@ -37,6 +37,7 @@ namespace AtharPlatform.Controllers
 
 
         [HttpGet("followed/{donorId}/paged")]
+        [Authorize(Roles = "CharityAdmin,Donor")]
         public async Task<IActionResult> GetFollowedContent(int donorId, int page = 1, int pageSize = 12)
         {
             if (donorId <= 0)
