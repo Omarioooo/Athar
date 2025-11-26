@@ -1,4 +1,5 @@
-﻿using AtharPlatform.DTOs;
+﻿using AtharPlatform.Dtos;
+using AtharPlatform.DTOs;
 using AtharPlatform.Repositories;
 
 
@@ -15,6 +16,116 @@ namespace AtharPlatform.Services
             _httpContextAccessor = httpContextAccessor;
             _contentRepository = contentRepository;
         }
+
+        public async Task<PaginatedResultDto<ContentList_Detailes_DTO>> GetPagedAllAsync(int page, int pageSize)
+        {
+            var baseUrl = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}";
+
+            var query = _unitOfWork.Contents.GetAll()
+                .Include(c => c.Campaign)
+                .ThenInclude(ca => ca.Charity);
+
+         
+            var totalItems = await query.CountAsync();
+
+            var items = await query
+                .OrderBy(c => Guid.NewGuid()) //بشكل عشوائي يعني الترتيب
+
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(c => new ContentList_Detailes_DTO
+                {
+                    Id = c.Id,
+                    Title = c.Title,
+                    Description = c.Description,
+                    CreatedAt = c.CreatedAt,
+                    ImageUrl = $"{baseUrl}/api/content/image/{c.Id}",
+
+                    CampaignId = c.CampaignId,
+                    CampaignTitle = c.Campaign.Title,
+                    CharityId = c.Campaign.CharityID,
+                    CharityName = c.Campaign.Charity.Name
+                })
+                .ToListAsync();
+
+            return new PaginatedResultDto<ContentList_Detailes_DTO>
+            {
+                Items = items,
+                Total = totalItems,
+                Page = page,
+                PageSize = pageSize
+            };
+        }
+
+
+
+        //الجمعيات الي عملها فولو بس
+        public async Task<PaginatedResultDto<ContentList_Detailes_DTO>>GetFollowedCharitiesContentAsync(int donorId, int page, int pageSize)
+        {
+            var baseUrl = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}";
+
+            
+            var followedCharities = await _unitOfWork.Follows.GetAll()
+                .Where(f => f.DonorId == donorId)
+                .Select(f => f.CharityId)
+                .ToListAsync();
+
+            if (!followedCharities.Any())
+                return new PaginatedResultDto<ContentList_Detailes_DTO>
+                {
+                    Items = new List<ContentList_Detailes_DTO>(),
+                    Page = page,
+                    PageSize = pageSize,
+                    Total = 0
+                };
+
+           
+            var query = _unitOfWork.Contents.GetAll()
+                .Include(c => c.Campaign)
+                .ThenInclude(ca => ca.Charity)
+                .Where(c => followedCharities.Contains(c.Campaign.CharityID));
+
+            var totalItems = await query.CountAsync();
+
+            var items = await query
+                // .OrderByDescending(c => c.CreatedAt) // لو نعمللها بالترتيب من الاحدث يعني
+                .OrderBy(c => Guid.NewGuid())//ننعرض بشكل عشوائي
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(c => new ContentList_Detailes_DTO
+                {
+                    Id = c.Id,
+                    Title = c.Title,
+                    Description = c.Description,
+                    CreatedAt = c.CreatedAt,
+                    ImageUrl = $"{baseUrl}/api/content/image/{c.Id}",
+
+                    CampaignId = c.CampaignId,
+                    CampaignTitle = c.Campaign.Title,
+                    CharityId = c.Campaign.CharityID,
+                    CharityName = c.Campaign.Charity.Name
+                })
+                .ToListAsync();
+
+            return new PaginatedResultDto<ContentList_Detailes_DTO>
+            {
+                Items = items,
+                Total = totalItems,
+                Page = page,
+                PageSize = pageSize
+            };
+        }
+
+
+
+
+
+
+
+
+
+
+
 
         public async Task<Content> CreateContentAsync(CreateContentDTO dto)
         {
@@ -194,10 +305,10 @@ namespace AtharPlatform.Services
             {
                 Id = c.Id,
                 Title = c.Title,
-                Description = c.Description ,
+                Description = c.Description,
                 CreatedAt = c.CreatedAt,
                 ImageUrl = $"{baseUrl}/api/content/image/{c.Id}",
-                
+
             }).ToList();
 
             return new PagingResponse<ContentListDTO>
@@ -208,7 +319,6 @@ namespace AtharPlatform.Services
                 Items = dtoList
             };
         }
-
 
 
     }

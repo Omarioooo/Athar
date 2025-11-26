@@ -17,6 +17,42 @@ namespace AtharPlatform.Controllers
             _contentService = contentService;
         }
 
+
+
+        [HttpGet("GetAll")]
+        public async Task<IActionResult> GetAll(int page = 1, int pageSize = 12)
+        {
+            if (page <= 0 || pageSize <= 0)
+                return BadRequest("Page number and page size must be greater than zero.");
+
+            var contents = await _contentService.GetPagedAllAsync(page,pageSize);
+
+            if (contents == null || !contents.Items.Any())
+            {
+                return NotFound("No contents found");
+            }
+            return Ok(contents);
+                
+        }
+
+
+        [HttpGet("followed/{donorId}/paged")]
+        public async Task<IActionResult> GetFollowedContent(int donorId, int page = 1, int pageSize = 12)
+        {
+            if (donorId <= 0)
+                return BadRequest("Invalid donor ID");
+
+            var result = await _contentService.GetFollowedCharitiesContentAsync(donorId, page, pageSize);
+
+            if (result == null || result.Total == 0 || result.Items == null || !result.Items.Any())
+                return NoContent();
+
+            return Ok(result);
+        }
+
+
+
+
         [HttpPost("create")]
         [Consumes("multipart/form-data")]// بيقول علشان Swagger يعرف انه بيتم رفع صورة
         [Authorize(Roles = "CharityAdmin")]
