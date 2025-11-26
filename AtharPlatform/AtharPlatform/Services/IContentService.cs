@@ -1,5 +1,8 @@
 ﻿using AtharPlatform.DTOs;
 
+
+using AtharPlatform.Dtos;
+
 namespace AtharPlatform.Services
 {
     public interface IContentService
@@ -17,6 +20,9 @@ namespace AtharPlatform.Services
 
         Task<PagingResponse<ContentListDTO>> GetPagedByCharityIdAsync(int charityId, int pageNumber, int pageSize);
         Task<PagingResponse<ContentListDTO>> SearchContentsAsync(string keyword, int page = 1, int pageSize = 12);
+        Task<PaginatedResultDto<ContentList_Detailes_DTO>> GetPagedAllAsync(int page, int pageSize);
+
+        Task<PaginatedResultDto<ContentList_Detailes_DTO>> GetFollowedCharitiesContentAsync(int donorId, int page, int pageSize);
 
     }
 }
