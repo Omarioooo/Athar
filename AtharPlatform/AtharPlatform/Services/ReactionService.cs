@@ -61,7 +61,7 @@ namespace AtharPlatform.Services
                 ?? throw new KeyNotFoundException("Content not found.");
 
             // check the reaction
-            var reaction = _unitOfWork.Reactions.GetReactionByDonorAndContentAsync(donorId, contentId)
+            var reaction = await  _unitOfWork.Reactions.GetReactionByDonorAndContentAsync(donorId, contentId)
                 ?? throw new InvalidOperationException("You are not reacted on this content.");
 
             await _unitOfWork.Reactions.DeleteAsync(reaction.Id);

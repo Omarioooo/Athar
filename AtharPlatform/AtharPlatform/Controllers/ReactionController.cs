@@ -10,11 +10,12 @@ namespace AtharPlatform.Controllers
     {
         private readonly IReactionService _reactionService;
         private readonly IAccountContextService _acountContextService;
-
-        public ReactionController(IReactionService reactionService, IAccountContextService accountContextService)
+        private readonly IContentService _contentService;
+        public ReactionController(IReactionService reactionService, IAccountContextService accountContextService, IContentService contentService)
         {
             _reactionService = reactionService;
             _acountContextService = accountContextService;
+            _contentService = contentService;
         }
 
         [HttpPost("{id}")]
@@ -45,7 +46,7 @@ namespace AtharPlatform.Controllers
             }
             catch (DbUpdateException ex)
             {
-                return StatusCode(500, new { message = ex.Message });
+                return StatusCode(500, new { message = ex.Message, inner = ex.InnerException?.Message });
             }
             catch (Exception)
             {
@@ -86,5 +87,15 @@ namespace AtharPlatform.Controllers
                 return StatusCode(500, new { message = "An unexpected error occurred while trying to remove reaction on the content." });
             }
         }
+
+        [HttpGet("{id}/reactions/count")]
+        public async Task<IActionResult> GetReactionCount(int id)
+        {
+            var content = await _contentService.GetByIdAsync(id);
+            if (content == null) return NotFound();
+
+            return Ok(content.Reactions.Count);
+        }
+
     }
 }

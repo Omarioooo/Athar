@@ -14,6 +14,11 @@ namespace AtharPlatform.Repositories
             _dbSet = _context.Set<T>();
         }
 
+        public IQueryable<T> GetAll()
+        {
+            return _dbSet.AsQueryable();
+        }
+
         public virtual async Task<List<T>> GetAllAsync() => await _dbSet.ToListAsync();
 
         public virtual async Task<T?> GetAsync(int id)
@@ -61,5 +66,11 @@ namespace AtharPlatform.Repositories
             _dbSet.Remove(entity);
             return true;
         }
+
+        public async Task<T?> GetByIdAsync(int id)
+        {
+            return await _context.Set<T>().FindAsync(id);
+        }
+
     }
 }
