@@ -42,7 +42,8 @@ namespace AtharPlatform.Controllers
             
             // Convert relative path to full URL
             var request = HttpContext.Request;
-            var baseUrl = $"{request.Scheme}://{request.Host}";
+            // Force HTTPS scheme
+            var baseUrl = $"https://{request.Host}";
             return $"{baseUrl}{imageUrl}";
         }
 

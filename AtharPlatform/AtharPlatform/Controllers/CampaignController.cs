@@ -38,7 +38,8 @@ namespace AtharPlatform.Controllers
             
             // Convert relative path to full URL
             var request = HttpContext.Request;
-            var baseUrl = $"{request.Scheme}://{request.Host}";
+            // Force HTTPS scheme
+            var baseUrl = $"https://{request.Host}";
             return $"{baseUrl}{imageUrl}";
         }
 
@@ -157,7 +158,7 @@ namespace AtharPlatform.Controllers
                 // Validate scraped campaigns have ImageUrl (Image should be null for scraped data)
                 if (string.IsNullOrWhiteSpace(i.ImageUrl))
                     continue; // Skip campaigns without image URL
-
+                
                 var campaign = new Campaign
                 {
                     Title = i.Title!.Trim(),
