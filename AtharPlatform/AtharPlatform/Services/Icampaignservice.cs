@@ -6,6 +6,33 @@ namespace AtharPlatform.Services
 {
     public interface ICampaignService
     {
+
+
+    Task<PaginatedResultDto<CampaignDto>> GetPaginatedOptimizedAsync(
+    int page,
+    int pageSize,
+    CampainStatusEnum? status,
+    CampaignCategoryEnum? category,
+    string? search,
+    bool? isCritical,
+    double? minGoalAmount,
+    double? maxGoalAmount,
+    DateTime? startDateFrom,
+    DateTime? startDateTo,
+    int? charityId
+);
+
+
+
+
+
+
+
+
+
+
+
+
         /// <summary>
         /// Get the total number of campaigns with optional filters
         /// </summary>
@@ -50,8 +77,8 @@ namespace AtharPlatform.Services
         /// Retrieves campaigns in a paginated format with optional filters.
         /// </summary>
         Task<List<CampaignDto>> GetPaginatedAsync(
-            int page, 
-            int pageSize, 
+            int page,
+            int pageSize,
             CampainStatusEnum? status = null,
             CampaignCategoryEnum? category = null,
             string? search = null,

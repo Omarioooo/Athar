@@ -19,11 +19,15 @@ namespace AtharPlatform.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAccountContextService _accountContextService;
 
-        public CampaignController(ICampaignService service, IUnitOfWork unitOfWork, IAccountContextService accountContextService)
+        private readonly IWebHostEnvironment _env;
+
+
+        public CampaignController(ICampaignService service, IUnitOfWork unitOfWork, IAccountContextService accountContextService, IWebHostEnvironment env)
         {
             _campaignService = service;
             _unitOfWork = unitOfWork;
             _accountContextService = accountContextService;
+            _env = env;
         }
 
         // Helper method to convert relative URLs to full URLs
@@ -43,26 +47,103 @@ namespace AtharPlatform.Controllers
             return $"{baseUrl}{imageUrl}";
         }
 
+        #region OldGetAll 
+        //    [HttpGet("[action]")]
+        //    public async Task<ActionResult<AtharPlatform.Dtos.PaginatedResultDto<CampaignDto>>>
+        //GetAll(
+        //    [FromQuery] int page = 1,
+        //    [FromQuery] int pageSize = 12,
+        //    [FromQuery] CampainStatusEnum? status = null,
+        //    [FromQuery] CampaignCategoryEnum? category = null,
+        //    [FromQuery] string? search = null,
+        //    [FromQuery] bool? isCritical = null,
+        //    [FromQuery] double? minGoalAmount = null,
+        //    [FromQuery] double? maxGoalAmount = null,
+        //    [FromQuery] DateTime? startDateFrom = null,
+        //    [FromQuery] DateTime? startDateTo = null,
+        //    [FromQuery] int? charityId = null)
+        //    {
+        //        try
+        //        {
+        //            var campaigns = await _campaignService.GetPaginatedAsync(
+        //                page,
+        //                pageSize,
+        //                status,
+        //                category,
+        //                search,
+        //                isCritical,
+        //                minGoalAmount,
+        //                maxGoalAmount,
+        //                startDateFrom,
+        //                startDateTo,
+        //                charityId,
+        //                inCludeCharity: true);
+
+        //            var total = await _campaignService.GetCountOfCampaignsAsync(
+        //                status,
+        //                category,
+        //                search,
+        //                isCritical,
+        //                minGoalAmount,
+        //                maxGoalAmount,
+        //                startDateFrom,
+        //                startDateTo,
+        //                charityId);
+
+        //            Convert relative ImageUrls to full URLs
+        //            foreach (var campaign in campaigns)
+        //            {
+        //                campaign.ImageUrl = ToFullUrl(campaign.ImageUrl);
+        //            }
+
+        //            var result = new AtharPlatform.Dtos.PaginatedResultDto<CampaignDto>
+        //            {
+        //                Items = campaigns,
+        //                Page = page,
+        //                PageSize = pageSize,
+        //                Total = total
+        //            };
+
+        //            return Ok(result);
+        //        }
+        //        catch (ArgumentException ex)
+        //        {
+        //            return BadRequest(new { message = ex.Message });
+        //        }
+        //        catch (KeyNotFoundException ex)
+        //        {
+        //            return NotFound(new { message = ex.Message });
+        //        }
+        //        catch (InvalidOperationException ex)
+        //        {
+        //            return StatusCode(500, new { message = ex.Message });
+        //        }
+        //        catch (Exception)
+        //        {
+        //            return StatusCode(500, new { message = "An unexpected error occurred during fetching campaigns." });
+        //        }
+        //    }
+        #endregion
+
         [HttpGet("[action]")]
-        public async Task<ActionResult<AtharPlatform.Dtos.PaginatedResultDto<CampaignDto>>>
-            GetAll(
-                [FromQuery] int page = 1, 
-                [FromQuery] int pageSize = 12,
-                [FromQuery] CampainStatusEnum? status = null,
-                [FromQuery] CampaignCategoryEnum? category = null,
-                [FromQuery] string? search = null,
-                [FromQuery] bool? isCritical = null,
-                [FromQuery] double? minGoalAmount = null,
-                [FromQuery] double? maxGoalAmount = null,
-                [FromQuery] DateTime? startDateFrom = null,
-                [FromQuery] DateTime? startDateTo = null,
-                [FromQuery] int? charityId = null)
+        public async Task<ActionResult<PaginatedResultDto<CampaignDto>>> GetAll(
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 12,
+    [FromQuery] CampainStatusEnum? status = null,
+    [FromQuery] CampaignCategoryEnum? category = null,
+    [FromQuery] string? search = null,
+    [FromQuery] bool? isCritical = null,
+    [FromQuery] double? minGoalAmount = null,
+    [FromQuery] double? maxGoalAmount = null,
+    [FromQuery] DateTime? startDateFrom = null,
+    [FromQuery] DateTime? startDateTo = null,
+    [FromQuery] int? charityId = null)
         {
             try
             {
-                var campaigns = await _campaignService.GetPaginatedAsync(
-                    page, 
-                    pageSize, 
+                var result = await _campaignService.GetPaginatedOptimizedAsync(
+                    page,
+                    pageSize,
                     status,
                     category,
                     search,
@@ -71,53 +152,22 @@ namespace AtharPlatform.Controllers
                     maxGoalAmount,
                     startDateFrom,
                     startDateTo,
-                    charityId,
-                    inCludeCharity: true);
+                    charityId
+                );
 
-                var total = await _campaignService.GetCountOfCampaignsAsync(
-                    status,
-                    category,
-                    search,
-                    isCritical,
-                    minGoalAmount,
-                    maxGoalAmount,
-                    startDateFrom,
-                    startDateTo,
-                    charityId);
-
-                // Convert relative ImageUrls to full URLs
-                foreach (var campaign in campaigns)
-                {
-                    campaign.ImageUrl = ToFullUrl(campaign.ImageUrl);
-                }
-
-                var result = new AtharPlatform.Dtos.PaginatedResultDto<CampaignDto>
-                {
-                    Items = campaigns,
-                    Page = page,
-                    PageSize = pageSize,
-                    Total = total
-                };
+                // Convert URLs directly (no loop on entity)
+                foreach (var c in result.Items)
+                    c.ImageUrl = ToFullUrl(c.ImageUrl);
 
                 return Ok(result);
             }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (InvalidOperationException ex)
+            catch (Exception ex)
             {
                 return StatusCode(500, new { message = ex.Message });
             }
-            catch (Exception)
-            {
-                return StatusCode(500, new { message = "An unexpected error occurred during fetching campaigns." });
-            }
         }
+
+
 
         [HttpPost("import")]
         //[Authorize(Roles = "Admin,SuperAdmin")]
@@ -298,50 +348,90 @@ namespace AtharPlatform.Controllers
             }
         }
 
+        #region Old_Create
 
+        // [HttpPost("[action]")]
+        //// [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+        // public async Task<IActionResult> CreateCampaign([FromForm] AddCampaignDto model)
+        // {
+        //     if (!ModelState.IsValid)
+        //         return BadRequest(ModelState);
 
-        [HttpPost("[action]")]
-       // [Authorize(Roles = "CharityAdmin,SuperAdmin")]
-        public async Task<IActionResult> CreateCampaign([FromForm] AddCampaignDto model)
+        //     try
+        //     {
+        //         // If CharityAdmin, enforce ownership & charity approval
+        //         if (User.IsInRole("CharityAdmin"))
+        //         {
+        //             var currentId = _accountContextService.GetCurrentAccountId();
+        //             if (model.CharityID != currentId)
+        //                 return Forbid();
+        //             var charity = await _unitOfWork.Charities.GetAsync(currentId);
+        //             if (charity == null || charity.Status != AtharPlatform.Models.Enums.CharityStatusEnum.Approved || !charity.IsActive)
+        //                 return BadRequest(new { message = "Charity not approved or inactive." });
+        //         }
+        //         var isCreated = await _campaignService.CreateAsync(model);
+        //         if (!isCreated)
+        //             return BadRequest(new { message = "Failed to create campaign. Please try again later." });
+
+        //         return Ok(new { message = "Campaign created successfully." });
+        //     }
+        //     catch (ArgumentException ex)
+        //     {
+        //         return BadRequest(new { message = ex.Message });
+        //     }
+        //     catch (KeyNotFoundException ex)
+        //     {
+        //         return NotFound(new { message = ex.Message });
+        //     }
+        //     catch (InvalidOperationException ex)
+        //     {
+        //         return StatusCode(500, new { message = ex.Message });
+        //     }
+        //     catch (Exception)
+        //     {
+        //         return StatusCode(500, new { message = "An unexpected error occurred during campaign search." });
+        //     }
+        // }
+        #endregion
+
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateCampaign([FromForm] CreateCampaignDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            if (dto.ImageFile == null)
+                return BadRequest("Campaign image is required.");
 
-            try
-            {
-                // If CharityAdmin, enforce ownership & charity approval
-                if (User.IsInRole("CharityAdmin"))
-                {
-                    var currentId = _accountContextService.GetCurrentAccountId();
-                    if (model.CharityID != currentId)
-                        return Forbid();
-                    var charity = await _unitOfWork.Charities.GetAsync(currentId);
-                    if (charity == null || charity.Status != AtharPlatform.Models.Enums.CharityStatusEnum.Approved || !charity.IsActive)
-                        return BadRequest(new { message = "Charity not approved or inactive." });
-                }
-                var isCreated = await _campaignService.CreateAsync(model);
-                if (!isCreated)
-                    return BadRequest(new { message = "Failed to create campaign. Please try again later." });
+            // 1) Upload image
+            string fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.ImageFile.FileName)}";
+            string folderPath = Path.Combine(_env.WebRootPath, "uploads/campaigns");
+            if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
 
-                return Ok(new { message = "Campaign created successfully." });
-            }
-            catch (ArgumentException ex)
+            string filePath = Path.Combine(folderPath, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
             {
-                return BadRequest(new { message = ex.Message });
+                await dto.ImageFile.CopyToAsync(stream);
             }
-            catch (KeyNotFoundException ex)
+
+            string imageUrl = $"/uploads/campaigns/{fileName}";
+
+            // 2) Save campaign
+            Campaign campaign = new()
             {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (InvalidOperationException ex)
-            {
-                return StatusCode(500, new { message = ex.Message });
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, new { message = "An unexpected error occurred during campaign search." });
-            }
+                Title = dto.Title,
+                Description = dto.Description,
+                GoalAmount = dto.GoalAmount,
+                RaisedAmount = 0,
+                Duration = dto.Duration,
+                CharityID = dto.CharityId,
+                ImageUrl = imageUrl
+            };
+
+           await _unitOfWork.Campaigns.AddAsync(campaign);
+            await _unitOfWork.SaveAsync();
+
+            return Ok(new { message = "Campaign created successfully", imageUrl });
         }
+
 
         [HttpPut("[action]/{id}")]
         //[Authorize(Roles = "CharityAdmin,SuperAdmin")]
