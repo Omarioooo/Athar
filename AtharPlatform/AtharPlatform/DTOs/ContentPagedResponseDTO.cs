@@ -7,6 +7,5 @@
         public int TotalCount { get; set; }
         public int TotalPages { get; set; }
         public List<ContentListDTO> Data { get; set; }
-        public string ShareLink { get; set; }
     }
 }
