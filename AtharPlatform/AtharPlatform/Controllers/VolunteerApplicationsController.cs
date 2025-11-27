@@ -23,7 +23,7 @@ namespace AtharPlatform.Controllers
         /// Get application by ID
         /// </summary>
         [HttpGet("{id}")]
-        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+        //[Authorize(Roles = "CharityAdmin,SuperAdmin")]
         public async Task<IActionResult> GetById(int id)
         {
             if (id <= 0)
@@ -48,7 +48,7 @@ namespace AtharPlatform.Controllers
         /// Apply for a volunteer opportunity
         /// </summary>
         [HttpPost("apply")]
-        [Authorize(Roles = "Donor")] 
+        //[Authorize(Roles = "Donor")] 
         public async Task<IActionResult> Apply([FromBody] VolunteerApplicationDTO dto)
         {
             if (!ModelState.IsValid)
@@ -103,7 +103,7 @@ namespace AtharPlatform.Controllers
         /// Delete an application
         /// </summary>
         [HttpDelete("{id}")]
-        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+        //[Authorize(Roles = "CharityAdmin,SuperAdmin")]
         public async Task<IActionResult> Delete(int id)
         {
             if (id <= 0)
@@ -128,7 +128,7 @@ namespace AtharPlatform.Controllers
         }
 
         [HttpGet("{id:int}/volunteer-opportunities")]
-        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+        //[Authorize(Roles = "CharityAdmin,SuperAdmin")]
         public async Task<IActionResult> GetVolunteerOpportunitiesByCharity(int id)
         {
             var opportunities = await _unitOfWork.CharityVolunteers.GetByCharityIdAsync(id);
