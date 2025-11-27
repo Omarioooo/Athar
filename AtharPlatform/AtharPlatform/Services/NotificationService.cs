@@ -92,44 +92,89 @@ namespace AtharPlatform.Services
         {
             var time = DateTime.UtcNow;
 
+            //var message = type switch
+            //{
+            //    NotificationsTypeEnum.NewCharity => new NotificationMessageDto
+            //    {
+            //        Message = $"A new charity ({senderName}) has signed up at {time}. Please review it.",
+            //        CreatedAt = time
+            //    },
+            //    NotificationsTypeEnum.AdminApproved => new NotificationMessageDto
+            //    {
+            //        Message = $"Your charity has been approved by admin {senderName} at {time}.",
+            //        CreatedAt = time
+            //    },
+            //    NotificationsTypeEnum.AdminRejected => new NotificationMessageDto
+            //    {
+            //        Message = $"Your charity has been rejected by admin {senderName} at {time}.",
+            //        CreatedAt = time
+            //    },
+            //    NotificationsTypeEnum.NewCampagin => new NotificationMessageDto
+            //    {
+            //        Message = $"A new campaign has been launched by {senderName} at {time}. Check it out!",
+            //        CreatedAt = time
+            //    },
+            //    NotificationsTypeEnum.NewSubscriber => new NotificationMessageDto
+            //    {
+            //        Message = $"A new subscriber ({senderName}) joined at {time}.",
+            //        CreatedAt = time
+            //    },
+            //    NotificationsTypeEnum.NewFollower => new NotificationMessageDto
+            //    {
+            //        Message = $"A new follower ({senderName}) followed you at {time}.",
+            //        CreatedAt = time
+            //    },
+            //    _ => new NotificationMessageDto
+            //    {
+            //        Message = $"You have a new notification from {senderName} at {time}.",
+            //        CreatedAt = time
+            //    }
+            //};
             var message = type switch
             {
                 NotificationsTypeEnum.NewCharity => new NotificationMessageDto
                 {
-                    Message = $"A new charity ({senderName}) has signed up at {time}. Please review it.",
+                    Message = $"تم تسجيل جمعية جديدة ({senderName}) بتاريخ {time}. برجاء مراجعتها.",
                     CreatedAt = time
                 },
+
                 NotificationsTypeEnum.AdminApproved => new NotificationMessageDto
                 {
-                    Message = $"Your charity has been approved by admin {senderName} at {time}.",
+                    Message = $"تمت الموافقة على جمعيتك من قبل المسؤول ({senderName}) بتاريخ {time}.",
                     CreatedAt = time
                 },
+
                 NotificationsTypeEnum.AdminRejected => new NotificationMessageDto
                 {
-                    Message = $"Your charity has been rejected by admin {senderName} at {time}.",
+                    Message = $"تم رفض جمعيتك من قبل المسؤول ({senderName}) بتاريخ {time}.",
                     CreatedAt = time
                 },
+
                 NotificationsTypeEnum.NewCampagin => new NotificationMessageDto
                 {
-                    Message = $"A new campaign has been launched by {senderName} at {time}. Check it out!",
+                    Message = $"قام ({senderName}) بإطلاق حملة جديدة بتاريخ {time}. يمكنك الاطّلاع عليها الآن!",
                     CreatedAt = time
                 },
+
                 NotificationsTypeEnum.NewSubscriber => new NotificationMessageDto
                 {
-                    Message = $"A new subscriber ({senderName}) joined at {time}.",
+                    Message = $"مشترك جديد ({senderName}) انضم بتاريخ {time}.",
                     CreatedAt = time
                 },
+
                 NotificationsTypeEnum.NewFollower => new NotificationMessageDto
                 {
-                    Message = $"A new follower ({senderName}) followed you at {time}.",
+                    Message = $"متابع جديد ({senderName}) قام بمتابعتك بتاريخ {time}.",
                     CreatedAt = time
                 },
+
                 _ => new NotificationMessageDto
                 {
-                    Message = $"You have a new notification from {senderName} at {time}.",
+                    Message = $"لديك إشعار جديد من ({senderName}) بتاريخ {time}.",
                     CreatedAt = time
                 }
             };
+
 
             return Task.FromResult(message);
         }

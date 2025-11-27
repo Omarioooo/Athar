@@ -1,6 +1,7 @@
 ﻿using AtharPlatform.Dtos;
 using AtharPlatform.DTOs;
 using AtharPlatform.Repositories;
+using Microsoft.AspNetCore.SignalR;
 
 
 namespace AtharPlatform.Services
@@ -146,6 +147,69 @@ namespace AtharPlatform.Services
 
             await _unitOfWork.Contents.AddAsync(content);
             await _unitOfWork.SaveAsync();
+
+
+
+
+
+
+            var campaign = await _unitOfWork.Campaigns.GetAsync(dto.CampaignId);
+            if (campaign == null)
+                return content;
+
+            int charityId = campaign.CharityID;
+
+            // هجيب كل المتابعين (donorIds)
+            var followerIds = await _unitOfWork.Follows.GetAll()
+                .Where(f => f.CharityId == charityId)
+                .Select(f => f.DonorId)
+                .ToListAsync();
+
+            if (followerIds.Any())
+            {
+           
+                var charity = await _unitOfWork.Charities.GetAsync(charityId);
+                int senderUserId = charity.Id; // عدل الاسم لو عندك عمود مختلف
+
+              
+                var notification = new Notification
+                {
+                    Message = $"{charity.Name} رفعت بوست جديد.",
+                    CreatedAt = DateTime.UtcNow,
+                    IsDeleted = false,
+                };
+                await _unitOfWork.Notifications.AddAsync(notification);
+                await _unitOfWork.SaveAsync();
+
+             
+                var sender = new NotificationSender
+                {
+                    NotificationId = notification.Id,
+                    SenderId = senderUserId
+                };
+                await _unitOfWork.Notifications.AddSenderAsync(sender);
+
+               
+                var receivers = followerIds.Select(id => new NotificationReceiver
+                {
+                    NotificationId = notification.Id,
+                    ReceiverId = id,
+                    IsRead = false
+                }).ToList();
+
+                await _unitOfWork.Notifications.AddReceiversAsync(receivers);
+
+                await _unitOfWork.SaveAsync();
+
+            }
+
+
+
+
+
+
+
+
 
             return content;
         }
