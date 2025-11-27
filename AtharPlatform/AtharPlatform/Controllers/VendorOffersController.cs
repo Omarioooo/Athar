@@ -19,7 +19,7 @@ namespace AtharPlatform.Controllers
         }
 
         [HttpGet("by-campaign/{charityVendorOfferId}")]
-        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+        //[Authorize(Roles = "CharityAdmin,SuperAdmin")]
         public async Task<IActionResult> GetByCampaign(int charityVendorOfferId)
         {
             if (charityVendorOfferId <= 0)
@@ -35,7 +35,7 @@ namespace AtharPlatform.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+       // [Authorize(Roles = "CharityAdmin,SuperAdmin")]
         public async Task<IActionResult> GetById(int id)
         {
             if (id <= 0)
@@ -50,7 +50,7 @@ namespace AtharPlatform.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Donor")]
+        //[Authorize(Roles = "Donor")]
         public async Task<IActionResult> Create([FromBody] VendorOfferDTO offerDto)
         {
             if (!ModelState.IsValid)
@@ -84,7 +84,7 @@ namespace AtharPlatform.Controllers
         }
 
         [HttpPut("{id}/status")]
-        [Authorize(Roles = "CharityAdmin")]
+        //[Authorize(Roles = "CharityAdmin")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] OfferStatus status)
         {
             if (id <= 0)
@@ -102,7 +102,7 @@ namespace AtharPlatform.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "CharityAdmin")]
+        //[Authorize(Roles = "CharityAdmin")]
         public async Task<IActionResult> Delete(int id)
         {
             if (id <= 0)

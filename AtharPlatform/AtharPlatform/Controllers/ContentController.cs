@@ -56,7 +56,7 @@ namespace AtharPlatform.Controllers
 
         [HttpPost("create")]
         [Consumes("multipart/form-data")]// بيقول علشان Swagger يعرف انه بيتم رفع صورة
-       // [Authorize(Roles = "CharityAdmin")]
+       //// [Authorize(Roles = "CharityAdmin")]
         public async Task<IActionResult> CreateContent([FromForm] CreateContentDTO dto)
         {
             if (!ModelState.IsValid)

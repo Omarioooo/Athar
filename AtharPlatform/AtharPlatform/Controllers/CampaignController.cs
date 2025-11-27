@@ -120,7 +120,7 @@ namespace AtharPlatform.Controllers
         }
 
         [HttpPost("import")]
-        [Authorize(Roles = "Admin,SuperAdmin")]
+        //[Authorize(Roles = "Admin,SuperAdmin")]
         public async Task<IActionResult> Import([FromBody] IEnumerable<CampaignImportItemDto> items)
         {
             if (items == null) return BadRequest(new { message = "No data provided" });
@@ -301,7 +301,7 @@ namespace AtharPlatform.Controllers
 
 
         [HttpPost("[action]")]
-        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+       // [Authorize(Roles = "CharityAdmin,SuperAdmin")]
         public async Task<IActionResult> CreateCampaign([FromForm] AddCampaignDto model)
         {
             if (!ModelState.IsValid)
@@ -344,7 +344,7 @@ namespace AtharPlatform.Controllers
         }
 
         [HttpPut("[action]/{id}")]
-        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+        //[Authorize(Roles = "CharityAdmin,SuperAdmin")]
         public async Task<IActionResult> UpdateCampaign(UpdatCampaignDto model, [FromRoute] int id)
         {
             if (!ModelState.IsValid)
@@ -385,7 +385,7 @@ namespace AtharPlatform.Controllers
         }
 
         [HttpDelete("[action]/{id}")]
-        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+       //[Authorize(Roles = "CharityAdmin,SuperAdmin")]
         public async Task<IActionResult> DeleteCampaign([FromRoute] int id)
         {
             try
