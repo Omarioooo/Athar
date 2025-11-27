@@ -53,7 +53,7 @@ namespace AtharPlatform.Controllers
 
         // فتح باب التطوع
         [HttpPost("open-volunteers/{charityId}")]
-        [Authorize(Roles = "CharityAdmin")]
+        //[Authorize(Roles = "CharityAdmin")]
         public async Task<IActionResult> OpenVolunteers(int charityId)
         {
             try
@@ -99,7 +99,7 @@ namespace AtharPlatform.Controllers
 
         // غلق باب التطوع
         [HttpPost("close-volunteers/{charityId}")]
-        [Authorize(Roles = "CharityAdmin")]
+       //[Authorize(Roles = "CharityAdmin")]
         public async Task<IActionResult> CloseVolunteers(int charityId)
         {
             try
@@ -132,7 +132,7 @@ namespace AtharPlatform.Controllers
 
         // فتح باب العروض للـ Vendor
         [HttpPost("open-vendor-offers/{charityId}")]
-        [Authorize(Roles = "CharityAdmin")]
+       // [Authorize(Roles = "CharityAdmin")]
         public async Task<IActionResult> OpenVendorOffers(int charityId)
         {
             try
@@ -179,7 +179,7 @@ namespace AtharPlatform.Controllers
 
         // غلق باب العروض للـ Vendor
         [HttpPost("close-vendor-offers/{charityId}")]
-        [Authorize(Roles = "CharityAdmin")]
+       // [Authorize(Roles = "CharityAdmin")]
         public async Task<IActionResult> CloseVendorOffers(int charityId)
         {
             try
@@ -499,7 +499,7 @@ namespace AtharPlatform.Controllers
 
         // (PUT) /api/charities/{id} - update charity (name/description/image and optional external links)
         [HttpPut("{id:int}")]
-        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+       // [Authorize(Roles = "CharityAdmin,SuperAdmin")]
         public async Task<IActionResult> Update(int id, [FromBody] CharityUpdateDto body)
         {
             var userId = _accountContextService.GetCurrentAccountId();
@@ -542,7 +542,7 @@ namespace AtharPlatform.Controllers
 
         // Approve / Reject (SuperAdmin only)
         [HttpPost("{id:int}/approve")]
-        [Authorize(Roles = "SuperAdmin")]
+        //[Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Approve(int id)
         {
             var charity = await _db.Charities.FirstOrDefaultAsync(c => c.Id == id);
@@ -567,7 +567,7 @@ namespace AtharPlatform.Controllers
 
         // (GET) /api/charities/stats?charityId=123 - global if omitted, per charity if provided
         [HttpGet("stats")]
-        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+        //[Authorize(Roles = "CharityAdmin,SuperAdmin")]
         public async Task<ActionResult<CharityStatsDto>> GetStats([FromQuery] int? charityId = null)
         {
             var userId = _accountContextService.GetCurrentAccountId();
@@ -856,7 +856,7 @@ namespace AtharPlatform.Controllers
 
         // (GET) /api/charities/{id}/material-donations
         [HttpGet("{id:int}/material-donations")]
-        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+       // [Authorize(Roles = "CharityAdmin,SuperAdmin")]
         public async Task<ActionResult<IEnumerable<MaterialDonationDto>>> GetMaterialDonationsByCharity(int id)
         {
             // CharityAdmin can only view own material donations
