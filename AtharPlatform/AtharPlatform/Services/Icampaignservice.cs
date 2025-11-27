@@ -8,27 +8,19 @@ namespace AtharPlatform.Services
     {
 
 
-    Task<PaginatedResultDto<CampaignDto>> GetPaginatedOptimizedAsync(
-    int page,
-    int pageSize,
-    CampainStatusEnum? status,
-    CampaignCategoryEnum? category,
-    string? search,
-    bool? isCritical,
-    double? minGoalAmount,
-    double? maxGoalAmount,
-    DateTime? startDateFrom,
-    DateTime? startDateTo,
-    int? charityId
-);
-
-
-
-
-
-
-
-
+        Task<PaginatedResultDto<CampaignDto>> GetPaginatedOptimizedAsync(
+        int page,
+        int pageSize,
+        CampainStatusEnum? status,
+        CampaignCategoryEnum? category,
+        string? search,
+        bool? isCritical,
+        double? minGoalAmount,
+        double? maxGoalAmount,
+        DateTime? startDateFrom,
+        DateTime? startDateTo,
+        int? charityId
+    );
 
 
 

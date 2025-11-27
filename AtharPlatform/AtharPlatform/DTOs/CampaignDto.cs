@@ -1,15 +1,20 @@
-﻿using AtharPlatform.Models.Enum;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using AtharPlatform.Models.Enum;
 
 namespace AtharPlatform.Dtos
 {
     public class CampaignDto
     {
+
         public int Id { get; set; }
+
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
 
+        public string City { get; set; }
         public string? ImageUrl { get; set; }
+
+        public DateTime CreatedAt { get; set; }
 
         public double GoalAmount { get; set; }
         public double RaisedAmount { get; set; }

@@ -3,6 +3,7 @@ using AtharPlatform.Dtos;
 using AtharPlatform.DTOs;
 using AtharPlatform.Models.Enum;
 using AtharPlatform.Repositories;
+using System.Linq;
 
 namespace AtharPlatform.Services
 {
@@ -88,6 +89,8 @@ namespace AtharPlatform.Services
                 CharityName = c.Charity?.Name ?? ""
             }).ToList(); ;
         }
+
+
 
         public async Task<CampaignDto> GetAsync(int id, bool inProgress = true, bool inCludeCharity = true)
         {

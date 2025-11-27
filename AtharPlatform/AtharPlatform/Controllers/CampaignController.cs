@@ -1,12 +1,10 @@
-﻿using AtharPlatform.Dtos;
+﻿using System.Text.Json;
+using AtharPlatform.Dtos;
 using AtharPlatform.DTOs;
 using AtharPlatform.Models.Enum;
 using AtharPlatform.Repositories;
 using AtharPlatform.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
 
 
 namespace AtharPlatform.Controllers
@@ -35,11 +33,11 @@ namespace AtharPlatform.Controllers
         {
             if (string.IsNullOrEmpty(imageUrl))
                 return null;
-            
+
             // If already a full URL (external), return as-is
             if (imageUrl.StartsWith("http://") || imageUrl.StartsWith("https://"))
                 return imageUrl;
-            
+
             // Convert relative path to full URL
             var request = HttpContext.Request;
             // Force HTTPS scheme
@@ -167,7 +165,7 @@ namespace AtharPlatform.Controllers
             }
         }
 
-
+      
 
         [HttpPost("import")]
         //[Authorize(Roles = "Admin,SuperAdmin")]
@@ -208,7 +206,7 @@ namespace AtharPlatform.Controllers
                 // Validate scraped campaigns have ImageUrl (Image should be null for scraped data)
                 if (string.IsNullOrWhiteSpace(i.ImageUrl))
                     continue; // Skip campaigns without image URL
-                
+
                 var campaign = new Campaign
                 {
                     Title = i.Title!.Trim(),
@@ -426,7 +424,7 @@ namespace AtharPlatform.Controllers
                 ImageUrl = imageUrl
             };
 
-           await _unitOfWork.Campaigns.AddAsync(campaign);
+            await _unitOfWork.Campaigns.AddAsync(campaign);
             await _unitOfWork.SaveAsync();
 
             return Ok(new { message = "Campaign created successfully", imageUrl });
@@ -475,7 +473,7 @@ namespace AtharPlatform.Controllers
         }
 
         [HttpDelete("[action]/{id}")]
-       //[Authorize(Roles = "CharityAdmin,SuperAdmin")]
+        //[Authorize(Roles = "CharityAdmin,SuperAdmin")]
         public async Task<IActionResult> DeleteCampaign([FromRoute] int id)
         {
             try
@@ -511,5 +509,8 @@ namespace AtharPlatform.Controllers
                 return StatusCode(500, new { message = "An unexpected error occurred during campaign search." });
             }
         }
+
+
+
     }
 }
