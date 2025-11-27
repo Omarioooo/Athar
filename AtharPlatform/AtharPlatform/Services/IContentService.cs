@@ -19,7 +19,10 @@ namespace AtharPlatform.Services
         Task<bool> DeleteContentAsync(int id);
 
         Task<PagingResponse<ContentListDTO>> GetPagedByCharityIdAsync(int charityId, int pageNumber, int pageSize);
-        Task<PagingResponse<ContentListDTO>> SearchContentsAsync(string keyword, int page = 1, int pageSize = 12);
+        //  Task<PagingResponse<ContentListDTO>> SearchContentsAsync(string keyword);
+        //Task<ContentListDTO> SearchContentsAsync(string keyword);
+         Task<List<ContentListDTO>> SearchContentsAsync(string keyword);
+
         Task<PaginatedResultDto<ContentList_Detailes_DTO>> GetPagedAllAsync(int page, int pageSize);
 
         Task<PaginatedResultDto<ContentList_Detailes_DTO>> GetFollowedCharitiesContentAsync(int donorId, int page, int pageSize);

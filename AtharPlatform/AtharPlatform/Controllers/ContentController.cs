@@ -36,8 +36,6 @@ namespace AtharPlatform.Controllers
         }
 
 
-
-
         [HttpGet("followed/{donorId}/paged")]
         [Authorize(Roles = "CharityAdmin,Donor")]
         public async Task<IActionResult> GetFollowedContent(int donorId, int page = 1, int pageSize = 12)
@@ -131,7 +129,7 @@ namespace AtharPlatform.Controllers
 
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "CharityAdmin")]
+       [Authorize(Roles = "CharityAdmin")]
         public async Task<IActionResult> DeleteContent(int id)
         {
             var result = await _contentService.DeleteContentAsync(id);
@@ -165,27 +163,15 @@ namespace AtharPlatform.Controllers
         //علشان تدور باسم الجمعية او اسم الحملة عنوانها يعني
         [HttpGet("search")]
         [Authorize(Roles = "CharityAdmin,Donor,SuperAdmin")]
-        public async Task<IActionResult> SearchContents([FromQuery] string Word, int page = 1, int pageSize = 12)
+        public async Task<IActionResult> SearchContents([FromQuery] string Word)
         {
             if (string.IsNullOrWhiteSpace(Word))
                 return BadRequest("Keyword cannot be empty.");
 
-            var results = await _contentService.SearchContentsAsync(Word, page, pageSize);
+            var results = await _contentService.SearchContentsAsync(Word);
             return Ok(results);
         }
 
-
-
-        [HttpGet("/content/{id:int}")]
-        public async Task<IActionResult> OpenPublicContent(int id)
-        {
-            var content = await _contentService.GetByIdAsync(id);
-
-            if (content == null)
-                return NotFound("Content not found");
-
-            return Ok(content);
-        }
 
     }
 

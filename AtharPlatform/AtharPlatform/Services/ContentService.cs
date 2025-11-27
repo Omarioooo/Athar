@@ -44,9 +44,7 @@ namespace AtharPlatform.Services
                     CampaignId = c.CampaignId,
                     CampaignTitle = c.Campaign.Title,
                     CharityId = c.Campaign.CharityID,
-                    CharityName = c.Campaign.Charity.Name,
-                    ShareLink = $"{baseUrl}/content/{c.Id}"
-
+                    CharityName = c.Campaign.Charity.Name
                 })
                 .ToListAsync();
 
@@ -105,9 +103,7 @@ namespace AtharPlatform.Services
                     CampaignId = c.CampaignId,
                     CampaignTitle = c.Campaign.Title,
                     CharityId = c.Campaign.CharityID,
-                    CharityName = c.Campaign.Charity.Name,
-                    ShareLink = $"{baseUrl}/content/{c.Id}"
-
+                    CharityName = c.Campaign.Charity.Name
                 })
                 .ToListAsync();
 
@@ -180,9 +176,7 @@ namespace AtharPlatform.Services
                 Title = c.Title,
                 Description = c.Description,
                 CreatedAt = c.CreatedAt,
-                ImageUrl = $"{baseUrl}/api/content/image/{c.Id}",
-                ShareLink = $"{baseUrl}/content/{c.Id}"
-
+                ImageUrl = $"{baseUrl}/api/content/image/{c.Id}"
             }).ToList();
         }
 
@@ -205,9 +199,7 @@ namespace AtharPlatform.Services
                 Title = c.Title,
                 Description = c.Description,
                 CreatedAt = c.CreatedAt,
-                ImageUrl = $"{baseUrl}/api/content/image/{c.Id}",
-                ShareLink = $"{baseUrl}/content/{c.Id}"
-
+                ImageUrl = $"{baseUrl}/api/content/image/{c.Id}"
             }).ToList();
 
             return new PagingResponse<ContentListDTO>
@@ -280,9 +272,7 @@ namespace AtharPlatform.Services
                 Title = c.Title,
                 Description = c.Description,
                 CreatedAt = c.CreatedAt,
-                ImageUrl = $"{baseUrl}/api/content/image/{c.Id}",
-                ShareLink = $"{baseUrl}/content/{c.Id}"
-
+                ImageUrl = $"{baseUrl}/api/content/image/{c.Id}"
             }).ToList();
 
             return new PagingResponse<ContentListDTO>
@@ -295,19 +285,16 @@ namespace AtharPlatform.Services
         }
 
 
-        public async Task<PagingResponse<ContentListDTO>> SearchContentsAsync(string keyword, int pageNumber, int pageSize)
+
+        public async Task<List<ContentListDTO>> SearchContentsAsync(string keyword)
         {
             var query = _unitOfWork.Contents.GetAll()
                 .Where(c => !c.IsDeleted &&
                              (c.Campaign.Title.Contains(keyword) ||
-                             c.Campaign.Charity.Name.Contains(keyword)))
+                              c.Campaign.Charity.Name.Contains(keyword)))
                 .OrderByDescending(c => c.CreatedAt);
 
-            var totalRecords = query.Count();
-            var contents = query
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
+            var contents = query.ToList();
 
             var baseUrl = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}";
 
@@ -318,18 +305,10 @@ namespace AtharPlatform.Services
                 Description = c.Description,
                 CreatedAt = c.CreatedAt,
                 ImageUrl = $"{baseUrl}/api/content/image/{c.Id}",
-                ShareLink = $"{baseUrl}/content/{c.Id}"
-
 
             }).ToList();
 
-            return new PagingResponse<ContentListDTO>
-            {
-                PageNumber = pageNumber,
-                PageSize = pageSize,
-                TotalItems = totalRecords,
-                Items = dtoList
-            };
+            return dtoList;
         }
 
 
