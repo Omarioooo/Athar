@@ -137,7 +137,6 @@ namespace AtharPlatform.Services
                 CampaignId = dto.CampaignId,
                 CreatedAt = DateTime.UtcNow
             };
-            // لو رفع صورة → نحولها لـ byte[]
             if (dto.PostImage != null)
             {
                 using var ms = new MemoryStream();
@@ -151,15 +150,13 @@ namespace AtharPlatform.Services
 
 
 
-
-
             var campaign = await _unitOfWork.Campaigns.GetAsync(dto.CampaignId);
             if (campaign == null)
                 return content;
 
             int charityId = campaign.CharityID;
 
-            // هجيب كل المتابعين (donorIds)
+           
             var followerIds = await _unitOfWork.Follows.GetAll()
                 .Where(f => f.CharityId == charityId)
                 .Select(f => f.DonorId)
@@ -169,7 +166,7 @@ namespace AtharPlatform.Services
             {
            
                 var charity = await _unitOfWork.Charities.GetAsync(charityId);
-                int senderUserId = charity.Id; // عدل الاسم لو عندك عمود مختلف
+                int senderUserId = charity.Id; 
 
               
                 var notification = new Notification
@@ -202,11 +199,6 @@ namespace AtharPlatform.Services
                 await _unitOfWork.SaveAsync();
 
             }
-
-
-
-
-
 
 
 
@@ -300,7 +292,7 @@ namespace AtharPlatform.Services
 
 
 
-        // ContentService
+
         public async Task<bool> DeleteContentAsync(int id)
         {
             var content = await _unitOfWork.Contents.GetByIdAsync(id);

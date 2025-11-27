@@ -37,7 +37,7 @@ namespace AtharPlatform.Controllers
 
 
         [HttpGet("followed/{donorId}/paged")]
-        [Authorize(Roles = "CharityAdmin,Donor,SuperAdmin")]
+        //[Authorize(Roles = "CharityAdmin,Donor,SuperAdmin")]
         public async Task<IActionResult> GetFollowedContent(int donorId, int page = 1, int pageSize = 12)
         {
             if (donorId <= 0)
@@ -56,7 +56,7 @@ namespace AtharPlatform.Controllers
 
         [HttpPost("create")]
         [Consumes("multipart/form-data")]// بيقول علشان Swagger يعرف انه بيتم رفع صورة
-        [Authorize(Roles = "CharityAdmin")]
+       // [Authorize(Roles = "CharityAdmin")]
         public async Task<IActionResult> CreateContent([FromForm] CreateContentDTO dto)
         {
             if (!ModelState.IsValid)
@@ -97,7 +97,7 @@ namespace AtharPlatform.Controllers
 
 
         [HttpGet("campaign/{campaignId}/paged")]
-        [Authorize(Roles = "CharityAdmin,Donor,SuperAdmin")]
+        //[Authorize(Roles = "CharityAdmin,Donor,SuperAdmin")]
         public async Task<IActionResult> GetPagedByCampaign(int campaignId, int page = 1, int pageSize = 12)
         {
             if (campaignId <= 0)
@@ -113,7 +113,7 @@ namespace AtharPlatform.Controllers
 
         [HttpPut("{id}")]
         [Consumes("multipart/form-data")]
-        [Authorize(Roles = "CharityAdmin")]
+        //[Authorize(Roles = "CharityAdmin")]
         public async Task<IActionResult> UpdateContent(int id, [FromForm] UpdateContentDTO dto)
         {
             try
@@ -130,7 +130,7 @@ namespace AtharPlatform.Controllers
 
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+        //[Authorize(Roles = "CharityAdmin,SuperAdmin")]
         
         public async Task<IActionResult> DeleteContent(int id)
         {
@@ -164,7 +164,7 @@ namespace AtharPlatform.Controllers
 
         //علشان تدور باسم الجمعية او اسم الحملة عنوانها يعني
         [HttpGet("search")]
-        [Authorize(Roles = "CharityAdmin,Donor,SuperAdmin")]
+        ///[Authorize(Roles = "CharityAdmin,Donor,SuperAdmin")]
         public async Task<IActionResult> SearchContents([FromQuery] string Word)
         {
             if (string.IsNullOrWhiteSpace(Word))
