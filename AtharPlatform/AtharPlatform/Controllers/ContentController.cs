@@ -37,7 +37,7 @@ namespace AtharPlatform.Controllers
 
 
         [HttpGet("followed/{donorId}/paged")]
-        [Authorize(Roles = "CharityAdmin,Donor")]
+        [Authorize(Roles = "CharityAdmin,Donor,SuperAdmin")]
         public async Task<IActionResult> GetFollowedContent(int donorId, int page = 1, int pageSize = 12)
         {
             if (donorId <= 0)
@@ -97,6 +97,7 @@ namespace AtharPlatform.Controllers
 
 
         [HttpGet("campaign/{campaignId}/paged")]
+        [Authorize(Roles = "CharityAdmin,Donor,SuperAdmin")]
         public async Task<IActionResult> GetPagedByCampaign(int campaignId, int page = 1, int pageSize = 12)
         {
             if (campaignId <= 0)
@@ -129,7 +130,8 @@ namespace AtharPlatform.Controllers
 
 
         [HttpDelete("{id}")]
-       [Authorize(Roles = "CharityAdmin")]
+        [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+        
         public async Task<IActionResult> DeleteContent(int id)
         {
             var result = await _contentService.DeleteContentAsync(id);
