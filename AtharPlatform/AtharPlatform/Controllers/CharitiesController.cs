@@ -558,8 +558,7 @@ namespace AtharPlatform.Controllers
             var admins = await _userManager.GetUsersInRoleAsync("SuperAdmin");
             var adminId = admins.FirstOrDefault()?.Id;
 
-            if (adminId == null)
-                return BadRequest("No SuperAdmin found.");
+            
 
             // Receivers = charity owner
             var receivers = new List<int> { charity.Id };
@@ -587,8 +586,7 @@ namespace AtharPlatform.Controllers
             var admins = await _userManager.GetUsersInRoleAsync("SuperAdmin");
             var admin = admins.FirstOrDefault();
 
-            if (admin == null)
-                return BadRequest("No SuperAdmin found.");
+            
 
             var adminId = admin.Id;
 
