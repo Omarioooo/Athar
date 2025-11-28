@@ -88,48 +88,59 @@ namespace AtharPlatform.Services
             await _hub.SendMessage(receiverIds, messageDto);
         }
 
+
+        //public async Task SendNotificationAsync(int charityId, NotificationMessageDto message)
+        //{
+            
+        //    var admins = await _userManager.GetUsersInRoleAsync("Admin");
+        //    var senderId = admins.FirstOrDefault()?.Id ?? 0; 
+
+           
+        //    var receiverIds = new List<int> { charityId };
+
+      
+        //    var notification = new Notification
+        //    {
+        //        Message = message.Message,
+        //        CreatedAt = message.CreatedAt,
+        //        IsDeleted = false
+        //    };
+        //    await _unitOfWork.Notifications.AddAsync(notification);
+        //    await _unitOfWork.SaveAsync();
+
+        //    // 4️⃣ إضافة Sender
+        //    var notificationSender = new NotificationSender
+        //    {
+        //        NotificationId = notification.Id,
+        //        SenderId = senderId
+        //    };
+        //    await _unitOfWork.Notifications.AddSenderAsync(notificationSender);
+
+        //    // 5️⃣ إضافة Receivers
+        //    var notificationReceivers = receiverIds.Select(rid => new NotificationReceiver
+        //    {
+        //        NotificationId = notification.Id,
+        //        ReceiverId = rid,
+        //        IsRead = false
+        //    }).ToList();
+        //    await _unitOfWork.Notifications.AddReceiversAsync(notificationReceivers);
+        //    await _unitOfWork.SaveAsync();
+
+        //    // 6️⃣ إرسال الإشعار عبر الـ Hub
+        //    if (_hub != null)
+        //    {
+        //        await _hub.SendMessage(receiverIds, message);
+        //    }
+        //}
+
+
+
+
+
         private Task<NotificationMessageDto> CreateMessage(NotificationsTypeEnum type, string senderName)
         {
             var time = DateTime.UtcNow;
 
-            //var message = type switch
-            //{
-            //    NotificationsTypeEnum.NewCharity => new NotificationMessageDto
-            //    {
-            //        Message = $"A new charity ({senderName}) has signed up at {time}. Please review it.",
-            //        CreatedAt = time
-            //    },
-            //    NotificationsTypeEnum.AdminApproved => new NotificationMessageDto
-            //    {
-            //        Message = $"Your charity has been approved by admin {senderName} at {time}.",
-            //        CreatedAt = time
-            //    },
-            //    NotificationsTypeEnum.AdminRejected => new NotificationMessageDto
-            //    {
-            //        Message = $"Your charity has been rejected by admin {senderName} at {time}.",
-            //        CreatedAt = time
-            //    },
-            //    NotificationsTypeEnum.NewCampagin => new NotificationMessageDto
-            //    {
-            //        Message = $"A new campaign has been launched by {senderName} at {time}. Check it out!",
-            //        CreatedAt = time
-            //    },
-            //    NotificationsTypeEnum.NewSubscriber => new NotificationMessageDto
-            //    {
-            //        Message = $"A new subscriber ({senderName}) joined at {time}.",
-            //        CreatedAt = time
-            //    },
-            //    NotificationsTypeEnum.NewFollower => new NotificationMessageDto
-            //    {
-            //        Message = $"A new follower ({senderName}) followed you at {time}.",
-            //        CreatedAt = time
-            //    },
-            //    _ => new NotificationMessageDto
-            //    {
-            //        Message = $"You have a new notification from {senderName} at {time}.",
-            //        CreatedAt = time
-            //    }
-            //};
             var message = type switch
             {
                 NotificationsTypeEnum.NewCharity => new NotificationMessageDto
@@ -178,5 +189,8 @@ namespace AtharPlatform.Services
 
             return Task.FromResult(message);
         }
+
+        
+     
     }
 }

@@ -1,15 +1,14 @@
-using AtharPlatform.Dtos;
-
-using AtharPlatform.DTOs;
+using System.Security.Claims;
+using System.Text;
 using AtharPlatform.DTO;
-
+using AtharPlatform.Dtos;
+using AtharPlatform.DTOs;
+using AtharPlatform.Models.Enum;
 using AtharPlatform.Repositories;
 using AtharPlatform.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
-using System.Text;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AtharPlatform.Controllers
 {
@@ -21,14 +20,16 @@ namespace AtharPlatform.Controllers
         private readonly IAccountContextService _accountContextService;
         private readonly Context _db;
         private readonly UserManager<UserAccount> _userManager;
+        private readonly INotificationService _notificationService;
 
         public CharitiesController(IUnitOfWork unitOfWork, IAccountContextService accountContextService
-            , Context db, UserManager<UserAccount> userManager)
+            , Context db, UserManager<UserAccount> userManager, INotificationService notificationService)
         {
             _unitOfWork = unitOfWork;
             _accountContextService = accountContextService;
             _db = db;
             _userManager = userManager;
+            _notificationService = notificationService;
         }
 
         // Helper method to convert relative URLs to full URLs
@@ -551,17 +552,55 @@ namespace AtharPlatform.Controllers
             charity.IsActive = true;
             charity.DeactivatedAt = null;
             await _unitOfWork.SaveAsync();
+
+
+            // Get admin as sender
+            var admins = await _userManager.GetUsersInRoleAsync("SuperAdmin");
+            var adminId = admins.FirstOrDefault()?.Id;
+
+            if (adminId == null)
+                return BadRequest("No SuperAdmin found.");
+
+            // Receivers = charity owner
+            var receivers = new List<int> { charity.Id };
+
+            await _notificationService.SendNotificationAsync(
+                adminId.Value,
+                receivers,
+                NotificationsTypeEnum.AdminApproved
+            );
+
             return Ok(new { id, status = charity.Status.ToString() });
         }
 
         [HttpPost("{id:int}/reject")]
-        [Authorize(Roles = "SuperAdmin")]
+       // [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Reject(int id)
         {
             var charity = await _db.Charities.FirstOrDefaultAsync(c => c.Id == id);
             if (charity == null) return NotFound("Charity not found.");
             charity.Status = Models.Enums.CharityStatusEnum.Rejected;
             await _unitOfWork.SaveAsync();
+
+
+            
+            var admins = await _userManager.GetUsersInRoleAsync("SuperAdmin");
+            var admin = admins.FirstOrDefault();
+
+            if (admin == null)
+                return BadRequest("No SuperAdmin found.");
+
+            var adminId = admin.Id;
+
+            
+            var receivers = new List<int> { charity.Id };
+
+            await _notificationService.SendNotificationAsync(
+                adminId,
+                receivers,
+                NotificationsTypeEnum.AdminRejected
+            );
+
             return Ok(new { id, status = charity.Status.ToString() });
         }
 
