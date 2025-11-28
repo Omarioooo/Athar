@@ -1,9 +1,10 @@
-﻿using Ardalis.GuardClauses;
+﻿using System.Linq;
+using Ardalis.GuardClauses;
 using AtharPlatform.Dtos;
 using AtharPlatform.DTOs;
+using AtharPlatform.Models;
 using AtharPlatform.Models.Enum;
 using AtharPlatform.Repositories;
-using System.Linq;
 
 namespace AtharPlatform.Services
 {
@@ -12,11 +13,13 @@ namespace AtharPlatform.Services
 
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFileService _fileService;
+        private readonly INotificationService _notificationService;
 
-        public CampaignService(IUnitOfWork unitOfWork, IFileService fileService)
+        public CampaignService(IUnitOfWork unitOfWork, IFileService fileService, INotificationService notificationService)
         {
             _unitOfWork = unitOfWork;
             _fileService = fileService;
+            _notificationService = notificationService;
         }
 
         public async Task<int> GetCountOfCampaignsAsync(
@@ -251,20 +254,20 @@ namespace AtharPlatform.Services
 
         public async Task<bool> CreateAsync(AddCampaignDto model)
         {
-            // Check the model
+             
             if (model == null)
                 throw new ArgumentNullException(nameof(model), "Your model from request is null.");
 
-            // Handle image: either uploaded file or external URL
+            
             string? imageUrl = null;
             if (model.Image != null)
             {
-                // Save uploaded image file
+ 
                 imageUrl = await _fileService.SaveFileAsync(model.Image, "campaigns");
             }
             else if (!string.IsNullOrWhiteSpace(model.ImageUrl))
             {
-                // Use provided external URL
+               
                 imageUrl = model.ImageUrl;
             }
             else
@@ -291,6 +294,32 @@ namespace AtharPlatform.Services
             await _unitOfWork.Campaigns.AddAsync(campaign);
             await _unitOfWork.SaveAsync();
 
+            //شغل الnotiification
+            
+            var followerIds = await _unitOfWork.Follows.GetAll()
+                .Where(f => f.CharityId == campaign.CharityID)
+                .Select(f => f.DonorId)
+                .ToListAsync();
+
+            
+            if (followerIds.Any())
+            {
+                 
+                var charity = await _unitOfWork.Charities.GetAsync(campaign.CharityID);
+
+                if (charity == null || charity.Account == null)
+                    throw new Exception("Charity user account not found");
+
+                int senderId = charity.Id;
+
+                
+                await _notificationService.SendNotificationAsync(
+                    senderId,
+                    followerIds,
+                    NotificationsTypeEnum.NewCampagin
+                );
+
+            }
             return true;
         }
 
