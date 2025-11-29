@@ -11,8 +11,14 @@ import CharityRegister from './pages/charityregister/charityregister';
 import DonorRegister from './pages/donorregister/donorregister';
 import { Link } from "react-router-dom";
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { UseAuth } from './Auth/Auth';
+import { RequireDonorAuth } from './Auth/RequireDonorAuth';
+import { RequireAuth } from './Auth/requireauth';
+import CampaignDetail from "./pages/compaign-details/compaign-details";
 function App() {
+  const auth=UseAuth();
   return (
+    
     <div className="App">
       <Router>
           <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -31,7 +37,8 @@ function App() {
                <li className="nav-item">
                 <Link className="nav-link" to="/Campaign">الحملات</Link>
                   </li>
-              
+          { !auth.user&&(
+            <>
                   <li className="nav-item">
                 <Link className="nav-link" to="/register">انشاء حساب</Link>
               </li>
@@ -39,6 +46,8 @@ function App() {
                   <li className="nav-item">
                 <Link className="nav-link" to="/login">تسجيل الدخول</Link>
               </li>
+              </>)
+}
             </ul>
           </div>
         </nav>
@@ -47,11 +56,12 @@ function App() {
               <Route path="/" element={<Home/>}/>
               <Route path="/Campaign" element={<Campaign/>}/>
                <Route path="/content" element={<Content/>}/>
-                  <Route path="/login" element={<Login/>}/>
-                   <Route path="/register" element={<Register/>}/>
-                      <Route path="/charityregister" element={<CharityRegister/>}/>
-                        <Route path="/donorregister" element={<DonorRegister/>}/>
-                
+              <Route path="/login" element={<Login/>}/>
+              <Route path="/register" element={<Register/>}/>
+              <Route path="/charityregister" element={<CharityRegister/>}/>
+              <Route path="/donorregister" element={<DonorRegister/>}/>
+              <Route path="/campaign/:id" element={<CampaignDetail />} />
+            
    
        </Routes>
        </Router>
