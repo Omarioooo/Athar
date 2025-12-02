@@ -1,0 +1,206 @@
+.notifications-modern-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    padding: 40px 20px;
+}
+
+.notifications-wrapper {
+    width: 75%;
+    margin: 0 auto;
+}
+
+.notifications-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.notifications-title {
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--primary);
+    margin: 25px 0;
+    background-clip: text;
+}
+
+/***** Filters *****/
+.notifications-filters {
+    display: flex;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.filter-btn {
+    padding: 10px 22px;
+    border-radius: 30px;
+    font-weight: 600;
+    background: #f2f6fa;
+    border: 1px solid #dbe7f3;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.filter-btn.active {
+    background: linear-gradient(135deg, #4eb6e6 0%, #7fd4f3 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 6px 18px rgba(78, 182, 230, 0.25);
+}
+
+/***** READ ALL *****/
+.read-all-btn {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    background: var(--text-muted);
+    color: white;
+    border: none;
+    padding: 20px;
+    border-radius: 50%;
+    font-weight: 600;
+    z-index: 500;
+    cursor: pointer;
+    box-shadow: 0 10px 35px rgba(78, 182, 230, 0.25);
+    transition: 0.3s ease;
+}
+
+.read-all-btn.active {
+    background: linear-gradient(135deg, #4eb6e6 0%, #7fd4f3 100%);
+}
+
+.read-all-btn:hover {
+    transform: scale(1.08);
+}
+
+/* Notification Card */
+.notifications-box {
+    margin: 20px 0 50px;
+}
+
+.notifications-box .no-notifications {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.notifications-box .no-notifications h3 {
+    font-weight: 600;
+    color: var(--yellow);
+}
+
+.notification-card {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.notification-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 35px rgba(0, 0, 0, 0.12);
+}
+
+.notification-card.unread {
+    background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+    box-shadow: 0px 3px 10px rgba(78, 182, 230, 0.25);
+}
+
+.notification-bar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 6px;
+    height: 100%;
+    border-radius: 0 20px 20px 0;
+}
+
+.notification-bar.not-read {
+    background: var(--yellow);
+}
+
+.notification-inner {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.notification-icon-wrapper {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+}
+
+.notification-icon-wrapper svg {
+    color: var(--yellow);
+}
+
+.icon-system {
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+}
+
+.notification-content h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 10px 0;
+}
+
+.notification-card.unread h3 {
+    color: #1e293b;
+}
+
+.notification-content p {
+    font-size: 16px;
+    line-height: 1.7;
+    color: #475569;
+    margin: 0 0 16px 0;
+}
+
+.notification-card.unread p {
+    color: #334155;
+    font-weight: 500;
+}
+
+.notification-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 14px;
+    color: #64748b;
+}
+
+.time-ago {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .notifications-title {
+        font-size: 32px;
+    }
+    .notification-card {
+        padding: 20px;
+        .notification-icon-wrapper {
+            width: 56px;
+            height: 56px;
+        }
+        .unread-banner {
+            font-size: 16px;
+            padding: 12px 24px;
+        }
+    }
+}

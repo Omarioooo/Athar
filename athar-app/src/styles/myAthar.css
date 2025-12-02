@@ -1,0 +1,249 @@
+/******** GENERAL PAGE LAYOUT ********/
+.my-athar-page {
+    background: #f9f9f9;
+    min-height: 100vh;
+}
+
+.section-container {
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.athar-section {
+    margin-bottom: 60px;
+    position: relative;
+}
+
+.athar-section:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70%;
+    height: 3px;
+    background: var(--primary);
+}
+
+.section-title {
+    font-size: 32px;
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+/******** EMBLA SLIDER ********/
+.embla {
+    overflow: hidden;
+    padding: 10px 10px;
+}
+
+.embla__viewport {
+    overflow: hidden;
+    width: 100%;
+}
+
+.embla__container {
+    display: flex;
+    direction: rtl;
+    gap: 18px;
+}
+
+/******** INSTAGRAM-STYLE STORY CIRCLES ********/
+.story-slide {
+    text-align: center;
+    width: 90px;
+    flex: 0 0 auto;
+    cursor: pointer;
+}
+
+.story-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    padding: 3px;
+    background: linear-gradient(45deg, var(--yellow), var(--primary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+}
+
+.story-avatar:hover {
+    transform: scale(1.07);
+}
+
+.story-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+}
+
+.story-name {
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+}
+
+/******** TOTAL DONATION BOX ********/
+.total-donation-box {
+    text-align: center;
+    padding: 40px 20px;
+    background: var(--colored-bg);
+    color: white;
+    border-radius: 32px;
+    margin-bottom: 40px;
+    box-shadow: 0 15px 40px rgba(78, 182, 230, 0.3);
+}
+
+.total-donation-box h2 {
+    font-size: 28px;
+    margin-bottom: 16px;
+    opacity: 0.9;
+}
+
+.big-amount {
+    font-size: 56px;
+    font-weight: 800;
+    letter-spacing: -2px;
+}
+
+.big-amount span {
+    font-size: 24px;
+    font-weight: normal;
+}
+
+/******** DONATION FILTER BUTTONS ********/
+.donations-filter {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 40px;
+}
+
+.filter-btn {
+    padding: 12px 24px;
+    border: 2px solid #ddd;
+    background: white;
+    border-radius: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-btn.active,
+.filter-btn:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/******** DONATION CARDS ********/
+.donation-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.donations-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+}
+
+.donation-card {
+    position: relative;
+    height: 280px;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    transition: transform 0.4s ease;
+}
+
+.donation-card:hover {
+    transform: translateY(-12px);
+}
+
+.donation-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 8s ease;
+}
+.donation-card:hover img {
+    transform: scale(1.2);
+}
+
+.donation-card .card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    color: white;
+    padding: 80px 24px 24px;
+    text-align: right;
+}
+
+.donation-card h3 {
+    font-size: 24px;
+    margin-bottom: 12px;
+}
+
+.donation-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.amount {
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--yellow);
+}
+
+.charity-name {
+    font-size: 15px;
+    opacity: 0.9;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 6px 12px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+/* Empty state */
+.empty-donations {
+    text-align: center;
+    padding: 60px 20px;
+    font-size: 20px;
+    color: #999;
+    grid-column: 1 / -1;
+}
+
+/******** RESPONSIVE ********/
+@media (max-width: 768px) {
+    .donations-list {
+        grid-template-columns: 1fr;
+    }
+
+    .big-amount {
+        font-size: 42px;
+    }
+}
+
+@media (max-width: 480px) {
+    .donations-list {
+        display: block;
+    }
+
+    .donations-list > * {
+        margin-bottom: 20px;
+    }
+}
