@@ -2,10 +2,12 @@
 {
     public class DonationsHistoryDto
     {
-        public string CharityName { get; set; }
-        public string Currency { get; set; }
-        public DateTime DonationTime { get; set; }
-
-        public double DonationAmount { get; set; }
+        public int DonationId { get; set; }         
+        public double Amount { get; set; }            
+        public DateTime? DonationDate { get; set; }  
+        public string? Currency { get; set; }       
+        public string? Status { get; set; }          
+        public int CampaignId { get; set; }         
+        public int CharityId { get; set; }          
     }
 }
