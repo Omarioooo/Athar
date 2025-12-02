@@ -1,4 +1,6 @@
-﻿using AtharPlatform.DTO;
+﻿using Ardalis.GuardClauses;
+using AtharPlatform.DTO;
+using AtharPlatform.DTOs;
 using AtharPlatform.Models;
 using AtharPlatform.Models.Enum;
 using AtharPlatform.Models.Enums;
@@ -26,6 +28,19 @@ namespace AtharPlatform.Services
             _followService = followService;
         }
 
+        // يوثف وائل
+        public async Task<DonorProfileDto> GetDonorById(int id)
+        {
+            var donor = _unitOfWork.Donors.GetByIdAsync(id);
+            if (donor == null)
+                throw new NotFoundException($"{id}", $"Donor with id {id} not found");
+
+
+
+            DonorProfileDto dto = new DonorProfileDto();
+
+            return dto;
+        }
 
 
         public async Task<bool> DonateToCharityAsync(DonationDto model)
