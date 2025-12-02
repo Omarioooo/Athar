@@ -6,7 +6,8 @@ namespace AtharPlatform.Services
 {
     public interface IDonorService
     {
-        Task<DonorProfileDto> GetDonorById(int id);
+        Task<DonorProfileDto> GetDonorByIdAsync(int id);
+        Task<Donor> GetDonorFullProfileAsync(int id);
         Task<bool> DonateToCharityAsync(DonationDto model);
         Task<bool> DonateToCampaignAsync(DonationDto model);
 

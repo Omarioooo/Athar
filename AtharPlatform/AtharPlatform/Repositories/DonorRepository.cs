@@ -60,5 +60,19 @@ namespace AtharPlatform.Repositories
 
             return admins;
         }
+
+        public async Task<Donor> GetDonorFullProfileAsync(int id)
+        {
+            var donor = await _dbSet
+                .Include(d => d.Account)
+                .Include(d => d.Donations)
+                 .ThenInclude(cd => cd.Donation)
+                .Include(d => d.Follows)
+                .Where(d => d.Role == RolesEnum.Donor)
+                .FirstOrDefaultAsync(d => d.Id == id);
+
+
+            return donor;
+        }
     }
 }

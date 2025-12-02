@@ -1,5 +1,4 @@
-﻿using Ardalis.GuardClauses;
-using AtharPlatform.DTO;
+﻿using AtharPlatform.DTO;
 using AtharPlatform.DTOs;
 using AtharPlatform.Models;
 using AtharPlatform.Models.Enum;
@@ -16,31 +15,20 @@ namespace AtharPlatform.Services
         private readonly INotificationService _notificationService;
         private readonly IAccountService _accountService;
         private readonly IFollowService _followService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public DonorService(IUnitOfWork unitOfWork, ISubscriptionService subscriptionService,
             INotificationService notificationService, IAccountContextService accountContextService,
-            IAccountService accountService, IFollowService followService)
+            IAccountService accountService, IFollowService followService,IHttpContextAccessor httpContextAccessor)
         {
             _unitOfWork = unitOfWork;
             _notificationService = notificationService;
             _accountContextService = accountContextService;
             _accountService = accountService;
             _followService = followService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        // يوثف وائل
-        public async Task<DonorProfileDto> GetDonorById(int id)
-        {
-            var donor = _unitOfWork.Donors.GetByIdAsync(id);
-            if (donor == null)
-                throw new NotFoundException($"{id}", $"Donor with id {id} not found");
-
-
-
-            DonorProfileDto dto = new DonorProfileDto();
-
-            return dto;
-        }
 
 
         public async Task<bool> DonateToCharityAsync(DonationDto model)
@@ -82,5 +70,55 @@ namespace AtharPlatform.Services
         {
             throw new NotImplementedException();
         }
+
+        public async Task<DonorProfileDto> GetDonorByIdAsync(int id)
+        {
+            var donor = await _unitOfWork.Donors.GetDonorFullProfileAsync(id);
+
+            if (donor == null)
+                return null;
+
+            var baseUrl = _httpContextAccessor.HttpContext != null
+                ? $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}"
+                : "";
+
+           
+            var donations = donor.Donations?.Where(c => c?.Donation != null)
+                             .Select(c => c.Donation!)
+                             .ToList();
+
+            var followsCount = donor.Follows?.Count ?? 0;
+
+            var profile = new DonorProfileDto
+            {
+                FirstName = donor.FirstName  ,
+                LastName = donor.LastName  ,
+                Email=donor.Account.Email,
+                ImageUrl = donor.Account?.ProfileImage != null ? $"{baseUrl}/api/users/profile-image/{donor.Id}" : "No Photoooo",
+                Country = donor.Account?.Country,
+                City = donor.Account?.City,
+                DonationsCount = donations.Count,
+                FollowingCount = followsCount,
+                TotalDonationsAmount = donations.Sum(x => (double)x.NetAmountToCharity),
+                DonationsHistory = donations.Select(d => new DonationsHistoryDto
+                {
+                    DonationId = d.Id,
+                    Amount = (double)d.NetAmountToCharity,
+                    DonationDate = d.CreatedAt,
+                    Currency = d.Currency,
+                    Status = d.DonationStatus.ToString(),
+                    CampaignId = d.CampaignId,
+                    CharityId = d.CharityId
+                }).ToList()
+            };
+
+            return profile;
+        }
+
+        public async Task<Donor> GetDonorFullProfileAsync(int id)
+        {
+            return await _unitOfWork.Donors.GetDonorFullProfileAsync(id);
+        }
+
     }
 }
