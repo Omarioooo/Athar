@@ -1,0 +1,442 @@
+/**** Add Button ****/
+.add-campaign-wrapper {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    z-index: 1000;
+}
+
+.add-campaign-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    font-size: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s;
+}
+
+.add-campaign-btn.not-active::before {
+    content: "اضافة حملة";
+    position: absolute;
+    left: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #333;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s;
+}
+
+.add-campaign-btn.not-active:hover::before {
+    opacity: 0.8;
+    left: -160%;
+}
+
+.add-campaign-btn.active {
+    transform: rotate(45deg);
+    background: var(--yellow);
+}
+
+/**** Add Menu ****/
+/* Overlay */
+.add-campaign-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.add-campaign-modal {
+    width: 600px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    z-index: 1000;
+    transform: translateY(30px);
+    pointer-events: none;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .add-campaign-modal {
+        width: 95%;
+        padding: 15px;
+    }
+}
+
+.add-campaign-modal.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.add-campaign-form {
+    position: relative;
+    width: 100%;
+}
+
+.add-campaign-form h4 {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 18px;
+}
+
+.input-title {
+    margin: 5px;
+}
+
+.input-group input,
+.input-group textarea,
+.input-group select {
+    width: 100%;
+    padding: 14px 12px 6px;
+    font-size: 14px;
+    border: 1.5px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+    transition: 0.3s;
+    background: #fdfdfd;
+}
+
+.input-group input:focus,
+.input-group textarea:focus,
+.input-group select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(78, 182, 230, 0.25);
+}
+
+.input-group label {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: white;
+    padding: 0 6px;
+    font-size: 14px;
+    color: #777;
+    pointer-events: none;
+    transition: 0.3s ease;
+}
+
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label,
+.input-group textarea:focus + label,
+.input-group textarea:not(:placeholder-shown) + label,
+.input-group select:focus + label,
+.input-group select:not([value=""]) + label {
+    top: -6px;
+    font-size: 12px;
+    color: var(--primary);
+}
+
+.textarea-group textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.file-group {
+    margin-bottom: 18px;
+}
+
+.file-label {
+    display: block;
+    background: #f3f7ff;
+    border: 1.5px dashed var(--primary);
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--primary);
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.file-label:hover {
+    background: rgba(78, 182, 230, 0.1);
+}
+
+.file-label input {
+    display: none;
+}
+
+.select-group select {
+    appearance: none;
+    background: url("data:image/svg+xml;utf8,<svg fill='%234eb6e6' height='24' viewBox='0 0 24 24' width='24'><path d='M7 10l5 5 5-5z'/></svg>")
+        no-repeat left 12px center;
+    background-size: 18px;
+    padding-left: 32px;
+}
+
+.checkbox-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 15px 0;
+}
+
+.checkbox-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f9fafb;
+    padding: 12px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 1.5px solid #e4e4e4;
+    transition: 0.3s ease;
+    font-size: 15px;
+}
+
+.checkbox-card:hover {
+    background: #fff;
+    border-color: var(--primary);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.checkbox-card input {
+    display: none;
+}
+
+.checkbox-card .checkmark {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 2px solid var(--primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.25s ease;
+    position: relative;
+}
+
+.checkbox-card .checkmark::after {
+    content: "";
+    width: 10px;
+    height: 10px;
+    background: var(--primary);
+    border-radius: 2px;
+    transform: scale(0);
+    transition: 0.25s ease;
+}
+
+.checkbox-card input:checked + .checkmark {
+    background: #eaf6ff;
+    border-color: var(--primary);
+}
+
+.checkbox-card input:checked + .checkmark::after {
+    transform: scale(1);
+}
+
+.checkbox-card .text {
+    font-weight: 600;
+    color: #333;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.form-actions .btn {
+    width: 48%;
+    padding: 12px 0;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-warning {
+    background: var(--yellow);
+    color: white;
+}
+
+.btn-warning:hover {
+    background: #e6b500;
+}
+
+.btn-secondary {
+    background: #ccc;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background: #bdbdbd;
+}
+
+/* 
+.add-campaign-modal h4 {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.add-campaign-modal input,
+.add-campaign-modal textarea,
+.add-campaign-modal select {
+    outline: var(--primary);
+    width: 100%;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.add-campaign-modal textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.checkbox-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.checkbox-wrapper {
+    display: flex;
+    gap: 15px;
+    margin: 15px 0;
+}
+
+.checkbox-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f9fafb;
+    padding: 12px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 1.5px solid #e4e4e4;
+    transition: 0.3s ease;
+    font-size: 15px;
+}
+
+.checkbox-card:hover {
+    background: #fff;
+    border-color: var(--primary);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+
+.checkbox-card input {
+    display: none;
+}
+
+.checkbox-card .checkmark {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 2px solid var(--primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.25s ease;
+    position: relative;
+}
+
+.checkbox-card .checkmark::after {
+    content: "";
+    width: 10px;
+    height: 10px;
+    background: var(--primary);
+    border-radius: 2px;
+    transform: scale(0);
+    transition: 0.25s ease;
+}
+
+.checkbox-card input:checked + .checkmark {
+    background: #eaf6ff;
+    border-color: var(--primary);
+}
+
+.checkbox-card input:checked + .checkmark::after {
+    transform: scale(1);
+}
+
+.checkbox-card .text {
+    font-weight: 600;
+    color: #333;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.form-actions button {
+    width: 48%;
+    padding: 10px 0;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-warning {
+    background-color: var(--yellow);
+    color: white;
+}
+
+.btn-warning:hover {
+    background-color: #e6b500;
+}
+
+.btn-secondary {
+    background-color: #ccc;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background-color: #b3b3b3;
+} */

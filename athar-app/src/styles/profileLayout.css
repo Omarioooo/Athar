@@ -1,0 +1,147 @@
+.profile-body {
+    display: flex;
+    gap: 20px;
+    padding: 20px 0;
+    width: 100%;
+}
+
+.profile-body .profile-nav {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 0 1 180px;
+    transition: all 0.4s ease;
+    background: white;
+    min-width: 200px;
+    min-height: 80vh;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    top: 20px;
+}
+
+.profile-nav .link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    background: #f0f0f0;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+}
+
+.profile-nav .link.active {
+    background: var(--colored-bg);
+    color: white;
+}
+
+.profile-nav .link svg {
+    font-size: 20px;
+    color: var(--primary);
+}
+
+.profile-nav button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 40px;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.profile-nav button svg {
+    display: none;
+}
+
+.profile-body > *:nth-child(2) {
+    flex: 1;
+    background: white;
+    border-radius: 12px;
+    padding: 40px 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    min-height: 80vh;
+    font-size: 22px;
+    overflow-x: hidden;
+}
+
+@media (max-width: 992px) {
+    .profile-body .profile-nav {
+        flex: 0 1 200px;
+    }
+}
+
+@media (max-width: 767px) {
+    .profile-body .profile-nav {
+        flex: 0 1 70px;
+        min-width: 70px;
+        width: 70px;
+        padding: 20px 12px;
+        align-items: center;
+    }
+
+    .profile-nav .link span {
+        opacity: 0;
+        width: 0;
+        overflow: hidden;
+        margin-left: 0;
+        transition: all 0.4s ease;
+    }
+
+    .profile-nav .link {
+        padding: 15px;
+        justify-content: center;
+        gap: 0;
+    }
+
+    .profile-nav .link svg {
+        margin: 0;
+        font-size: 24px;
+    }
+
+    .profile-nav .logout {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+        margin-top: 30px;
+    }
+
+    .profile-nav .logout span {
+        opacity: 0;
+        width: 0;
+        overflow: hidden;
+    }
+
+    .profile-nav .logout svg {
+        display: inline-block;
+        margin: 0;
+        font-size: 30px;
+    }
+
+    .profile-nav .link,
+    .profile-nav .logout {
+        position: relative;
+    }
+
+    .profile-nav .link:hover:after,
+    .profile-nav .logout:hover:after {
+        content: attr(data-title);
+        position: absolute;
+        right: 60px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #333;
+        color: white;
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-size: 14px;
+        white-space: nowrap;
+        z-index: 100;
+    }
+}

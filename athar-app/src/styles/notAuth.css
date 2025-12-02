@@ -1,0 +1,44 @@
+.notauth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.notauth-container {
+    max-width: 550px;
+    text-align: center;
+}
+
+.notauth-icon {
+    color: var(--primary);
+    margin-bottom: 20px;
+}
+
+.notauth-title {
+    font-size: 28px;
+    font-weight: 800;
+    margin: 10px 0;
+    color: #2c3e50;
+}
+
+.notauth-message {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 30px;
+    line-height: 1.7;
+}
+
+.back-home-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--primary);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+}

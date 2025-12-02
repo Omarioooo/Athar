@@ -1,0 +1,74 @@
+/****** Campaign Card ******/
+.campaign-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.campaign-card .card-body {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 15px;
+}
+
+.campaign-card .card-body h4 {
+    font-size: 16px;
+    font-weight: 600;
+    min-height: 40px;
+}
+
+.campaign-card .card-body p {
+    font-size: 14px;
+    color: var(--text-muted);
+    min-height: 45px;
+    max-height: 45px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.campaign-card .card-body .progress {
+    background-color: rgba(78, 182, 230, 0.927);
+    height: 10px;
+    margin: 8px 0;
+}
+
+.campaign-card .card-body .progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 5px 0;
+    font-size: 12px;
+}
+
+.campaign-card .card-body .progress-info span {
+    display: block;
+}
+
+.campaign-card .card-body .progress-info span svg {
+    font-size: 14px;
+    margin-left: 5px;
+    color: var(--primary);
+}
+
+.campaign-card .card-body .cmp-donate-btn {
+    margin-top: 15px;
+    width: 100%;
+    height: 40px;
+    padding: 8px;
+    border: none;
+    border-radius: 12px;
+    background: var(--yellow);
+    transition: 0.3s;
+}
+
+.campaign-card .card-body .cmp-donate-btn:hover {
+    background: var(--yellow-hover);
+}
+
+.campaign-card .card-body .cmp-donate-btn p {
+    font-weight: 600;
+    color: white;
+}

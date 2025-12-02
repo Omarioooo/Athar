@@ -1,0 +1,189 @@
+.section-container {
+    margin: 0 auto;
+}
+
+.section-info {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    display: flex;
+    gap: 60px;
+}
+
+@media (max-width: 992px) {
+    .section-info {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 30px;
+    }
+}
+
+.section-info::after {
+    content: "";
+    position: absolute;
+    background: var(--colored-bg);
+    height: 3px;
+    width: 0%;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: shrink-expand 2s ease-in-out infinite;
+}
+
+@keyframes shrink-expand {
+    0% {
+        width: 0%;
+        opacity: 0.2;
+    }
+    40% {
+        width: 60%;
+        opacity: 1;
+    }
+    60% {
+        width: 60%;
+        opacity: 1;
+    }
+    100% {
+        width: 0%;
+        opacity: 0.2;
+    }
+}
+
+.avatar-section {
+    margin: auto 25px;
+    text-align: center;
+}
+
+.avatar {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 8px solid white;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    margin-bottom: 16px;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.username {
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .avatar {
+        width: 120px;
+        height: 120px;
+    }
+    .username {
+        font-size: 22px;
+    }
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .stats {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .cards .stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+.stats .stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s;
+}
+
+.stats .stat-card:hover {
+    transform: translateY(-8px);
+}
+
+.stats .stat-card .stat-label {
+    display: block;
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 8px;
+}
+
+.stats .stat-card .stat-value {
+    display: block;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--primary);
+}
+
+/*Donation history*/
+.donation-history {
+    width: 100%;
+    margin-top: 40px;
+}
+
+.donation-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.donation-item {
+    padding: 15px 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.donation-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.donation-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #444;
+    margin: 0;
+}
+
+.donation-time {
+    font-size: 13px;
+    color: #777;
+    margin-top: 4px;
+}
+
+.donation-amount {
+    background: var(--primary);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.no-donations {
+    text-align: center;
+    font-size: 16px;
+    color: #777;
+}

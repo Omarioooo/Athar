@@ -1,0 +1,28 @@
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./styles/variables.css";
+import "./styles/globals.css";
+import "./styles/header.css";
+import "./styles/profileLayout.css";
+import "./styles/myAthar.css";
+import "./styles/setting.css";
+import "./styles/profile.css";
+import "./styles/pagination.css";
+import "./styles/notifications.css";
+import "./styles/home.css";
+import "./styles/searchBar.css";
+import "./styles/charities.css";
+import "./styles/zakaa.css";
+import "./styles/charityHomePage.css";
+import "./styles/campaignCard.css";
+import "./styles/myCampaigns.css";
+import "./styles/addCampaignModal.css";
+import "./styles/charityProfile.css";
+import "./styles/charityCard.css";
+import "./styles/notFound.css";
+import "./styles/notAuth.css";
+import "./styles/volunteering.css";
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);

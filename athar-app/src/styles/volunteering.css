@@ -1,0 +1,395 @@
+/***** General Page Layout *****/
+.contact-requests-page {
+    width: 100%;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.page-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.page-subtitle {
+    color: #6b7c93;
+    font-size: 15px;
+    margin-top: 5px;
+}
+
+/***** Filter Pills *****/
+.filter-bar {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 30px;
+}
+
+.filter-pill {
+    background: #fff;
+    padding: 8px 18px;
+    border-radius: 30px;
+    font-size: 14px;
+    border: 1px solid #e5e9f2;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: 0.2s ease;
+}
+
+.filter-pill.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: none;
+}
+
+.pill-count {
+    background: rgba(255, 255, 255, 0.25);
+    color: inherit;
+    padding: 2px 7px;
+    border-radius: 12px;
+    font-size: 13px;
+}
+
+/***** volunteering Layout *****/
+.volunteering-container {
+    position: relative;
+    margin-top: 20px;
+}
+
+.volunteering-item {
+    display: flex;
+    gap: 25px;
+    position: relative;
+    margin-bottom: 35px;
+}
+
+/* Circle for each type */
+.volunteering-circle {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Colors */
+.volunteering-circle.volunteer {
+    background: #15b981;
+}
+.volunteering-circle.merchant {
+    background: #1d72e8;
+}
+.volunteering-circle.donation {
+    background: #f97316;
+}
+
+/* Vertical line */
+.volunteering-line {
+    width: 4px;
+    height: 80px;
+    border-radius: 5px;
+    margin: 5px auto 0;
+}
+
+.volunteering-line.volunteer {
+    background: #15b981;
+}
+.volunteering-line.merchant {
+    background: #1d72e8;
+}
+.volunteering-line.donation {
+    background: #f97316;
+}
+
+/***** Card *****/
+.volunteering-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 2px solid #d6e2ff;
+    padding: 20px;
+    flex: 1;
+    position: relative;
+    transition: 0.25s ease;
+    cursor: pointer;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.volunteering-card.unread {
+    border-color: var(--primary);
+}
+
+/***** Card Content *****/
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+.card-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.card-name h3 {
+    font-weight: 700;
+    font-size: 18px;
+    color: #0d1b2a;
+}
+
+.unread-dot {
+    width: 10px;
+    height: 10px;
+    background: #2f80ed;
+    border-radius: 50%;
+    margin: -8px 0 0;
+    animation: pulseBlink 1.8s infinite ease-in-out;
+}
+
+@keyframes pulseBlink {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+        box-shadow: 0 0 6px rgba(47, 128, 237, 0.6);
+    }
+    25% {
+        transform: scale(1.25);
+        opacity: 0.9;
+        box-shadow: 0 0 10px rgba(47, 128, 237, 0.9);
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.5;
+        box-shadow: 0 0 4px rgba(47, 128, 237, 0.4);
+    }
+    75% {
+        transform: scale(1.25);
+        opacity: 0.9;
+        box-shadow: 0 0 12px rgba(47, 128, 237, 1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+        box-shadow: 0 0 5px rgba(47, 128, 237, 0.6);
+    }
+}
+
+.card-badges {
+    display: flex;
+    gap: 6px;
+}
+
+.status-badge,
+.type-badge {
+    padding: 3px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* Status */
+.status-badge.new {
+    background: #d1eaff;
+    color: #007bff;
+}
+.status-badge.replied {
+    background: #d1f7e4;
+    color: #0e9f6e;
+}
+.status-badge.pending {
+    background: #ffe7ba;
+    color: #cc8500;
+}
+
+/* Type */
+.type-badge.volunteer {
+    background: #d1f7e4;
+    color: #0e9f6e;
+}
+.type-badge.merchant {
+    background: #d6eaff;
+    color: #1d72e8;
+}
+.type-badge.donation {
+    background: #ffe1c7;
+    color: #f97316;
+}
+
+.card-description {
+    font-size: 15px;
+    color: #4b5563;
+    margin-bottom: 12px;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.card-footer svg {
+    margin-left: 5px;
+}
+
+/* ======================
+   MODAL
+====================== */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.modal-content {
+    background: #fff;
+    width: 600px;
+    max-width: 90%;
+    padding: 25px;
+    border-radius: 20px;
+    position: relative;
+    animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    position: absolute;
+    left: 15px;
+    top: 15px;
+    cursor: pointer;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* icon colors */
+.modal-icon.volunteer {
+    background: #0e9f6e;
+}
+.modal-icon.merchant {
+    background: #1d72e8;
+}
+.modal-icon.donation {
+    background: #f97316;
+}
+
+.modal-body {
+    padding-top: 20px;
+}
+
+.modal-section {
+    margin-bottom: 20px;
+}
+
+.modal-section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: #0d1b2a;
+}
+
+.modal-section p {
+    color: #4b5563;
+    line-height: 1.7;
+}
+
+.modal-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 20px;
+}
+
+.modal-info-item {
+    display: flex;
+    gap: 10px;
+    color: #334155;
+}
+
+.info-label {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.info-value {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* Buttons */
+.modal-actions {
+    margin-top: 25px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.action-button {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.action-button.primary.volunteer {
+    background: #0e9f6e;
+    color: white;
+}
+.action-button.primary.merchant {
+    background: #1d72e8;
+    color: white;
+}
+.action-button.primary.donation {
+    background: #f97316;
+    color: white;
+}
+
+.action-button.secondary {
+    background: #eef2ff;
+    color: #3f3f46;
+}

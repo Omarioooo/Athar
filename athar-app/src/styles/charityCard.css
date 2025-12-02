@@ -1,0 +1,115 @@
+.charity-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    background: var(--card-bg);
+    transition: 0.3s ease;
+    direction: rtl;
+}
+
+.charity-card:hover {
+    border: 1px solid var(--primary);
+    transform: translateY(-4px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+.charity-card .info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.charity-card .card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.charity-card .charity-link {
+    font-size: 20px;
+    margin-left: 2px;
+    color: var(--yellow);
+}
+
+.charity-card .info img {
+    width: 60px;
+    height: 60px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.charity-card .text {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.charity-card .text p {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+    color: #1a1a1a;
+}
+
+.charity-card .text span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.charity-card .description p {
+    margin: 0;
+    color: #555;
+    line-height: 1.7;
+    font-size: 14px;
+}
+
+/*** Buttons ***/
+.charity-card-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+/* Buttons Style */
+.charity-card-btns button {
+    flex: 1;
+    padding: 8px 0;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    cursor: pointer;
+    color: white;
+    background: var(--primary);
+}
+
+.charity-card-btns div:first-of-type {
+    display: flex;
+    gap: 5px;
+    width: 100%;
+}
+
+.charity-card-btns div:first-of-type button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+.charity-card-btns div:first-of-type .icon {
+    font-size: 16px;
+}
+
+.charity-card-btns .campaigns-btn {
+    width: 100%;
+    background-color: var(--yellow);
+}
