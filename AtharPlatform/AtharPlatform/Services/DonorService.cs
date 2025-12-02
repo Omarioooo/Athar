@@ -31,13 +31,20 @@ namespace AtharPlatform.Services
         // يوثف وائل
         public async Task<DonorProfileDto> GetDonorById(int id)
         {
-            var donor = _unitOfWork.Donors.GetByIdAsync(id);
+            var donor = await _unitOfWork.Donors.GetAsync(id);
             if (donor == null)
                 throw new NotFoundException($"{id}", $"Donor with id {id} not found");
 
 
-
-            DonorProfileDto dto = new DonorProfileDto();
+            DonorProfileDto dto = new DonorProfileDto()
+            {
+                FirstName = donor.FirstName,
+                LastName = donor.LastName,
+                City = donor.Account.City,
+                Country = donor.Account.Country,
+                DonationsCount = donor.Donations.Count,
+                FollowingCount = 0
+            };
 
             return dto;
         }

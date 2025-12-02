@@ -219,7 +219,6 @@ namespace AtharPlatform.Controllers
                 return BadRequest("Page and PageSize must be greater than zero.");
 
 
-
             var total = await _unitOfWork.Charities.CountAsync(
                 query, 
                 isActive, 
@@ -317,7 +316,7 @@ namespace AtharPlatform.Controllers
                 }
             }
 
-            var dto = new AtharPlatform.Dtos.PaginatedResultDto<CharityCardDto>
+            var dto = new PaginatedResultDto<CharityCardDto>
             {
                 Items = pageCharities.Select(pc => new CharityCardDto
                 {
@@ -336,6 +335,11 @@ namespace AtharPlatform.Controllers
                 PageSize = pageSize,
                 Total = total
             };
+            foreach (var item in dto.Items)
+            {
+            Console.WriteLine("IMAGE: " + item.ImageUrl);
+            }
+            
             return Ok(dto);
         }
 

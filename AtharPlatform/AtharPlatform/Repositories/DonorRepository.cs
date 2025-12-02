@@ -12,6 +12,7 @@ namespace AtharPlatform.Repositories
         {
             return await _context.Set<Donor>().AnyAsync(d => d.Id == id);
         }
+
         public async override Task<Donor> GetAsync(int id)
         {
             var donor = await _dbSet.Include(d => d.Account)
