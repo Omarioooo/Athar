@@ -7,7 +7,6 @@ using AtharPlatform.Models.Enum;
 using AtharPlatform.Repositories;
 using AtharPlatform.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AtharPlatform.Controllers
@@ -48,8 +47,6 @@ namespace AtharPlatform.Controllers
             var baseUrl = $"https://{request.Host}";
             return $"{baseUrl}{imageUrl}";
         }
-
-
 
 
         // فتح باب التطوع
@@ -127,10 +124,6 @@ namespace AtharPlatform.Controllers
             }
         }
 
-
-
-
-
         // فتح باب العروض للـ Vendor
         [HttpPost("open-vendor-offers/{charityId}")]
        // [Authorize(Roles = "CharityAdmin")]
@@ -207,10 +200,6 @@ namespace AtharPlatform.Controllers
                 return StatusCode(500, new { Message = "Failed to close vendor offers.", Error = ex.Message });
             }
         }
-
-
-
-
 
 
         // (GET) /api/charities?query=&page=1&pageSize=12
@@ -349,6 +338,7 @@ namespace AtharPlatform.Controllers
             };
             return Ok(dto);
         }
+
 
         // (GET) /api/charities/{id}
         [HttpGet("{id:int}")]
