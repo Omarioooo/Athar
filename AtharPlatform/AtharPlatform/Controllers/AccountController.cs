@@ -101,19 +101,14 @@ namespace AtharPlatform.Controllers
                 await _unitOfWork.SaveAsync();
                 return Ok(new { message = "Charity registered successfully." });
             }
-            catch (ArgumentException ex)
+            catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (InvalidOperationException ex)
-            {
-                return StatusCode(500, new { message = ex.Message });
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, new { message = "An unexpected error occurred during charity registration." });
+                // اطبع الاستثناء عشان تشوف السبب الحقيقي
+                Console.WriteLine(ex);
+                return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
             }
         }
+
 
         [HttpPost("[action]")]
         public async Task<IActionResult> Login(LoginDto model)
@@ -146,26 +141,28 @@ namespace AtharPlatform.Controllers
 
 
 
-        [HttpGet("/api/donors/{id}/profile")]
+        [HttpGet("donors/{id}/profile")]
         public async Task<IActionResult> GetDonorProfile(int id)
         {
             var profile = await _donorService.GetDonorByIdAsync(id);
             if (profile == null)
                 return NotFound(new { message = "Donor not found" });
 
+
+
             return Ok(profile);
         }
 
 
-        [HttpGet("/api/users/profile-image/{donorId}")]
+        [HttpGet("users/profile-image/{donorId}")]
         public async Task<IActionResult> GetProfileImage(int donorId)
         {
             var donor = await _donorService.GetDonorFullProfileAsync(donorId);
 
-            if (donor?.Account?.ProfileImage == null || donor.Account.ProfileImage.Length == 0)
-                return Ok("No Photo");
+            if (donor.Account.ProfileImage == null || donor.Account.ProfileImage.Length == 0)
+                return NotFound(new { message = "No photo found" });
 
-            return File(donor.Account.ProfileImage, "image/PNG");/// هنا عادي بترجع PNG  JPG
+            return File(donor.Account.ProfileImage, "image/png"); // يمكن تعديل النوع حسب الصورة
         }
 
     }

@@ -20,15 +20,17 @@ namespace AtharPlatform.Controllers
         private readonly Context _db;
         private readonly UserManager<UserAccount> _userManager;
         private readonly INotificationService _notificationService;
+        private readonly ICharityService _charityService;
 
         public CharitiesController(IUnitOfWork unitOfWork, IAccountContextService accountContextService
-            , Context db, UserManager<UserAccount> userManager, INotificationService notificationService)
+            , Context db, UserManager<UserAccount> userManager, INotificationService notificationService, ICharityService charityService)
         {
             _unitOfWork = unitOfWork;
             _accountContextService = accountContextService;
             _db = db;
             _userManager = userManager;
             _notificationService = notificationService;
+            _charityService = charityService;
         }
 
         // Helper method to convert relative URLs to full URLs
@@ -201,9 +203,40 @@ namespace AtharPlatform.Controllers
             }
         }
 
+        /*علشان التعامل بتاع الصور!!!!!!!!!!*/
+
+        [HttpGet("fullProfile/{id}")]
+        public async Task<IActionResult> GetCharity(int id)
+        {
+            var result = await _charityService.GetCharityByIdAsync(id);
+
+            if (result == null)
+                return NotFound();
+
+            return Ok(result);
+        }
+
+        [HttpGet("{id:int}/image")]
+        public IActionResult GetImageFromFile(int id)
+        {
+            var charity = _charityService.GetCharityFullProfileAsync(id).Result;
+
+            if (charity == null || string.IsNullOrEmpty(charity.ImageUrl))
+                return Ok("No Photo");
+
+            var filePath = Path.Combine("wwwroot", charity.ImageUrl.Replace("https://localhost:5192/", ""));
+
+            if (!System.IO.File.Exists(filePath))
+                return Ok("No Photo");
+
+            var imageBytes = System.IO.File.ReadAllBytes(filePath);
+            return File(imageBytes, "image/png"); // أو jpeg حسب الملف
+        }
+
+
 
         // (GET) /api/charities?query=&page=1&pageSize=12
-        [HttpGet]
+        [HttpGet("all")]
         public async Task<ActionResult<AtharPlatform.Dtos.PaginatedResultDto<CharityCardDto>>> GetAll(
             [FromQuery] string? query, 
             [FromQuery] int page = 1, 

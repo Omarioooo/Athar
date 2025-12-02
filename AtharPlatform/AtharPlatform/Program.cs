@@ -84,6 +84,7 @@ builder.Services.AddScoped<IFollowRepository, FollowRepository>();
 builder.Services.AddScoped<IReactionRepository, ReactionRepository>();
 builder.Services.AddScoped<IVendorOfferRepository, VendorOfferRepository>();
 builder.Services.AddScoped<IVolunteerApplicationRepository, VolunteerApplicationRepository>();
+ 
 
 
 // Inject Services
@@ -101,6 +102,8 @@ builder.Services.AddScoped<IDonationService, DonationService>();
 builder.Services.AddScoped<IDonorService, DonorService>();
 builder.Services.AddScoped<ICampaignService, CampaignService>();
 builder.Services.AddScoped<IContentService, ContentService>();
+builder.Services.AddScoped<ICharityService, CharityService>();
+
 builder.Services.AddHttpContextAccessor();
 
 

@@ -20,5 +20,7 @@
             bool? hasExternalWebsite = null);
         Task<Charity?> GetWithCampaignsAsync(int id);
         Task BulkImportAsync(IEnumerable<Charity> charities);
+
+        Task<Charity> GetCharityFullProfileAsync(int id);
     }
 }
