@@ -158,5 +158,16 @@ namespace AtharPlatform.Repositories
             if (charities == null) return;
             await _dbSet.AddRangeAsync(charities);
         }
+
+        public async Task<Charity> GetCharityFullProfileAsync(int id)
+        {
+            return await _dbSet
+                .Include(c => c.Account)
+                .Include(c => c.Campaigns)
+                    .ThenInclude(c => c.CampaignDonations)
+                .Include(c => c.Follows)
+                .FirstOrDefaultAsync(c => c.Id == id);
+        }
+
     }
 }

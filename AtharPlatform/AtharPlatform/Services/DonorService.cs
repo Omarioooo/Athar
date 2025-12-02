@@ -74,7 +74,6 @@ namespace AtharPlatform.Services
         public async Task<DonorProfileDto> GetDonorByIdAsync(int id)
         {
             var donor = await _unitOfWork.Donors.GetDonorFullProfileAsync(id);
-
             if (donor == null)
                 return null;
 
@@ -82,25 +81,21 @@ namespace AtharPlatform.Services
                 ? $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}"
                 : "";
 
-           
-            var donations = donor.Donations?.Where(c => c?.Donation != null)
-                             .Select(c => c.Donation!)
-                             .ToList();
-
+            var donations = donor.Donations?.Where(c => c?.Donation != null).Select(c => c.Donation!).ToList();
             var followsCount = donor.Follows?.Count ?? 0;
 
-            var profile = new DonorProfileDto
+            return new DonorProfileDto
             {
-                FirstName = donor.FirstName  ,
-                LastName = donor.LastName  ,
-                Email=donor.Account.Email,
-                ImageUrl = donor.Account?.ProfileImage != null ? $"{baseUrl}/api/users/profile-image/{donor.Id}" : "No Photoooo",
+                FirstName = donor.FirstName,
+                LastName = donor.LastName,
+                Email = donor.Account.Email,
+                ImageUrl = donor.Account?.ProfileImage != null ? $"{baseUrl}/api/account/users/profile-image/{donor.Id}" : null,
                 Country = donor.Account?.Country,
                 City = donor.Account?.City,
-                DonationsCount = donations.Count,
+                DonationsCount = donations?.Count ?? 0,
                 FollowingCount = followsCount,
-                TotalDonationsAmount = donations.Sum(x => (double)x.NetAmountToCharity),
-                DonationsHistory = donations.Select(d => new DonationsHistoryDto
+                TotalDonationsAmount = donations?.Sum(x => (double)x.NetAmountToCharity) ?? 0,
+                DonationsHistory = donations?.Select(d => new DonationsHistoryDto
                 {
                     DonationId = d.Id,
                     Amount = (double)d.NetAmountToCharity,
@@ -109,10 +104,8 @@ namespace AtharPlatform.Services
                     Status = d.DonationStatus.ToString(),
                     CampaignId = d.CampaignId,
                     CharityId = d.CharityId
-                }).ToList()
+                }).ToList() ?? new List<DonationsHistoryDto>()
             };
-
-            return profile;
         }
 
         public async Task<Donor> GetDonorFullProfileAsync(int id)
