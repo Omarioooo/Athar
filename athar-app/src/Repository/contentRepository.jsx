@@ -1,9 +1,7 @@
-import axios from "axios";
-
-const API_URL = "https://localhost:5192/api/Content";
+import api from "../Auth/AxiosInstance";
 
 export const fetchAllContents = async (page = 1, pageSize = 12) => {
-    const response = await axios.get(`${API_URL}/GetAll`, {
+    const response = await api.get(`/Content/GetAll`, {
         params: { page, pageSize },
     });
     return {
@@ -13,14 +11,14 @@ export const fetchAllContents = async (page = 1, pageSize = 12) => {
 };
 
 export const searchContents = async (word) => {
-    const response = await axios.get(`${API_URL}/search`, {
+    const response = await api.get(`/Content/search`, {
         params: { word },
     });
     return response.data.items || [];
 };
 
 export const getMediaOfCampaign = async (id, page = 1, pageSize = 12) => {
-    const response = await axios.get(`${API_URL}/campaign/${id}/paged`, {
+    const response = await api.get(`/Content/campaign/${id}/paged`, {
         params: { page, pageSize },
     });
     return {

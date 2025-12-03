@@ -22,7 +22,7 @@ import {
 
 function validateCharityForm(user) {
     console.log("Charity USer is :- ", user);
-    
+
     return {
         emailerror: validateEmail(user.email),
         charitynameerror: validateCharityName(user.charityname),
@@ -106,7 +106,7 @@ export async function getAllCharities(
     return data;
 }
 
-export const getCharityProfileData = async (charityId) => {
+export const getCharityProfile = async (charityId) => {
     if (!charityId) throw new Error("Charity ID is required");
 
     try {

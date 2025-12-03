@@ -14,7 +14,7 @@ namespace AtharPlatform.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAccountService _accountService;
 
-        public AccountController(IUnitOfWork unitOfWork, IAccountService accountService)
+        public AccountController(IUnitOfWork unitOfWork, IAccountService accountService,IDonorService donorService)
         {
             _unitOfWork = unitOfWork;
             _accountService = accountService;
@@ -81,7 +81,7 @@ namespace AtharPlatform.Controllers
             }
         }
 
-        
+
 
         [HttpPost("[action]")]
         public async Task<IActionResult> CharityRegister([FromForm] CharityRegisterDto model)
@@ -141,5 +141,6 @@ namespace AtharPlatform.Controllers
                 return StatusCode(500, new { message = "An unexpected error occurred during login." });
             }
         }
+
     }
 }

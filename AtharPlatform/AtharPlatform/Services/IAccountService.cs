@@ -1,4 +1,5 @@
 ﻿using AtharPlatform.DTO;
+using AtharPlatform.DTOs;
 using AtharPlatform.Models.Enums;
 
 namespace AtharPlatform.Services
@@ -27,7 +28,7 @@ namespace AtharPlatform.Services
         /// <param name="model">The login details required for authentication, including username and password.</param>
         /// <returns>A <see cref="TokenDto"/> containing the access token and related information if authentication is
         /// successful.</returns>
-        Task<TokenDto> LogInAsync(LoginDto model);
+        Task<LoginResponseDto> LogInAsync(LoginDto model);
 
         /// <summary>
         /// Asynchronously retrieves a user account by the specified email address.

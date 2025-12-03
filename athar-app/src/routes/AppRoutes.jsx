@@ -43,11 +43,7 @@ export default function AppRoutes() {
                             element={<Notifications />}
                         />
                         <Route
-                            path="dashboard/*"
-                            element={<DashboardWrapper />}
-                        />
-                        <Route
-                            path="profile/:id/*"
+                            path="profile/:id"
                             element={<ProfileRoutesWrapper />}
                         >
                             <Route
@@ -57,6 +53,16 @@ export default function AppRoutes() {
                         </Route>
                     </Route>
                 </Route>
+                
+                {/* DashBoard */}
+                <Route
+                    path="dashboard/*"
+                    element={
+                        <RequireAuth>
+                            <DashboardWrapper />
+                        </RequireAuth>
+                    }
+                />
 
                 {/* Auth Routes (without layout) */}
                 <Route path="/login" element={<Login />} />
@@ -66,7 +72,10 @@ export default function AppRoutes() {
 
                     <Route path="donorregister" element={<DonorRegister />} />
 
-                    <Route path="charityregister" element={<CharityRegister />} />
+                    <Route
+                        path="charityregister"
+                        element={<CharityRegister />}
+                    />
                 </Route>
 
                 {/* 404 */}

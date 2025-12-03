@@ -14,7 +14,7 @@ export default function LinksBar({ role }) {
             <NavLink to="/dashboard">لوحة التحكم</NavLink>
 
             {/* let it after auth */}
-            {["superAdmin", "donor", "charityAdmin"].includes(role) || role ? (
+            {["superAdmin", "Donor", "charityAdmin"].includes(role) || role ? (
                 <NavLink to="/content">الميديا</NavLink>
             ) : null}
 

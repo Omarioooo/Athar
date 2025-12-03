@@ -1,6 +1,8 @@
 import { Home } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const NotFound = () => {
+    const navigate = useNavigate();
     return (
         <div className="not-found">
             <div className="not-found-wrapper">
@@ -13,7 +15,10 @@ const NotFound = () => {
                     إنها مش هنا 😅"
                 </p>
 
-                <button className="home-btn">
+                <button
+                    className="home-btn"
+                    onClick={() => navigate("/", { replace: true })}
+                >
                     <Home size={20} />
                     العودة للبيت
                 </button>

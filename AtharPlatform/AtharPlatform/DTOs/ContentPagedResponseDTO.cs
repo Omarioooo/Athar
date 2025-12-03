@@ -6,6 +6,6 @@
         public int PageSize { get; set; }
         public int TotalCount { get; set; }
         public int TotalPages { get; set; }
-        public List<ContentListDTO> Data { get; set; }
+        public List<ContentListDTO> Data { get; set; } = new ();
     }
 }

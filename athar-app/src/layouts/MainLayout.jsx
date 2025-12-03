@@ -3,17 +3,26 @@ import Header from "../components/header/Header";
 import { Outlet } from "react-router-dom";
 
 export default function MainLayout() {
-    const { user, loading } = UseAuth();
+    const { loading } = UseAuth();
 
     if (loading) {
-        return <div className="loading">Loading...</div>;
+        return (
+            <>
+                <div className="d-flex justify-content-center align-items-center min-vh-100">
+                    <div
+                        className="spinner-border text-primary"
+                        style={{ width: "3rem", height: "3rem" }}
+                    >
+                        <span className="visually-hidden">جاري التحميل...</span>
+                    </div>
+                </div>
+            </>
+        );
     }
-
-    const role = user?.role || null;
 
     return (
         <div className="container">
-            <Header role={role} />
+            <Header />
             <div className="main-body">
                 <Outlet />
             </div>

@@ -1,4 +1,5 @@
 ﻿using AtharPlatform.DTO;
+using AtharPlatform.DTOs;
 using AtharPlatform.Models.Enum;
 using AtharPlatform.Models.Enums;
 using AtharPlatform.Repositories;
@@ -135,33 +136,33 @@ namespace AtharPlatform.Services
             return result;
         }
 
-        public async Task<TokenDto> LogInAsync(LoginDto model)
+        public async Task<LoginResponseDto> LogInAsync(LoginDto model)
         {
-            if (model == null)
-                throw new ArgumentNullException(nameof(model), "login data cannot be null.");
+            if (model == null) throw new ArgumentNullException(nameof(model));
 
-            if (string.IsNullOrWhiteSpace(model.UserNameOrEmail) || string.IsNullOrWhiteSpace(model.Password))
-                throw new ArgumentException("Email and Password are required.");
-
-            UserAccount? user;
-            string userNameOrEmail = model.UserNameOrEmail.Trim();
-
-            if (new EmailAddressAttribute().IsValid(userNameOrEmail))
-                user = await _userManager.FindByEmailAsync(userNameOrEmail.ToLowerInvariant());
-            else
-                user = await _userManager.FindByNameAsync(userNameOrEmail);
+            UserAccount? user = new EmailAddressAttribute().IsValid(model.UserNameOrEmail)
+                ? await _userManager.FindByEmailAsync(model.UserNameOrEmail)
+                : await _userManager.FindByNameAsync(model.UserNameOrEmail);
 
             if (user == null)
-                throw new InvalidOperationException("Invalid Username or Email.");
+                throw new InvalidOperationException("username or email are not valied");
 
             if (!await _userManager.CheckPasswordAsync(user, model.Password))
-                throw new UnauthorizedAccessException("Invalid password.");
+                throw new UnauthorizedAccessException("password is not valied");
 
-            // Create token
-            var token = await _jwtServices.CreateJwtTokenAsync(user);
+            var roles = await _userManager.GetRolesAsync(user);
+            var jwt = await _jwtServices.CreateJwtTokenAsync(user);
 
-            return token;
+            return new LoginResponseDto
+            {
+                Token = jwt.Token,
+                Id = user.Id,
+                Email = user.Email ?? "",
+                UserName = user.UserName ?? "",
+                Role = roles.FirstOrDefault() ?? "Donor",
+            };
         }
+
 
         public async Task<UserAccount> FindByEmailAsync(string email)
         {

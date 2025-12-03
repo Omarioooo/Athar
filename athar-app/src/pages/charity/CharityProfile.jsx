@@ -7,7 +7,7 @@ import CharityDescription from "../../components/charity/charity-profile/Charity
 import CharityCampaigns from "../../components/charity/charity-profile/CharityCampaigns";
 import CharityMedia from "../../components/charity/charity-profile/CharityMedia";
 
-import { getCharityProfileData } from "../../services/charityService";
+import { getCharityProfile } from "../../services/charityService";
 
 export default function CharityProfile() {
     const { id } = useParams();
@@ -23,7 +23,7 @@ export default function CharityProfile() {
 
             try {
                 setLoading(true);
-                const data = await getCharityProfileData(id);
+                const data = await getCharityProfile(id);
                 setCharity(data);
             } catch (err) {
                 console.error("فشل تحميل بيانات الجمعية:", err);

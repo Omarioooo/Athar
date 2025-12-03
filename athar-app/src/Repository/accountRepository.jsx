@@ -1,14 +1,8 @@
-import axios from "axios";
+import api from "../Auth/AxiosInstance";
 
 export async function loginRequest(email, password) {
-    return axios.post(
-        "https://localhost:5192/api/Account/Login",
-        {
-            UserNameOrEmail: email,
-            Password: password,
-        },
-        {
-            headers: { "Content-Type": "application/json" },
-        }
-    );
+    return api.post("/Account/Login", {
+        UserNameOrEmail: email,
+        Password: password,
+    });
 }

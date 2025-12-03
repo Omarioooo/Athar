@@ -1,17 +1,18 @@
-import axios from "axios";
-
-const api = axios.create({
-    baseURL: "https://localhost:5192",
-    withCredentials: true,
-});
+import api from "../Auth/AxiosInstance";
 
 export function donorRegister(formData) {
-    return api.post("/api/Account/DonorRegister", formData, {
+    return api.post("/Account/DonorRegister", formData, {
         headers: { "Content-Type": "multipart/form-data" },
     });
 }
 
-export const fetchDonorByIdFromApi = async (id) => {
-    const res = await api.get(`/donor/${id}`);
-    return res.data;
-};
+export async function fetchDonorByIdFromApi(id) {
+    try {
+        const res = await api.get(`/donor-profile/${id}`);
+        return res.data;
+    } catch (error) {
+        const msg =
+            error.response?.data?.message || "فشل جلب بيانات الملف الشخصي";
+        throw new Error(msg);
+    }
+}

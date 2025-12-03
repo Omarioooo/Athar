@@ -1,36 +1,72 @@
+// context/AuthContext.jsx
 import { createContext, useState, useContext, useEffect } from "react";
 import Cookies from "js-cookie";
+import {jwtDecode} from "jwt-decode";
 
-const Authcontext = createContext(null);
+const AuthContext = createContext(null);
 
 export const ProvideContext = ({ children }) => {
-    const [user, setuser] = useState(null);
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    const login = (userdata) => {
-        setuser(userdata);
-        Cookies.set("user", JSON.stringify(userdata), {
+    const login = (token, userDataFromApi = null) => {
+        Cookies.set("auth_token", token, {
             expires: 7,
-            path: "/",
+            secure: true,
+            sameSite: "strict",
+            path: "/"
         });
+
+        const userInfo = userDataFromApi || jwtDecode(token);
+
+        Cookies.set("user", JSON.stringify(userInfo), {
+            expires: 7,
+            secure: true,
+            sameSite: "strict",
+            path: "/"
+        });
+
+        setUser(userInfo);
     };
 
     const logout = () => {
-        setuser(null);
+        Cookies.remove("auth_token", { path: "/" });
         Cookies.remove("user", { path: "/" });
+        setUser(null);
     };
 
     useEffect(() => {
-        const storeduser = Cookies.get("user");
-        if (storeduser) setuser(JSON.parse(storeduser));
+        const token = Cookies.get("auth_token");
+        const storedUser = Cookies.get("user");
+
+        if (token && storedUser) {
+            try {
+                const userData = JSON.parse(storedUser);
+                const decoded = jwtDecode(token);
+
+                if (decoded.exp * 1000 < Date.now()) {
+                    logout();
+                } else {
+                    setUser(userData);
+                }
+            } catch (err) {
+                logout();
+            }
+        }
+        setLoading(false);
     }, []);
 
     return (
-        <Authcontext.Provider value={{ login, logout, user }}>
+        <AuthContext.Provider value={{ user, login, logout, loading }}>
             {children}
-        </Authcontext.Provider>
+        </AuthContext.Provider>
     );
 };
 
-export const UseAuth = () => useContext(Authcontext);
-
-
+export const UseAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error("useAuth must be used within AuthProvider");
+    }
+    return context;
+};

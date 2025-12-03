@@ -1,8 +1,6 @@
 import { loginRequest } from "../Repository/accountRepository";
-import { extractRoleFromToken } from "../Auth/extractRoleFromToken";
 import { validateEmail } from "../utils/validation/validateEmail";
 import { validatePassword } from "../utils/validation/validatePassword";
-import { parseLoginError } from "../utils/errors/parseLoginError";
 
 export function validateLoginForm(user) {
     const errors = {
@@ -20,15 +18,16 @@ export async function loginUser(user) {
 
     try {
         const response = await loginRequest(user.email, user.password);
-        const token = response.data.token;
-        const role = extractRoleFromToken(token);
+        const { token, id, email, userName, role } = response.data;
 
-        // Handle cookies
-        document.cookie = `token=${token}; path=/`;
-        document.cookie = `role=${role}; path=/`;
+        const userData = { id, email, userName, role };
 
-        return { success: true, data: { email: user.email, token, role } };
+        return { success: true, data: { ...userData, token } };
     } catch (err) {
-        return { success: false, errors: parseLoginError(err) };
+        console.error("Login failed:", err);
+        return {
+            success: false,
+            errors: err.response?.data?.message || "فشل تسجيل الدخول",
+        };
     }
 }
