@@ -14,7 +14,7 @@ namespace AtharPlatform.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAccountService _accountService;
 
-        public AccountController(IUnitOfWork unitOfWork, IAccountService accountService,IDonorService donorService)
+        public AccountController(IUnitOfWork unitOfWork, IAccountService accountService, IDonorService donorService)
         {
             _unitOfWork = unitOfWork;
             _accountService = accountService;
@@ -99,19 +99,14 @@ namespace AtharPlatform.Controllers
                 await _unitOfWork.SaveAsync();
                 return Ok(new { message = "Charity registered successfully." });
             }
-            catch (ArgumentException ex)
+            catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (InvalidOperationException ex)
-            {
-                return StatusCode(500, new { message = ex.Message });
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, new { message = "An unexpected error occurred during charity registration." });
+                // اطبع الاستثناء عشان تشوف السبب الحقيقي
+                Console.WriteLine(ex);
+                return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
             }
         }
+
 
         [HttpPost("[action]")]
         public async Task<IActionResult> Login(LoginDto model)
