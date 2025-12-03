@@ -1,8 +1,9 @@
-import axios from "axios";
 import api from "../Auth/AxiosInstance";
 
 export async function charityRegisterRequest(formData) {
-    return api.post(`/Account/CharityRegister`, formData);
+    return api.post(`/Account/CharityRegister`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
 }
 
 export const fetchCharities = async ({
@@ -26,6 +27,18 @@ export const fetchCharities = async ({
 export const fetchCharityByIdFromApi = async (id) => {
     const res = await api.get(`/charities/${id}`);
     return res.data;
+};
+
+export const fetchCharityProfileById = async (id) => {
+    try {
+        const res = await api.get(`/charities/charityProfile/${id}`);
+        return res.data;
+    } catch (error) {
+        console.error("فشل جلب بيانات الجمعية:", error);
+        throw new Error(
+            error.response?.data?.message || "تعذر تحميل بيانات الجمعية"
+        );
+    }
 };
 
 export const fetchCampaignsByCharityId = async (id) => {

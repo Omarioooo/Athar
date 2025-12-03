@@ -14,8 +14,8 @@ import Home from "../pages/Home";
 import VolunteeringForms from "../pages/profile/charity-profile/VolunteeringForms";
 
 export const roleConfig = {
-    charity: {
-        role: "charity",
+    CharityAdmin: {
+        role: "charityAdmin",
         nav: [
             { label: "حسابي", path: "charityhomeinfo", icon: <RiHome9Line /> },
             { label: "حملاتي", path: "mycampaigns", icon: <TbReplaceFilled /> },
@@ -42,8 +42,8 @@ export const roleConfig = {
         defaultPage: "charityhomeinfo",
     },
 
-    donor: {
-        role: "donor",
+    Donor: {
+        role: "Donor",
         nav: [
             { label: "حسابي", path: "donorhomeinfo", icon: <RiHome9Line /> },
             { label: "أثري", path: "myathar", icon: <GiSelfLove /> },
@@ -61,8 +61,8 @@ export const roleConfig = {
         defaultPage: "donorhomeinfo",
     },
 
-    admin: {
-        role: "admin",
+    SuperAdmin: {
+        role: "superAdmin",
         nav: [
             { label: "الرئيسية", path: "adminhomeinfo", icon: <RiHome9Line /> },
         ],

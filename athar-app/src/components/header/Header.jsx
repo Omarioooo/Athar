@@ -13,6 +13,7 @@ export default function Header() {
     const { user, loading } = UseAuth();
     const [menuOpen, setMenuOpen] = useState(false);
 
+
     if (loading) {
         return (
             <header className="header">
@@ -53,7 +54,6 @@ export default function Header() {
             <LinksMenu
                 open={menuOpen}
                 setOpen={setMenuOpen}
-                role={role}
                 user={user}
             />
         </header>

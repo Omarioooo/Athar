@@ -17,7 +17,7 @@ namespace AtharPlatform.Controllers
             _donorService = donorService;
         }
 
-        [HttpGet("/donor-profile/{id}")]
+        [HttpGet("donorProfile/{id}")]
         public async Task<IActionResult> GetDonorProfile(int id)
         {
             try
@@ -26,14 +26,14 @@ namespace AtharPlatform.Controllers
 
                 return Ok(profile);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
 
         }
 
-        [HttpGet("/users/profile-image/{donorId}")]
+        [HttpGet("users/profile-image/{donorId}")]
         public async Task<IActionResult> GetProfileImage(int donorId)
         {
             var donor = await _donorService.GetDonorFullProfileAsync(donorId);

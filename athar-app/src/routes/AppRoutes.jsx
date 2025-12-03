@@ -2,8 +2,6 @@ import { AnimatePresence } from "framer-motion";
 import { Routes, Route, useLocation } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import { RequireAuth } from "../Auth/RequireAuth";
-import { ProfileRoutesWrapper } from "../routes/ProfileRoutesWrapper";
-import { ProfileDynamicRoutes } from "../routes/ProfileDynamicRoutes";
 import { DashboardWrapper } from "./DashboardWrapper";
 
 // Pages
@@ -20,6 +18,8 @@ import CampaignDetails from "../pages/campaign/CampaignDetails";
 import Charities from "../pages/charity/Charities";
 import CharityProfile from "../pages/charity/CharityProfile";
 import NotFound from "../pages/callback/NotFound";
+import ProfilePageRoute from "./ProfilePageRoute";
+import ProfilePageRouteWrapper from "./ProfilePageRouteWrapper";
 
 export default function AppRoutes() {
     const location = useLocation();
@@ -43,17 +43,12 @@ export default function AppRoutes() {
                             element={<Notifications />}
                         />
                         <Route
-                            path="profile/:id"
-                            element={<ProfileRoutesWrapper />}
-                        >
-                            <Route
-                                path="*"
-                                element={<ProfileDynamicRoutes />}
-                            />
-                        </Route>
+                            path="profile/:id/*"
+                            element={<ProfilePageRoute />}
+                        />
                     </Route>
                 </Route>
-                
+
                 {/* DashBoard */}
                 <Route
                     path="dashboard/*"

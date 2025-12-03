@@ -6,18 +6,15 @@ import NotAuth from "../pages/callback/NotAuth";
 export function DashboardWrapper() {
     const { user } = UseAuth();
     const role = user?.role;
-
-
-    console.log("role is ", role);
     
-    if (!role || (role !== "superAdmin" && role !== "charityAdmin")) {
+    if (role==null || (role !== "SuperAdmin" && role !== "CharityAdmin")) {
         return <NotAuth />;
     }
 
     switch (role) {
-        case "superAdmin":
+        case "SuperAdmin":
             return <AdminDashboard />;
-        case "charityAdmin":
+        case "CharityAdmin":
             return <CharityDashBoard />;
         default:
             return <NotAuth />;

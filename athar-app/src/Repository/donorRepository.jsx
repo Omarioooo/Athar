@@ -8,7 +8,8 @@ export function donorRegister(formData) {
 
 export async function fetchDonorByIdFromApi(id) {
     try {
-        const res = await api.get(`/donor-profile/${id}`);
+        const res = await api.get(`/Donor/donorProfile/${id}`);
+
         return res.data;
     } catch (error) {
         const msg =

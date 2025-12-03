@@ -947,22 +947,6 @@ namespace AtharPlatform.Controllers
             return Ok(result);
         }
 
-        // (GET) /api/charities/{id}/image - serve manual image bytes as a browser-friendly URL
-        //[HttpGet("{id:int}/image")]
-        //[AllowAnonymous]
-        //public async Task<IActionResult> GetImage(int id)
-        //{
-        //    var charity = await _unitOfWork.Charities.GetAsync(id);
-        //    if (charity == null)
-        //        return NotFound();
-
-        //    // If you later store content type, use it here. Default to JPEG.
-        //    if (charity.Image == null || charity.Image.Length == 0)
-        //        return NotFound();
-        //    return File(charity.Image, "image/jpeg");
-        //}
-
-
 
     }
 }
