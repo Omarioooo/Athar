@@ -87,7 +87,9 @@ namespace AtharPlatform.Services
                 FirstName = donor.FirstName,
                 LastName = donor.LastName,
                 Email = donor.Account.Email,
-                ImageUrl = donor.Account?.ProfileImage != null ? $"{baseUrl}/api/account/users/profile-image/{donor.Id}" : null,
+                //ImageUrl = donor.Account?.ProfileImage != null ? $"{baseUrl}/api/account/users/profile-image/{donor.Id}" : null,
+               ImageUrl = donor.Account?.ProfileImage != null ? $"{baseUrl}/api/Donor/profile-image/{donor.Id}" : null,
+
                 Country = donor.Account?.Country,
                 City = donor.Account?.City,
                 DonationsCount = donations?.Count ?? 0,
