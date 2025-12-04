@@ -14,6 +14,7 @@ namespace AtharPlatform.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAccountService _accountService;
 
+
         public AccountController(IUnitOfWork unitOfWork, IAccountService accountService, IDonorService donorService)
         {
             _unitOfWork = unitOfWork;
@@ -136,6 +137,34 @@ namespace AtharPlatform.Controllers
                 return StatusCode(500, new { message = "An unexpected error occurred during login." });
             }
         }
+
+
+
+
+        //[HttpGet("donors/{id}/profile")]
+        //public async Task<IActionResult> GetDonorProfile(int id)
+        //{
+        //    var profile = await _donorService.GetDonorByIdAsync(id);
+        //    if (profile == null)
+        //        return NotFound(new { message = "Donor not found" });
+
+
+
+        //    return Ok(profile);
+        //}
+
+
+        //[HttpGet("users/profile-image/{donorId}")]
+        //public async Task<IActionResult> GetProfileImage(int donorId)
+        //{
+        //    var donor = await _donorService.GetDonorFullProfileAsync(donorId);
+
+        //    if (donor?.Account.ProfileImage == null || donor.Account.ProfileImage.Length == 0)
+        //        return NotFound(new { message = "No photo found" });
+
+        //    return File(donor.Account.ProfileImage, "image/png"); // يمكن تعديل النوع حسب الصورة
+        //}
+
 
     }
 }

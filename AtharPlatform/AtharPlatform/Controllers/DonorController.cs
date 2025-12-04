@@ -33,7 +33,7 @@ namespace AtharPlatform.Controllers
 
         }
 
-        [HttpGet("users/profile-image/{donorId}")]
+        [HttpGet("profile-image/{donorId}")]
         public async Task<IActionResult> GetProfileImage(int donorId)
         {
             var donor = await _donorService.GetDonorFullProfileAsync(donorId);
