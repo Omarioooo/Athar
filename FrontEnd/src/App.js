@@ -15,6 +15,7 @@ import { UseAuth } from './Auth/Auth';
 import { RequireDonorAuth } from './Auth/RequireDonorAuth';
 import { RequireAuth } from './Auth/requireauth';
 import CampaignDetail from "./pages/compaign-details/compaign-details";
+import '@fortawesome/fontawesome-free/css/all.min.css';
 function App() {
   const auth=UseAuth();
   return (
