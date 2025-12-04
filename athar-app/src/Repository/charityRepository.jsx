@@ -20,7 +20,7 @@ export const fetchCharities = async ({
 
     if (query) params.append("query", query.trim());
 
-    const response = await api.get(`/charities?${params}`);
+    const response = await api.get(`/charities/GetAll?${params}`);
     return response.data;
 };
 

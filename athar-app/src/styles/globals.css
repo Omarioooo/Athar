@@ -1,8 +1,8 @@
 /*Fonts*/
-@import url("https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap"); */
 
-/* Global Setting */
-* {
+/* /* Global Setting */
+ * { 
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -15,9 +15,6 @@ body {
     text-align: right;
 }
 
-ul {
-    list-style: none;
-}
 
 .main {
     min-height: 80vh;
@@ -38,7 +35,7 @@ ul {
 
 a {
     text-decoration: none;
-}
+} */
 
 .section-title {
     font-size: 24px;
@@ -46,249 +43,290 @@ a {
     color: var(--primary);
     font-weight: bold;
 }
+/* /////////////landingpage */
 
-/***/
+
 /* /////////////////////////////////////////////////////////compaign */
-.campaign-btn {
-    margin-top: 30px;
-    width: 90%;
-    height: 30px;
-    text-align: center;
+.campaign-btn-gihad{
+  margin-top: 30px;
+  width:90%;
+  height:30px;
+  text-align: center;
+
 }
-.campaign-description {
-    color: rgb(132, 131, 131);
+.campaign-description{
+  color:rgb(132, 131, 131);
     display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
-.p-complete {
-    font-size: 15px;
-    color: rgba(18, 162, 228, 0.927);
+.p-complete{
+  font-size: 15px;
+  color: rgba(18, 162, 228, 0.927);
+  
 }
-.time-left {
-    font-size: 15px;
-    color: rgba(18, 162, 228, 0.927);
+.time-left{
+ font-size: 15px;
+  color: rgba(18, 162, 228, 0.927);
+ 
 }
-.p-btn {
-    margin-top: -6px;
+.p-btn-gihad{
+ margin-top: -6px;
 }
-.p-underprogress {
-    display: flex;
-    gap: 160px;
+.p-underprogress{
+  display: flex;
+  gap: 160px;
 }
 .campaign-card {
-    overflow: hidden;
-    border-radius: 12px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;       
+  border-radius: 12px;    
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-.img-campaign {
-    overflow: hidden;
-
-    transition: transform 0.3s ease;
+.img-campaign{
+   overflow: hidden;       
+    
+  transition: transform 0.3s ease;
 }
 .campaign-card:hover {
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+          
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);  
 }
 
 .campaign-card img {
-    transition: transform 0.4s ease;
+  transition: transform 0.4s ease;    
+    
 }
 .img-campaign {
-    width: 100%;
-    height: 200px;
-    overflow: hidden;
-    border-radius: 10px;
+  width: 100%;
+  height: 200px;       
+  overflow: hidden;   
+  border-radius: 10px;  
 }
 .img-campaign img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
     /* //make the img cover the height */
 }
 .campaign-card:hover img {
-    transform: scale(1.1);
+  transform: scale(1.1);                    
 }
 .campaign-card:hover .cmp-title {
-    color: rgba(18, 162, 228, 0.927);
+ color:  rgba(18, 162, 228, 0.927);                 
 }
 .input-compaign {
-    padding: 10px 15px;
-    width: 300px;
+  padding: 10px 15px;
+  width: 300px;
 
-    border: 1px solid #ccc;
-    outline: none;
-    text-align: center;
-    margin-bottom: 10px;
-    font-size: 16px;
+  border: 1px solid #ccc;
+  outline: none;
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 16px;
 
     border-radius: 0 25px 25px 0;
 }
 
 .btn-compaign {
-    padding: 10px 25px;
-    border-radius: 25px 0 0 25px;
-    border: none;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
-    background-color: rgba(18, 162, 228, 0.927);
+  padding: 10px 25px;
+   border-radius: 25px 0 0 25px; 
+  border: none;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+  background-color: rgba(18, 162, 228, 0.927);
+
 }
-.serch-company {
-    text-align: center;
-    border-radius: 25px;
+.serch-company{
+ text-align: center;
+ border-radius: 25px;
 }
 
 .btn-compaign:hover {
-    background-color: rgba(10, 130, 200, 0.9);
+  background-color: rgba(10, 130, 200, 0.9);
 }
-.reaction {
-    display: flex;
-    gap: 160px;
+.reaction{
+   display: flex;
+  gap: 160px;
 }
-.ireaction {
-    color: rgba(18, 162, 228, 0.927);
+.ireaction{
+   color:  rgba(18, 162, 228, 0.927);  
 }
 /* //////////////////////////////////content */
 .content-card {
-    overflow: hidden;
-    border-radius: 12px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.content-body {
-    min-height: 150px;
-}
-.img-content {
-    overflow: hidden;
+  overflow: hidden;       
+  border-radius: 12px;    
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 
-    transition: transform 0.3s ease;
+}
+.content-body{
+  min-height: 150px;
+}
+.img-content{
+   overflow: hidden;       
+    
+  transition: transform 0.3s ease;
 }
 .content-card:hover {
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+          
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);  
 }
 
 .content-card img {
-    transition: transform 0.4s ease;
+  transition: transform 0.4s ease;         
 }
 
 .content-card:hover img {
-    transform: scale(1.1);
+  transform: scale(1.1);                    
 }
 .content-card:hover .cnt-title {
-    color: rgba(18, 162, 228, 0.927);
+ color:  rgba(18, 162, 228, 0.927);                 
 }
-.content-description {
-    color: rgb(132, 131, 131);
+.content-description{
+  color:rgb(132, 131, 131);
 }
+.overlay-info {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  justify-content: space-between;
+  z-index: 2;
+  gap: 10px;
+}
+
+.cmpcnt-title, .charity-gihad {
+  font-size: 13px;
+  font-weight: bold;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.cmpcnt-title {
+background: linear-gradient(90deg, #03a9f4, #0288d1);
+}
+
+.charity-gihad {
+  background: linear-gradient(90deg, #03a9f4, #0288d1);
+}
+
 /* ////////////////////////////////////////////////login */
-.login-section {
-    background: linear-gradient(180deg, #e8f4f8 0%, #f5fafc 100%);
-    height: 610px;
+.login-section{
+  background: linear-gradient(180deg, #E8F4F8 0%, #F5FAFC 100%);
+  height:610px;
+ 
 }
-.login-h1 {
-    background: linear-gradient(to right, #f1c147, #6cc5a5, #7bc3ff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+.login-h1{
+  background: linear-gradient(to right, #f1c147, #6cc5a5, #7bc3ff);
+     -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+} 
+.login-smallsection{
+  margin-top:100px;
+  width:400px;
+  height: 450px;
+  margin: auto;
+  background-color: white ;
+  border-radius: 10px;
+   
 }
-.login-smallsection {
-    margin-top: 100px;
-    width: 400px;
-    height: 450px;
-    margin: auto;
-    background-color: white;
-    border-radius: 10px;
+.login-input{
+color: rgb(132, 131, 131);
 }
-.login-input {
-    color: rgb(132, 131, 131);
+.login-p,.login-h1,.login-h4,.login-p2{
+  text-align: center;
 }
-.login-p,
-.login-h1,
-.login-h4,
-.login-p2 {
-    text-align: center;
+.login-p2{
+  color: rgb(115, 115, 115);
 }
-.login-p2 {
-    color: rgb(115, 115, 115);
+.login-btn{
+  width:80%;
+  height:40px;
+  border-radius: 8px;
+   background-color: rgba(78, 182, 230, 0.927);
+  margin:40px 40px;
 }
-.login-btn {
-    width: 80%;
-    height: 40px;
-    border-radius: 8px;
-    background-color: rgba(78, 182, 230, 0.927);
-    margin: 40px 40px;
+.login-btn:hover{
+   background-color: rgba(132, 194, 223, 0.927);
 }
-.login-btn:hover {
-    background-color: rgba(132, 194, 223, 0.927);
+.a-login{
+color:rgba(78, 182, 230, 0.927);
 }
-.a-login {
-    color: rgba(78, 182, 230, 0.927);
-}
-.login-div {
-    margin: auto;
-    text-align: center;
+.login-div{
+  margin: auto;
+  text-align: center;
 }
 /* /////////////////////////////////////////register */
-.register-idiv {
-    height: 100px;
-    width: 100px;
-    border-radius: 50%;
-    background-color: rgba(78, 182, 230, 0.927);
-    text-align: center;
-    margin: auto;
+.register-idiv{
+  height:100px;
+  width:100px;
+  border-radius: 50%;
+  background-color: rgba(78, 182, 230, 0.927);
+  text-align: center;
+  margin: auto;
+ 
 }
-.register-i {
-    font-size: 50px;
-    margin-top: 20px;
+.register-i{
+ font-size: 50px;
+ margin-top:20px;
+ 
 }
-.register-container {
-    background: linear-gradient(180deg, #e8f4f8 0%, #f5fafc 100%);
+.register-container{
+   background: linear-gradient(180deg, #E8F4F8 0%, #F5FAFC 100%);
+   
+    
 }
-.register-row {
-    padding: 50px;
+.register-row{
+  padding: 50px;
 }
-.register-card,
-.register-card2 {
-    margin: auto;
-    background-color: white;
-    padding: 30px;
-    border-radius: 5px;
-    border: 2px solid rgb(218, 213, 213);
-    transition: 0.3s;
+.register-card,.register-card2{
+  margin: auto;
+  background-color: white;
+padding:30px;
+border-radius: 5px;
+ border: 2px solid rgb(218, 213, 213); 
+  transition: 0.3s;
+  
 }
-.register-card:hover {
-    border-color: rgba(78, 182, 230, 0.927);
-    transform: scale(1.05);
+.register-card:hover{
+  border-color: rgba(78, 182, 230, 0.927);
+   transform: scale(1.05);
 }
-.register-card2:hover {
-    border-color: #ffca28;
-    transform: scale(1.05);
+.register-card2:hover{
+  border-color: #ffca28;
+  transform: scale(1.05);
+
 }
 
-.register-concept {
-    text-align: center;
+.register-concept{
+  text-align: center;
 }
-.register-idiv2 {
-    background-color: #ffca28;
-    height: 100px;
-    width: 100px;
-    border-radius: 50%;
-
-    text-align: center;
-    margin: auto;
+.register-idiv2{
+   background-color: #ffca28;
+     height:100px;
+  width:100px;
+  border-radius: 50%;
+  
+  text-align: center;
+  margin: auto;
 }
 /* ///////////////////////////////////////charityregister */
-.charityregister-section {
-    background: linear-gradient(180deg, #e8f4f8 0%, #f5fafc 100%);
+.charityregister-section{
+    background: linear-gradient(180deg, #E8F4F8 0%, #F5FAFC 100%);
     margin: auto;
 }
-.charityregister-media {
-    text-align: center;
+.charityregister-media{
+  text-align: center;
 }
-.charityregister-smallsection {
-    background-color: white;
-    width: 40%;
+.charityregister-smallsection{
+  background-color: white;
+  width:40%;
 
-    margin: auto;
-    padding: 10px;
+  margin: auto;
+padding: 10px;
 }

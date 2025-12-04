@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Link } from "react-router-dom";
+import Pagination from "../../components/Pagination";
 import {
     fetchAllCampaigns,
     fetchCampaignsByType,
@@ -183,9 +184,9 @@ export default function Campaigns() {
 
                                             <Link
                                                 to={`/campaign/${cmp.id}`}
-                                                className="btn btn-warning campaign-btn"
+                                                className="btn btn-warning campaign-btn-gihad"
                                             >
-                                                <p className="p-btn">
+                                                <p className="p-btn-gihad">
                                                     تبرع الان{" "}
                                                     <i className="fa-solid fa-heart first-section-i"></i>
                                                 </p>
@@ -197,31 +198,11 @@ export default function Campaigns() {
                         </div>
 
                         {/* Pagination */}
-                        <div
-                            style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                marginTop: "20px",
-                            }}
-                        >
-                            <ul className="pagination">
-                                {pages.map((page) => (
-                                    <li
-                                        key={page}
-                                        className={`page-item ${
-                                            currentPage === page ? "active" : ""
-                                        }`}
-                                    >
-                                        <button
-                                            className="page-link"
-                                            onClick={() => setCurrentPage(page)}
-                                        >
-                                            {page}
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+                        <Pagination
+                                   page={currentPage}
+                                   totalPages={totalPage}
+                                  onPageChange={setCurrentPage}
+                     />
                     </>
                 )}
             </div>
