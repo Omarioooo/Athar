@@ -1,22 +1,24 @@
 import { IoIosLogOut } from "react-icons/io";
-import { Navigate, NavLink, replace } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { UseAuth } from "../../Auth/Auth";
-import { Replace } from "lucide-react";
 
-export default function Nav({ links }) {
+export default function Nav({ links, baseUrl }) {
     const auth = UseAuth();
+    const navigate = useNavigate();
+
     const handleLogout = (e) => {
         e.preventDefault();
         auth.logout();
-        Navigate("/", Replace);
+        navigate("/", { replace: true });
     };
+
     return (
         <div className="profile-nav">
             <div className="links">
                 {links.map(({ path, label, icon }) => (
                     <NavLink
                         key={path}
-                        to={path}
+                        to={`${baseUrl}/${path}`}
                         className={({ isActive }) =>
                             `link ${isActive ? "active" : ""}`
                         }
@@ -27,6 +29,7 @@ export default function Nav({ links }) {
                     </NavLink>
                 ))}
             </div>
+
             <button
                 data-title="تسجيل خروج"
                 className="logout"

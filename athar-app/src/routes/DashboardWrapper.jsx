@@ -4,15 +4,17 @@ import CharityDashBoard from "../pages/dashboard/CharityDashboard";
 import NotAuth from "../pages/callback/NotAuth";
 
 export function DashboardWrapper() {
-    const auth = UseAuth();
-    const role = auth.user?.role;
-
-    if (!role) return <NotAuth />;
+    const { user } = UseAuth();
+    const role = user?.role;
+    
+    if (role==null || (role !== "SuperAdmin" && role !== "CharityAdmin")) {
+        return <NotAuth />;
+    }
 
     switch (role) {
-        case "admin":
+        case "SuperAdmin":
             return <AdminDashboard />;
-        case "charity":
+        case "CharityAdmin":
             return <CharityDashBoard />;
         default:
             return <NotAuth />;

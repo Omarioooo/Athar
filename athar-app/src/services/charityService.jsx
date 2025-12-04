@@ -1,6 +1,7 @@
 import {
     charityRegisterRequest as repoRegister,
     fetchCharities,
+    fetchCharityProfileById,
 } from "../Repository/charityRepository";
 import { validateEmail } from "../utils/validation/validateEmail";
 import {
@@ -22,7 +23,7 @@ import {
 
 function validateCharityForm(user) {
     console.log("Charity USer is :- ", user);
-    
+
     return {
         emailerror: validateEmail(user.email),
         charitynameerror: validateCharityName(user.charityname),
@@ -106,7 +107,7 @@ export async function getAllCharities(
     return data;
 }
 
-export const getCharityProfileData = async (charityId) => {
+export const getCharityView = async (charityId) => {
     if (!charityId) throw new Error("Charity ID is required");
 
     try {
@@ -161,3 +162,8 @@ export const getCharityProfileData = async (charityId) => {
         throw error;
     }
 };
+
+export async function getCharityProfile({ id }) {
+    const profile = await fetchCharityProfileById(id);
+    return profile;
+}

@@ -1,3 +1,4 @@
+// components/header/Header.jsx
 import { useState } from "react";
 import Logo from "./Logo";
 import LinksBar from "./LinksBar";
@@ -8,32 +9,53 @@ import LinksMenu from "./LinksMenu";
 import AuthButtons from "./AuthButtons";
 import { UseAuth } from "../../Auth/Auth";
 
-export default function Header({ role }) {
-    const auth = UseAuth();
+export default function Header() {
+    const { user, loading } = UseAuth();
     const [menuOpen, setMenuOpen] = useState(false);
+
+
+    if (loading) {
+        return (
+            <header className="header">
+                <div className="header-wrap">
+                    <Logo />
+                    <div
+                        className="skeleton skeleton-text"
+                        style={{ width: 200, height: 40 }}
+                    ></div>
+                </div>
+            </header>
+        );
+    }
+
+    const role = user?.role || null;
+
     return (
         <header className="header">
             <div className="header-wrap">
                 <Logo />
-
-                {/* Desktop Navigation */}
+                {/* LinkBar for large Screen */}
                 <LinksBar role={role} />
 
-                {!auth.user ? (
-                    <AuthButtons />
-                ) : (
+                {user ? (
                     <div className="header-icons">
                         <NotificationIcon />
-                        <ProfileIcon role={role} />
+                        <ProfileIcon user={user} />
                     </div>
+                ) : (
+                    <AuthButtons />
                 )}
 
-                {/* Mobile Menu Button */}
-                <MenuToggle open={menuOpen} setOpen={setMenuOpen} role={role} />
+                {/* Menu btn for small Screen */}
+                <MenuToggle open={menuOpen} setOpen={setMenuOpen} />
             </div>
 
-            {/* Mobile Menu */}
-            <LinksMenu open={menuOpen} setOpen={setMenuOpen} role={role} />
+            {/* Menu for small Screen */}
+            <LinksMenu
+                open={menuOpen}
+                setOpen={setMenuOpen}
+                user={user}
+            />
         </header>
     );
 }

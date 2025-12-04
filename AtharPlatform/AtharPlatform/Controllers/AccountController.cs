@@ -13,13 +13,11 @@ namespace AtharPlatform.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAccountService _accountService;
-        private readonly IDonorService _donorService;
 
-        public AccountController(IUnitOfWork unitOfWork, IAccountService accountService,IDonorService donorService)
+        public AccountController(IUnitOfWork unitOfWork, IAccountService accountService, IDonorService donorService)
         {
             _unitOfWork = unitOfWork;
             _accountService = accountService;
-            _donorService = donorService;
         }
 
         [HttpPost("[action]")]
@@ -139,6 +137,7 @@ namespace AtharPlatform.Controllers
             }
         }
 
+<<<<<<< HEAD
 
 
         [HttpGet("donors/{id}/profile")]
@@ -165,5 +164,7 @@ namespace AtharPlatform.Controllers
             return File(donor.Account.ProfileImage, "image/png"); // يمكن تعديل النوع حسب الصورة
         }
 
+=======
+>>>>>>> fd68f6abb0695100955a87e1f0e17001d59f01d4
     }
 }

@@ -9,6 +9,7 @@ import {
     validateLastName,
 } from "../utils/validation/validateDonorData";
 import { parseRegisterError } from "../utils/errors/parseRegisterError";
+import { fetchDonorByIdFromApi } from "../Repository/donorRepository";
 
 export function validateDonorForm(user) {
     return {
@@ -25,8 +26,6 @@ export function validateDonorForm(user) {
 
 export async function registerDonor(user) {
     const errors = validateDonorForm(user);
-    console.log("User is :- " + user);
-    console.log("Errors is :- " + errors);
 
     if (Object.values(errors).some((e) => e !== null)) {
         return { success: false, errors };
@@ -51,4 +50,9 @@ export async function registerDonor(user) {
             errors: { serverError: parseRegisterError(err) },
         };
     }
+}
+
+export async function getDonorProfile({ id }) {
+    const profile = await fetchDonorByIdFromApi(id);
+    return profile;
 }

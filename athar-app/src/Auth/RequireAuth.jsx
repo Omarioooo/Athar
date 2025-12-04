@@ -1,16 +1,17 @@
 import { UseAuth } from "../Auth/Auth";
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 export const RequireAuth = ({ children }) => {
     const { user, loading } = UseAuth();
+    const location = useLocation();
 
     if (loading) {
-        return <div>Loading...</div>;
+        return null;
     }
 
     if (!user) {
-        return <Navigate to="/login" replace={true} />;
+        return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
-    return children;
+    return children || <Outlet />;
 };

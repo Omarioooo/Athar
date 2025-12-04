@@ -1,10 +1,8 @@
-import axios from "axios";
-
-const API_URL = "https://localhost:5192/api/Campaign";
+import api from "../Auth/AxiosInstance";
 
 const getRequest = async (endpoint, params = {}) => {
     try {
-        const response = await axios.get(`${API_URL}/${endpoint}`, { params });
+        const response = await api.get(`/Campaign/${endpoint}`, { params });
         return response.data.items || response.data;
     } catch (error) {
         const message = error.response?.data?.message || error.message;

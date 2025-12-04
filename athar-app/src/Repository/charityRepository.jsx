@@ -1,9 +1,9 @@
-import axios from "axios";
-
-const API_BASE = "https://localhost:5192/api";
+import api from "../Auth/AxiosInstance";
 
 export async function charityRegisterRequest(formData) {
-    return axios.post(`${API_BASE}/Account/CharityRegister`, formData);
+    return api.post(`/Account/CharityRegister`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
 }
 
 export const fetchCharities = async ({
@@ -20,17 +20,29 @@ export const fetchCharities = async ({
 
     if (query) params.append("query", query.trim());
 
-    const response = await axios.get(`${API_BASE}/charities?${params}`);
+    const response = await api.get(`/charities?${params}`);
     return response.data;
 };
 
 export const fetchCharityByIdFromApi = async (id) => {
-    const res = await axios.get(`${API_BASE}/charities/${id}`);
+    const res = await api.get(`/charities/${id}`);
     return res.data;
 };
 
+export const fetchCharityProfileById = async (id) => {
+    try {
+        const res = await api.get(`/charities/charityProfile/${id}`);
+        return res.data;
+    } catch (error) {
+        console.error("فشل جلب بيانات الجمعية:", error);
+        throw new Error(
+            error.response?.data?.message || "تعذر تحميل بيانات الجمعية"
+        );
+    }
+};
+
 export const fetchCampaignsByCharityId = async (id) => {
-    const res = await axios.get(`${API_BASE}/charities/${id}/campaigns`);
+    const res = await api.get(`/charities/${id}/campaigns`);
     return res.data;
 };
 
@@ -40,15 +52,13 @@ export const fetchPagedContentByCharityId = async (
     pageSize = 12
 ) => {
     const params = new URLSearchParams({ page, pageSize });
-    const res = await axios.get(
-        `${API_BASE}/charities/charity/${charityId}/paged?${params}`
+    const res = await api.get(
+        `/charities/charity/${charityId}/paged?${params}`
     );
     return res.data;
 };
 
 export const fetchFollowersCount = async (charityId) => {
-    const res = await axios.get(
-        `${API_BASE}/charities/${charityId}/followers/count`
-    );
+    const res = await api.get(`/charities/${charityId}/followers/count`);
     return res.data;
 };

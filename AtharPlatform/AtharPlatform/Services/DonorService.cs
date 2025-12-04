@@ -29,8 +29,6 @@ namespace AtharPlatform.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-
-
         public async Task<bool> DonateToCharityAsync(DonationDto model)
         {
             // Check the donor
@@ -75,7 +73,7 @@ namespace AtharPlatform.Services
         {
             var donor = await _unitOfWork.Donors.GetDonorFullProfileAsync(id);
             if (donor == null)
-                return null;
+                throw new Exception("Donor not found");
 
             var baseUrl = _httpContextAccessor.HttpContext != null
                 ? $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}"

@@ -72,7 +72,7 @@ namespace AtharPlatform.Services
                 ?? new List<MiniCampaignDto>();
 
 
-           
+
             return new CharityProfileDto
             {
                 Name = charity.Name,
@@ -83,7 +83,7 @@ namespace AtharPlatform.Services
                 CampaignsCount = campaigns.Count,
                 TotalRaised = totalRaised,
                 FollowersCount = charity.Follows?.Count ?? 0,
-
+                status = charity.Status,
                 Campaigns = campaigns
             };
         }

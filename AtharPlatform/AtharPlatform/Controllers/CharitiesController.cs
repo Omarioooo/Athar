@@ -38,11 +38,11 @@ namespace AtharPlatform.Controllers
         {
             if (string.IsNullOrEmpty(imageUrl))
                 return null;
-            
+
             // If already a full URL (external), return as-is
             if (imageUrl.StartsWith("http://") || imageUrl.StartsWith("https://"))
                 return imageUrl;
-            
+
             // Convert relative path to full URL
             var request = HttpContext.Request;
             // Force HTTPS scheme
@@ -99,7 +99,7 @@ namespace AtharPlatform.Controllers
 
         // غلق باب التطوع
         [HttpPost("close-volunteers/{charityId}")]
-       //[Authorize(Roles = "CharityAdmin")]
+        //[Authorize(Roles = "CharityAdmin")]
         public async Task<IActionResult> CloseVolunteers(int charityId)
         {
             try
@@ -128,7 +128,7 @@ namespace AtharPlatform.Controllers
 
         // فتح باب العروض للـ Vendor
         [HttpPost("open-vendor-offers/{charityId}")]
-       // [Authorize(Roles = "CharityAdmin")]
+        // [Authorize(Roles = "CharityAdmin")]
         public async Task<IActionResult> OpenVendorOffers(int charityId)
         {
             try
@@ -175,7 +175,7 @@ namespace AtharPlatform.Controllers
 
         // غلق باب العروض للـ Vendor
         [HttpPost("close-vendor-offers/{charityId}")]
-       // [Authorize(Roles = "CharityAdmin")]
+        // [Authorize(Roles = "CharityAdmin")]
         public async Task<IActionResult> CloseVendorOffers(int charityId)
         {
             try
@@ -205,7 +205,7 @@ namespace AtharPlatform.Controllers
 
         /*علشان التعامل بتاع الصور!!!!!!!!!!*/
 
-        [HttpGet("fullProfile/{id}")]
+        [HttpGet("charityProfile/{id}")]
         public async Task<IActionResult> GetCharity(int id)
         {
             var result = await _charityService.GetCharityByIdAsync(id);
@@ -238,9 +238,9 @@ namespace AtharPlatform.Controllers
         // (GET) /api/charities?query=&page=1&pageSize=12
         [HttpGet("all")]
         public async Task<ActionResult<AtharPlatform.Dtos.PaginatedResultDto<CharityCardDto>>> GetAll(
-            [FromQuery] string? query, 
-            [FromQuery] int page = 1, 
-            [FromQuery] int pageSize = 12, 
+            [FromQuery] string? query,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 12,
             [FromQuery] bool includeCampaigns = false,
             [FromQuery] bool? isActive = null,
             [FromQuery] bool? isScraped = null,
@@ -252,11 +252,10 @@ namespace AtharPlatform.Controllers
                 return BadRequest("Page and PageSize must be greater than zero.");
 
 
-
             var total = await _unitOfWork.Charities.CountAsync(
-                query, 
-                isActive, 
-                isScraped, 
+                query,
+                isActive,
+                isScraped,
                 hasExternalWebsite);
 
             if (total == 0)// Handle empty data
@@ -270,8 +269,8 @@ namespace AtharPlatform.Controllers
 
 
             var items = await _unitOfWork.Charities.GetPageAsync(
-                query, 
-                page, 
+                query,
+                page,
                 pageSize,
                 isActive,
                 isScraped,
@@ -282,7 +281,7 @@ namespace AtharPlatform.Controllers
             // 2) Indirect support: Campaign.SupportingCharitiesJson contains the charity name
             List<(int Id, string Name,/* byte[]? Image,*/ string? ImageUrl, string? ExternalWebsiteUrl, string Description)> pageCharities = items
                 // Use the charity primary key directly; Account may not be eagerly loaded in GetPageAsync
-                .Select(c => (c.Id, c.Name, /*c.Image,*/ 
+                .Select(c => (c.Id, c.Name, /*c.Image,*/
                                ToFullUrl(c.ImageUrl ?? (c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null)),
                                c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null, c.Description))
                 .ToList();
@@ -350,14 +349,14 @@ namespace AtharPlatform.Controllers
                 }
             }
 
-            var dto = new AtharPlatform.Dtos.PaginatedResultDto<CharityCardDto>
+            var dto = new PaginatedResultDto<CharityCardDto>
             {
                 Items = pageCharities.Select(pc => new CharityCardDto
                 {
                     Id = pc.Id,
                     Name = pc.Name,
                     Description = pc.Description,
-                   // Image = pc.Image,
+                    // Image = pc.Image,
                     ImageUrl = pc.ImageUrl,
                     ExternalWebsiteUrl = pc.ExternalWebsiteUrl,
                     CampaignsCount = includeCampaigns ? (campaignMap.TryGetValue(pc.Id, out var list) ? list.Count : 0) : 0,
@@ -369,6 +368,11 @@ namespace AtharPlatform.Controllers
                 PageSize = pageSize,
                 Total = total
             };
+            foreach (var item in dto.Items)
+            {
+                Console.WriteLine("IMAGE: " + item.ImageUrl);
+            }
+
             return Ok(dto);
         }
 
@@ -387,7 +391,7 @@ namespace AtharPlatform.Controllers
                 Id = c.Id,
                 Name = c.Name,
                 Description = c.Description,
-               // Image = c.Image,
+                // Image = c.Image,
                 ImageUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
                 ExternalWebsiteUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null,
                 Campaigns = (c.Campaigns ?? new()).Select(x => new MiniCampaignDto
@@ -431,7 +435,7 @@ namespace AtharPlatform.Controllers
                 Id = c.Id,
                 Name = c.Name,
                 Description = c.Description,
-               // Image = c.Image,
+                // Image = c.Image,
                 ImageUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
                 ExternalWebsiteUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null
             };
@@ -449,7 +453,7 @@ namespace AtharPlatform.Controllers
                 Id = c.Id,
                 Name = c.Name,
                 Description = c.Description,
-               // Image = c.Image,
+                // Image = c.Image,
                 ImageUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ImageUrl : null,
                 ExternalWebsiteUrl = c.ScrapedInfo != null ? c.ScrapedInfo.ExternalWebsiteUrl : null,
                 CampaignsCount = c.Campaigns?.Count ?? 0
@@ -523,7 +527,7 @@ namespace AtharPlatform.Controllers
 
         // (PUT) /api/charities/{id} - update charity (name/description/image and optional external links)
         [HttpPut("{id:int}")]
-       // [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+        // [Authorize(Roles = "CharityAdmin,SuperAdmin")]
         public async Task<IActionResult> Update(int id, [FromBody] CharityUpdateDto body)
         {
             var userId = _accountContextService.GetCurrentAccountId();
@@ -581,7 +585,7 @@ namespace AtharPlatform.Controllers
             var admins = await _userManager.GetUsersInRoleAsync("SuperAdmin");
             var adminId = admins.FirstOrDefault()?.Id;
 
-            
+
 
             // Receivers = charity owner
             var receivers = new List<int> { charity.Id };
@@ -596,7 +600,7 @@ namespace AtharPlatform.Controllers
         }
 
         [HttpPost("{id:int}/reject")]
-       // [Authorize(Roles = "SuperAdmin")]
+        // [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Reject(int id)
         {
             var charity = await _db.Charities.FirstOrDefaultAsync(c => c.Id == id);
@@ -605,15 +609,15 @@ namespace AtharPlatform.Controllers
             await _unitOfWork.SaveAsync();
 
 
-            
+
             var admins = await _userManager.GetUsersInRoleAsync("SuperAdmin");
             var admin = admins.FirstOrDefault();
 
-            
+
 
             var adminId = admin.Id;
 
-            
+
             var receivers = new List<int> { charity.Id };
 
             await _notificationService.SendNotificationAsync(
@@ -916,7 +920,7 @@ namespace AtharPlatform.Controllers
 
         // (GET) /api/charities/{id}/material-donations
         [HttpGet("{id:int}/material-donations")]
-       // [Authorize(Roles = "CharityAdmin,SuperAdmin")]
+        // [Authorize(Roles = "CharityAdmin,SuperAdmin")]
         public async Task<ActionResult<IEnumerable<MaterialDonationDto>>> GetMaterialDonationsByCharity(int id)
         {
             // CharityAdmin can only view own material donations
@@ -942,22 +946,6 @@ namespace AtharPlatform.Controllers
             });
             return Ok(result);
         }
-
-        // (GET) /api/charities/{id}/image - serve manual image bytes as a browser-friendly URL
-        //[HttpGet("{id:int}/image")]
-        //[AllowAnonymous]
-        //public async Task<IActionResult> GetImage(int id)
-        //{
-        //    var charity = await _unitOfWork.Charities.GetAsync(id);
-        //    if (charity == null)
-        //        return NotFound();
-
-        //    // If you later store content type, use it here. Default to JPEG.
-        //    if (charity.Image == null || charity.Image.Length == 0)
-        //        return NotFound();
-        //    return File(charity.Image, "image/jpeg");
-        //}
-
 
 
     }
