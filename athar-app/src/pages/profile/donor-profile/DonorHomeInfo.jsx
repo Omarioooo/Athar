@@ -7,6 +7,8 @@ import { getDonorProfile } from "../../../services/donorService";
 export default function DonorHomeInfo() {
     function useDonorProfile() {
         const { user } = UseAuth();
+        console.log(user);
+
         const [profile, setProfile] = useState(null);
         const [loading, setLoading] = useState(true);
         const [error, setError] = useState(null);
@@ -20,10 +22,10 @@ export default function DonorHomeInfo() {
 
             getDonorProfile({ id: user.id })
                 .then((data) => {
-                    if (data.id !== user.id && user.role !== "Admin") {
-                        setError("غير مسموح لك بعرض هذه الصفحة");
-                    } else {
+                    if (data!==null) {
                         setProfile(data);
+                    } else {
+                        setError("غير مسموح لك بعرض هذه الصفحة");
                     }
                 })
                 .catch((err) => {
