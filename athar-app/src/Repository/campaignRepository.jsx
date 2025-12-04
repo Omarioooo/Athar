@@ -3,7 +3,7 @@ import api from "../Auth/AxiosInstance";
 const getRequest = async (endpoint, params = {}) => {
     try {
         const response = await api.get(`/Campaign/${endpoint}`, { params });
-        return response.data.items || response.data;
+        return response.data || response.data.items;
     } catch (error) {
         const message = error.response?.data?.message || error.message;
         throw new Error(message);
@@ -12,9 +12,12 @@ const getRequest = async (endpoint, params = {}) => {
 
 export const fetchAllCampaigns = async (page = 1, pageSize = 12) => {
     const data = await getRequest("GetAll", { page, pageSize });
+   console.log(data)
     return {
-        campaigns: data.items || data,
-        totalPages: data.totalPages || 1,
+
+        campaigns: data.items ||data,
+        totalPages: data.totalPages ,
+        
     };
 };
 

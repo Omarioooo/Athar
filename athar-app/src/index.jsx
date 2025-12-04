@@ -1,4 +1,5 @@
 import React from "react";
+import 'bootstrap/dist/css/bootstrap.rtl.min.css';
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./styles/globals.css";
@@ -23,6 +24,7 @@ import "./styles/charityCard.css";
 import "./styles/notFound.css";
 import "./styles/notAuth.css";
 import "./styles/volunteering.css";
+
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<App />);

@@ -3,7 +3,8 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import { RequireAuth } from "../Auth/RequireAuth";
 import { DashboardWrapper } from "./DashboardWrapper";
-
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import 'bootstrap/dist/css/bootstrap.rtl.min.css';
 // Pages
 import Home from "../pages/Home";
 import Zakaa from "../pages/Zakaa";
