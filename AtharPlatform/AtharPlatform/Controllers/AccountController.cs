@@ -159,7 +159,7 @@ namespace AtharPlatform.Controllers
         {
             var donor = await _donorService.GetDonorFullProfileAsync(donorId);
 
-            if (donor.Account.ProfileImage == null || donor.Account.ProfileImage.Length == 0)
+            if (donor?.Account.ProfileImage == null || donor.Account.ProfileImage.Length == 0)
                 return NotFound(new { message = "No photo found" });
 
             return File(donor.Account.ProfileImage, "image/png"); // يمكن تعديل النوع حسب الصورة
