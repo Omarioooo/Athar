@@ -27,25 +27,22 @@ namespace AtharPlatform.Services
             if (charity == null)
                 return null;
 
-            // Image
+       
             string? imageUrl;
 
             if (!string.IsNullOrEmpty(charity.ImageUrl))
             {
-               
-                imageUrl = charity.ImageUrl.StartsWith("http")
-                    ? charity.ImageUrl // لو الرابط كامل
-                    : $"{baseUrl}{charity.ImageUrl}";
+                imageUrl = charity.ImageUrl; // خارجي → رجعه كما هو
             }
             else if (charity.Account?.ProfileImage != null)
             {
-                
                 imageUrl = $"{baseUrl}/api/charities/profile-image/{charity.Id}";
             }
             else
             {
-                imageUrl = null; // مفيش صورة
+                imageUrl = null;
             }
+
 
             // Total raised across all campaigns
             double totalRaised =

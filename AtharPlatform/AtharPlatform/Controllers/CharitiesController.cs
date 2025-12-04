@@ -216,7 +216,10 @@ namespace AtharPlatform.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id:int}/image")]
+
+        //اسف لبشاعة المنظر بس ده حل شات 
+        //انما الي انا عمله  الكيوت الي فوقيه **:)
+        [HttpGet("{id}/image")]
         public IActionResult GetImageFromFile(int id)
         {
             var charity = _charityService.GetCharityFullProfileAsync(id).Result;
@@ -224,15 +227,20 @@ namespace AtharPlatform.Controllers
             if (charity == null || string.IsNullOrEmpty(charity.ImageUrl))
                 return Ok("No Photo");
 
-            var filePath = Path.Combine("wwwroot", charity.ImageUrl.Replace("https://localhost:5192/", ""));
+            // لو الرابط خارجي (http أو https)
+            if (charity.ImageUrl.StartsWith("http"))
+                return Redirect(charity.ImageUrl);
+
+            // لو الصورة داخل wwwroot
+            var relativePath = charity.ImageUrl.TrimStart('/');
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", relativePath);
 
             if (!System.IO.File.Exists(filePath))
                 return Ok("No Photo");
 
-            var imageBytes = System.IO.File.ReadAllBytes(filePath);
-            return File(imageBytes, "image/png"); // أو jpeg حسب الملف
+            var bytes = System.IO.File.ReadAllBytes(filePath);
+            return File(bytes, "image/png");
         }
-
 
 
         // (GET) /api/charities?query=&page=1&pageSize=12
