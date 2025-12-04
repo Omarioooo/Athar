@@ -22,7 +22,6 @@ import {
 } from "../Repository/charityRepository";
 
 function validateCharityForm(user) {
-    console.log("Charity USer is :- ", user);
 
     return {
         emailerror: validateEmail(user.email),

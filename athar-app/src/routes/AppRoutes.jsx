@@ -19,7 +19,6 @@ import Charities from "../pages/charity/Charities";
 import CharityProfile from "../pages/charity/CharityProfile";
 import NotFound from "../pages/callback/NotFound";
 import ProfilePageRoute from "./ProfilePageRoute";
-import ProfilePageRouteWrapper from "./ProfilePageRouteWrapper";
 
 export default function AppRoutes() {
     const location = useLocation();

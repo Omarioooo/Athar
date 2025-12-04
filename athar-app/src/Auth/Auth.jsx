@@ -1,4 +1,3 @@
-// context/AuthContext.jsx
 import { createContext, useState, useContext, useEffect } from "react";
 import Cookies from "js-cookie";
 import {jwtDecode} from "jwt-decode";
