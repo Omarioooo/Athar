@@ -8,4 +8,5 @@
         Task AddAsync(CharityVolunteer entity);
         Task<bool> ExistsAsync(int charityId);
     }
+
 }

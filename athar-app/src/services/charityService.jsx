@@ -15,14 +15,10 @@ import {
 import { parseRegisterError } from "../utils/errors/parseRegisterError";
 
 import {
-    fetchCharityByIdFromApi,
-    fetchCampaignsByCharityId,
-    fetchPagedContentByCharityId,
-    fetchFollowersCount,
+    fetchCharityViewById
 } from "../Repository/charityRepository";
 
 function validateCharityForm(user) {
-
     return {
         emailerror: validateEmail(user.email),
         charitynameerror: validateCharityName(user.charityname),
@@ -107,55 +103,9 @@ export async function getAllCharities(
 }
 
 export const getCharityView = async (charityId) => {
-    if (!charityId) throw new Error("Charity ID is required");
-
     try {
-        const [charityData, campaignsData, contentData, followersCount] =
-            await Promise.all([
-                fetchCharityByIdFromApi(charityId),
-                fetchCampaignsByCharityId(charityId).catch(() => []),
-                fetchPagedContentByCharityId(charityId, 1, 30).catch(() => ({
-                    items: [],
-                })),
-                fetchFollowersCount(charityId).catch(() => 0),
-            ]);
-
-        const realFollowersCount =
-            typeof followersCount === "object"
-                ? followersCount.count ?? followersCount.value ?? 0
-                : followersCount;
-
-        return {
-            id: charityData.id,
-            name: charityData.name,
-            logo: charityData.imageUrl || "/fallback-logo.jpg",
-            coverImage: charityData.imageUrl || "/fallback-cover.jpg",
-            description: charityData.description || "لا يوجد وصف متاح",
-            followersCount: realFollowersCount,
-            campaignsCount:
-                campaignsData.length || charityData.campaigns?.length || 0,
-            campaigns: campaignsData.map((c) => ({
-                id: c.id,
-                title: c.title,
-                description: c.description || "لا يوجد وصف",
-                raisedAmount: c.raisedAmount || 0,
-                goalAmount: c.goalAmount || 0,
-                startDate: c.startDate,
-                endDate: c.endDate,
-                charityName: c.charityName || charityData.name,
-                imageUrl: c.imageUrl,
-            })),
-            mediaPosts: contentData.items.map((post) => ({
-                id: post.id || Date.now() + Math.random(),
-                image: post.image || post.imageUrl || "/fallback-post.jpg",
-                caption:
-                    post.caption ||
-                    post.title ||
-                    post.description ||
-                    "منشور من الجمعية",
-                likes: post.likes || Math.floor(Math.random() * 600) + 100,
-            })),
-        };
+        const fetchedData = await fetchCharityViewById(charityId);
+        return fetchedData;
     } catch (error) {
         console.error("Failed to load charity profile:", error);
         throw error;

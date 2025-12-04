@@ -6,5 +6,7 @@ namespace AtharPlatform.Services
     {
         Task<CharityProfileDto?> GetCharityByIdAsync(int id);
         Task<Charity?> GetCharityFullProfileAsync(int id);
+
+        Task<CharityViewDto?> GetCharityViewAsync(int id);
     }
 }

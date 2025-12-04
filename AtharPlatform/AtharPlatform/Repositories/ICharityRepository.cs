@@ -22,5 +22,6 @@
         Task BulkImportAsync(IEnumerable<Charity> charities);
 
         Task<Charity> GetCharityFullProfileAsync(int id);
+        Task<Charity> GetCharityViewAsync(int id);
     }
 }

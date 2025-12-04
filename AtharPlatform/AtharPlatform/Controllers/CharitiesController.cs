@@ -173,6 +173,7 @@ namespace AtharPlatform.Controllers
             }
         }
 
+
         // غلق باب العروض للـ Vendor
         [HttpPost("close-vendor-offers/{charityId}")]
         // [Authorize(Roles = "CharityAdmin")]
@@ -202,6 +203,19 @@ namespace AtharPlatform.Controllers
                 return StatusCode(500, new { Message = "Failed to close vendor offers.", Error = ex.Message });
             }
         }
+
+
+        [HttpGet("charityview/{id}")]
+        public async Task<IActionResult> GetCharityView(int id)
+        {
+            var result = await _charityService.GetCharityViewAsync(id);
+
+            if (result == null)
+                return NotFound(new { message = "Charity not found or an error occurred" });
+
+            return Ok(result);
+        }
+
 
         /*علشان التعامل بتاع الصور!!!!!!!!!!*/
 
@@ -244,7 +258,7 @@ namespace AtharPlatform.Controllers
 
 
         // (GET) /api/charities?query=&page=1&pageSize=12
-        [HttpGet("all")]
+        [HttpGet("[action]")]
         public async Task<ActionResult<AtharPlatform.Dtos.PaginatedResultDto<CharityCardDto>>> GetAll(
             [FromQuery] string? query,
             [FromQuery] int page = 1,

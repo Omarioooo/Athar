@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import SearchBar from "../../components/SearchBar";
 import Pagination from "../../components/Pagination";
-import charityImg from "../../assets/images/athar2.png";
 import { getTotalPages } from "../../utils/PaginationHelper";
 
 export default function Charities() {
@@ -21,9 +20,7 @@ export default function Charities() {
         getAllCharities("", page)
             .then((response) => {
                 console.log(response);
-
                 setCharities(response.charities || []);
-                console.log(response.charities.imageUrl);
 
                 setTotalPages(getTotalPages(response.total, 9) || 1);
             })

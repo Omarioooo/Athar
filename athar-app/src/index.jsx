@@ -1,8 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
-import "./styles/variables.css";
 import "./styles/globals.css";
+import "./styles/variables.css";
 import "./styles/header.css";
 import "./styles/profileLayout.css";
 import "./styles/myAthar.css";

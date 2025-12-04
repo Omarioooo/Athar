@@ -16,6 +16,8 @@ namespace AtharPlatform.Repositories
         public IVendorOfferRepository VendorOffers { get; }
         public IVolunteerApplicationRepository VolunteerApplications { get; private set; }
         public ICharityVolunteerRepository CharityVolunteers { get; private set; }
+        public IMaterialDonationsRepository MaterialDonations { get; private set; }
+        public ICharityMaterialDonationsRepository CharityMaterialDonations { get; private set; }
         public IDonationRepository PaymentDonations { get; private set; }
         public ICampaignDonation PaymentCampaignDonations { get; private set; }
 

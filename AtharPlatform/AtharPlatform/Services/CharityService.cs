@@ -6,13 +6,15 @@ namespace AtharPlatform.Services
 {
     public class CharityService : ICharityService
     {
+        private readonly Context _context;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CharityService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor)
+        public CharityService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor, Context context)
         {
             _unitOfWork = unitOfWork;
             _httpContextAccessor = httpContextAccessor;
+            _context = context;
         }
 
         public async Task<CharityProfileDto> GetCharityByIdAsync(int id)
@@ -89,5 +91,67 @@ namespace AtharPlatform.Services
         {
             return await _unitOfWork.Charities.GetCharityFullProfileAsync(id);
         }
+
+
+        // need some fix
+        public async Task<CharityViewDto?> GetCharityViewAsync(int id)
+        {
+            try
+            {
+                var charity = await _context.Charities
+                    .Include(c => c.Campaigns)
+                    .Include(c => c.Follows)
+                    .FirstOrDefaultAsync(c => c.Id == id);
+
+                if (charity == null)
+                    return null;
+
+                var campaignIds = charity.Campaigns.Select(c => c.Id).ToList();
+
+                var contents = await _context.Contents
+                    .Include(c => c.Reactions)
+                    .Where(c => campaignIds.Contains(c.CampaignId))
+                    .ToListAsync();
+
+                var dto = new CharityViewDto
+                {
+                    Name = charity.Name,
+                    Description = charity.Description,
+                    ImgUrl = charity.ImageUrl,
+                    NumOfFollowers = charity.Follows.Count,
+                    NumOfCampaigns = charity.Campaigns.Count,
+
+                    Campaigns = charity.Campaigns.Select(c => new CharityViewCampaignDto
+                    {
+                        Id = c.Id,
+                        Title = c.Title,
+                        ImgUrl = c.ImageUrl,
+                        Description = c.Description,
+                        RaisedAmount = c.RaisedAmount,
+                        GoaldAmount = c.GoalAmount,
+                        StartDate = DateOnly.FromDateTime(c.StartDate),
+                        EndDate = DateOnly.FromDateTime(c.StartDate.AddDays(c.Duration))
+                    }).ToList(),
+
+                    Contents = contents.Select(x => new CharityViewContentDto
+                    {
+                        Id = x.Id,
+                        Description = x.Description,
+                        ImgUrl = x.PostImage != null
+                            ? $"data:image/png;base64,{Convert.ToBase64String(x.PostImage)}"
+                            : null,
+                        TotalReactions = x.Reactions.Count
+                    }).ToList()
+                };
+
+                return dto;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+
     }
 }

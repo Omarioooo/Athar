@@ -25,6 +25,7 @@ namespace AtharPlatform.Models
         // Donations
         public DbSet<Donation> Donations { get; set; }
         public DbSet<MaterialDonation> MaterialDonations { get; set; }
+        public DbSet<CharityMaterialDonation> CharityMaterialDonations { get; set; }
         public DbSet<CampaignDonation> CampaignDonations { get; set; }
         public DbSet<CharityDonation> CharityDonations { get; set; }
 

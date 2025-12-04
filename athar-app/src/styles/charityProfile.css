@@ -142,7 +142,6 @@
     box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
 }
 
-
 /***** Global Sections *****/
 .profile-container {
     max-width: 1200px;
@@ -439,6 +438,24 @@
 .submit-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(78, 182, 230, 0.4);
+}
+
+
+.grid {
+    display: grid;
+}
+
+.grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.gap-5 {
+    gap: 20px;
+}
+
+
+input[type="checkbox"] {
+    accent-color: #ffca28;
 }
 
 /***** LAST CAMPAIGNS FOR CHARITY *****/

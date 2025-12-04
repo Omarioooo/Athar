@@ -59,8 +59,8 @@ namespace AtharPlatform.Repositories
         }
 
         public async Task<List<Charity>> GetPageAsync(
-            string? query, 
-            int page, 
+            string? query,
+            int page,
             int pageSize,
             bool? isActive = null,
             bool? isScraped = null,
@@ -70,7 +70,7 @@ namespace AtharPlatform.Repositories
             if (pageSize <= 0) pageSize = 12;
 
             var q = _dbSet.AsQueryable();
-            
+
             // Apply name search
             if (!string.IsNullOrWhiteSpace(query))
             {
@@ -113,7 +113,7 @@ namespace AtharPlatform.Repositories
             bool? hasExternalWebsite = null)
         {
             var q = _dbSet.AsQueryable();
-            
+
             // Apply name search
             if (!string.IsNullOrWhiteSpace(query))
             {
@@ -169,5 +169,9 @@ namespace AtharPlatform.Repositories
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
+        public Task<Charity> GetCharityViewAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -6,6 +6,12 @@ export async function charityRegisterRequest(formData) {
     });
 }
 
+export const fetchCharityViewById = async (id) => {
+    const res = await api.get(`/charities/charityview/${id}`);
+    return res.data;
+};
+
+
 export const fetchCharities = async ({
     query = "",
     page = 1,
@@ -20,7 +26,7 @@ export const fetchCharities = async ({
 
     if (query) params.append("query", query.trim());
 
-    const response = await api.get(`/charities?${params}`);
+    const response = await api.get(`/charities/GetAll?${params}`);
     return response.data;
 };
 
@@ -32,6 +38,7 @@ export const fetchCharityByIdFromApi = async (id) => {
 export const fetchCharityProfileById = async (id) => {
     try {
         const res = await api.get(`/charities/charityProfile/${id}`);
+        console.log("res", res);
         return res.data;
     } catch (error) {
         console.error("فشل جلب بيانات الجمعية:", error);
