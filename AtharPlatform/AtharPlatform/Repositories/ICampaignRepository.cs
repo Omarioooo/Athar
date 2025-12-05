@@ -48,6 +48,10 @@ namespace AtharPlatform.Repositories
         /// Get queryable for custom filtering.
         /// </summary>
         IQueryable<Campaign> GetQueryable();
+
+
+        Task<List<Campaign>> GetByCharityIdAsync(int charityId);
+
     }
 
 }

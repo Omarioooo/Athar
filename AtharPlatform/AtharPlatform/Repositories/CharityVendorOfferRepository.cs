@@ -1,4 +1,6 @@
-﻿namespace AtharPlatform.Repositories
+﻿using AtharPlatform.Models;
+
+namespace AtharPlatform.Repositories
 {
     public class CharityVendorOfferRepository : ICharityVendorOfferRepository
     {
@@ -23,6 +25,7 @@
         {
             return await _context.CharityVendorOffers
                                  .Where(c => c.CharityId == charityId)
+                                 .Include(x => x.VendorOffers)
                                  .ToListAsync();
         }
 
@@ -35,6 +38,12 @@
         {
             return await _context.CharityVendorOffers
                                  .AnyAsync(c => c.CharityId == charityId);
+        }
+
+        public async Task<CharityVendorOffer?> GetSlotByCharityIdAsync(int charityId)
+        {
+            return await _context.CharityVendorOffers
+                                 .FirstOrDefaultAsync(c => c.CharityId == charityId);
         }
     }
 }

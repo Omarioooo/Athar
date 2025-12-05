@@ -293,6 +293,25 @@ namespace AtharPlatform.Controllers
             }
         }
 
+
+        [HttpGet("GetCampaignsByCharityId/{charityId}")]
+        public async Task<IActionResult> GetCampaignsByCharityId(int charityId)
+        {
+            try
+            {
+                var campaigns = await _campaignService.GetCampaignsByCharityIdAsync(charityId);
+
+                if (campaigns == null || !campaigns.Any())
+                    return NotFound(new { message = $"No campaigns found for CharityId {charityId}." });
+
+                return Ok(campaigns);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while fetching campaigns.", error = ex.Message });
+            }
+        }
+
         [HttpGet("[action]")]
         public async Task<IActionResult> GetByType(CampaignCategoryEnum type)
         {

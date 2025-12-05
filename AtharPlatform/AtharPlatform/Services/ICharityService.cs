@@ -8,5 +8,7 @@ namespace AtharPlatform.Services
         Task<Charity?> GetCharityFullProfileAsync(int id);
 
         Task<CharityViewDto?> GetCharityViewAsync(int id);
+
+        Task<List<CharityApplicationResponseDto>> GetAllApplicationsForCharityAsync(int charityId);
     }
 }

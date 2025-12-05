@@ -7,5 +7,7 @@
         Task<IEnumerable<CharityVendorOffer>> GetByCharityIdAsync(int charityId);
         Task AddAsync(CharityVendorOffer entity);
         Task<bool> ExistsAsync(int charityId);
+        Task<CharityVendorOffer?> GetSlotByCharityIdAsync(int charityId);
+
     }
 }

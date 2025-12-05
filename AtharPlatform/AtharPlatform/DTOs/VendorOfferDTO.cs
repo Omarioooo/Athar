@@ -38,6 +38,7 @@ namespace AtharPlatform.DTOs
         public OfferStatus Status { get; set; } = OfferStatus.Pending;
 
         [Required]
-        public int CharityVendorOfferId { get; set; }
+        // public int CharityVendorOfferId { get; set; }
+        public int CharityId { get; set; }
     }
 }

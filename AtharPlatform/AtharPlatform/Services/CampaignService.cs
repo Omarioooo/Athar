@@ -22,6 +22,28 @@ namespace AtharPlatform.Services
             _notificationService = notificationService;
         }
 
+        public async Task<List<CampaignDto>> GetCampaignsByCharityIdAsync(int charityId)
+        {
+            var campaigns = await _unitOfWork.Campaigns.GetByCharityIdAsync(charityId);
+
+            return campaigns.Select(c => new CampaignDto
+            {
+                Id = c.Id,
+                Title = c.Title,
+                Description = c.Description,
+                ImageUrl = c.ImageUrl,
+                GoalAmount = c.GoalAmount,
+                RaisedAmount = c.RaisedAmount,
+                StartDate = c.StartDate,
+                EndDate = c.StartDate.AddDays(c.Duration),
+                Status = c.Status,
+                Category = c.Category,
+                CharityID = c.CharityID,
+                CharityName = c.Charity?.Name
+            }).ToList();
+        }
+
+
         public async Task<int> GetCountOfCampaignsAsync(
             CampainStatusEnum? status = null,
             CampaignCategoryEnum? category = null,

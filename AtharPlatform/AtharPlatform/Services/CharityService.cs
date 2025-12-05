@@ -17,6 +17,60 @@ namespace AtharPlatform.Services
             _context = context;
         }
 
+
+        public async Task<List<CharityApplicationResponseDto>> GetAllApplicationsForCharityAsync(int charityId)
+        {
+            // 1) Get volunteer  to charity
+            var volunteerSlots = await _unitOfWork.CharityVolunteers.GetByCharityIdAsync(charityId);
+
+            var volunteerApps = volunteerSlots
+                .SelectMany(v => v.VolunteerApplications)
+                .Select(v => new CharityApplicationResponseDto
+                {
+                    Id = v.Id,
+                    Type = "Volunteer",
+                    Name = v.FirstName + " " + v.LastName,
+                    Phone = v.PhoneNumber,
+                    Country = v.Country,
+                    City = v.City,
+                    Age = v.Age,
+                    Date = v.CharityVolunteer.Date,
+                    IsFirstTime = v.IsFirstTime
+                })
+                .ToList();
+
+            // 2) Get vendor  to charity
+            var vendorSlots = await _unitOfWork.CharityVendorOffers.GetByCharityIdAsync(charityId);
+            vendorSlots ??= new List<CharityVendorOffer>();
+
+            var vendorOffers = vendorSlots
+                .Where(v => v?.VendorOffers != null)
+                .SelectMany(v => v.VendorOffers!)
+                .Select(v => new CharityApplicationResponseDto
+                {
+                    Id = v.Id,
+                    Type = "VendorOffer",
+                    Name = v.VendorName,
+                    Phone = v.PhoneNumber,
+                    Country = v.Country,
+                    City = v.City,
+                    ItemName = v.ItemName,
+                    Quantity = v.Quantity,
+                    Description = v.Description,
+                    PriceBefore = v.PriceBeforDiscount,
+                    PriceAfter = v.PriceAfterDiscount,
+                    Date = v.CharityVendorOffer.Date
+                })
+                .ToList();
+
+
+
+            return volunteerApps
+                .Concat(vendorOffers)
+                
+                .ToList();
+        }
+
         public async Task<CharityProfileDto> GetCharityByIdAsync(int id)
         {
             var http = _httpContextAccessor.HttpContext;

@@ -20,10 +20,10 @@ namespace AtharPlatform.Repositories
                 .Where(v => v.CharityVendorOfferId == charityVendorOfferId)
                 .ToListAsync();
         }
-        public async Task<IEnumerable<CharityVendorOffer>> GetByCharityIdAsync(int charityId)
+        public async Task<List<VendorOffers>> GetByCharityIdAsync(int charityId)
         {
-            return await _context.CharityVendorOffers
-                                 .Where(c => c.CharityId == charityId)
+            return await _context.VendorForms
+                                 .Where(c => c.CharityVendorOfferId == charityId)
                                  .ToListAsync();
         }
 
@@ -31,6 +31,12 @@ namespace AtharPlatform.Repositories
         {
             await _context.CharityVendorOffers.AddAsync(entity);
         }
+        public async Task<CharityVendorOffer?> GetSlotByCharityIdAsync(int charityId)
+        {
+            return await _context.CharityVendorOffers
+                .FirstOrDefaultAsync(c => c.CharityId == charityId);
+        }
 
+       
     }
 }
