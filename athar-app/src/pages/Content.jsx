@@ -3,6 +3,8 @@ import { useInView } from "react-intersection-observer";
 import { useEffect, useState } from "react";
 import 'bootstrap/dist/css/bootstrap.rtl.min.css';
 import Pagination from "../components/Pagination";
+import ContentCard from "../components/content/content";
+import { UseAuth } from "../Auth/Auth";
 import {
     getAllContentsService,
     searchMediaService,
@@ -20,7 +22,7 @@ export default function Content() {
     const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState("");
     const pageSize = 12;
-
+ const {user } = UseAuth(); 
     const loadContents = async (page) => {
         setLoading(true);
         setErrorMessage("");
@@ -29,6 +31,8 @@ export default function Content() {
         setTotalPages(data.totalPages || 1);
         if (data.error) setErrorMessage(data.error);
         setLoading(false);
+         
+  console.log("User ID:", user.id);
     };
 
     const handleSearch = async () => {
@@ -49,6 +53,7 @@ export default function Content() {
     const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
    return (
+
     <motion.div
     ref={refFirstContent}
       className="first-section-content"
@@ -91,28 +96,8 @@ export default function Content() {
                 });
 
                 return (
-                  <div key={cnt.id} className="col-xl-4 col-lg-6 col-md-12 col-sm-12 mb-4">
-                    <div className="card content-card" style={{ width: "400px" }}>
-                      <div className="img-campaign">
-                        <div className="overlay-info">
-                          <h6 className="cmpcnt-title">{cnt.campaignTitle}</h6>
-                          <p className="charity-gihad">{cnt.charityName}</p>
-
-                        </div>
-                        <img className="card-img-top" src={cnt.imageUrl} alt="Card image" style={{ width: "400px" }} />
-                      </div>
-                      <div className="card-body">
-                        <div className="content-body">
-                          <h4 className="card-title cnt-title">{cnt.title}</h4>
-                          <p className="card-text content-description">{cnt.description}</p>
-                        </div>
-                        <hr />
-                        <div className="reaction d-flex justify-content-between">
-                          <span><i className="fa-sharp fa-regular fa-heart ireaction"></i>تفاعل1</span>
-                          <span>{arabicDate}</span>
-                        </div>
-                      </div>
-                    </div>
+                    <div className="col-xl-4 col-lg-6 col-md-12 col-sm-12 mb-4">
+         <ContentCard key={cnt.id} cnt={cnt} arabicDate={arabicDate} user={user} />
                   </div>
                 );
               })}
@@ -120,10 +105,10 @@ export default function Content() {
 
             {/* Pagination */}
              <Pagination
-                                             page={currentPage}
-                                             totalPages={totalPages}
-                                            onPageChange={setCurrentPage}
-                                                 />
+                  page={currentPage}
+                   totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                   />
           </>
         )}
       </div>
