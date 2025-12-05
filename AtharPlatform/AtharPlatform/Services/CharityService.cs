@@ -67,7 +67,7 @@ namespace AtharPlatform.Services
 
             return volunteerApps
                 .Concat(vendorOffers)
-                
+                .OrderBy(c=> Guid.NewGuid())
                 .ToList();
         }
 
