@@ -21,6 +21,13 @@ namespace AtharPlatform.Repositories
                 .Include(v => v.CharityVolunteer)
                 .ToListAsync();
         }
+
+        public async Task<CharityVolunteer?> GetSlotByCharityIdAsync(int charityId)
+        {
+            return await _context.CharityVolunteers
+                .FirstOrDefaultAsync(c => c.CharityId == charityId);
+        }
+
     }
 
 

@@ -11,7 +11,11 @@ namespace AtharPlatform.Repositories
         {
             _context = context;
         }
-
+        public async Task<CharityMaterialDonation?> GetSlotByCharityIdAsync(int charityId)
+        {
+            return await _context.CharityMaterialDonations
+                                 .FirstOrDefaultAsync(c => c.CharityId == charityId);
+        }
         public async Task AddAsync(CharityMaterialDonation entity)
         {
             await _context.CharityMaterialDonations.AddAsync(entity);

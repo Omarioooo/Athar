@@ -92,5 +92,7 @@ namespace AtharPlatform.Services
         /// Deletes a campaign by its ID.
         /// </summary>
         Task<bool> DeleteAsync(int id);
+
+        Task<List<CampaignDto>> GetCampaignsByCharityIdAsync(int charityId);
     }
 }

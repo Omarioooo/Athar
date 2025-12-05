@@ -55,6 +55,12 @@ namespace AtharPlatform.Repositories
 
             return campaign;
         }
+        public async Task<List<Campaign>> GetByCharityIdAsync(int charityId)
+        {
+            return await _context.Campaigns
+                .Where(c => c.CharityID == charityId)
+                .ToListAsync();
+        }
 
         public async Task<List<Campaign>> GetAllAsync(bool includeCharity = true)
         {

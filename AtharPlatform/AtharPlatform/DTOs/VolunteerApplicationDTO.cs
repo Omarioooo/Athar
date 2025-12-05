@@ -28,6 +28,14 @@ namespace AtharPlatform.DTOs
         public bool IsFirstTime { get; set; } = true;
 
         [Required]
-        public int CharityVolunteerId { get; set; }
+        //public int CharityVolunteerId { get; set; }
+        public int CharityId { get; set; }
+
+        public string Type = "Volunteer";
+
+        public DateTime Date { get; set; }
+
+   
+
     }
 }

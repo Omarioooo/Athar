@@ -39,5 +39,11 @@
             return await _context.CharityVolunteers
                 .AnyAsync(c => c.CharityId == charityId);
         }
+
+        public async Task<CharityVolunteer?> GetSlotByCharityIdAsync(int charityId)
+        {
+            return await _context.CharityVolunteers
+                                 .FirstOrDefaultAsync(c => c.CharityId == charityId);
+        }
     }
 }
