@@ -20,9 +20,11 @@
         {
             return await _context.CharityVolunteers
                 .Where(v => v.CharityId == charityId)
+                 .Include(c => c.Charity)
                  .Include(v => v.VolunteerApplications)
                 .ToListAsync();
         }
+        
 
         public async Task AddAsync(CharityVolunteer entity)
         {

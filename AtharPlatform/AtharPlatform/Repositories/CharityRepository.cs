@@ -20,6 +20,7 @@ namespace AtharPlatform.Repositories
             return charity;
         }
 
+
         public async override Task<List<Charity>> GetAllAsync()
         {
             var charities = await _dbSet

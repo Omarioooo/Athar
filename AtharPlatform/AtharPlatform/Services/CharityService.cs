@@ -31,11 +31,12 @@ namespace AtharPlatform.Services
                     Type = "Volunteer",
                     Name = v.FirstName + " " + v.LastName,
                     Phone = v.PhoneNumber,
-                    Country = v.Country,
-                    City = v.City,
-                    Age = v.Age,
+                    // Country = v.Country,
+                    //City = v.City,
+                    ///Age = v.Age,
+                   Description = $"ارغب في التطوع لجمعية {v.CharityVolunteer?.Charity?.Name}",
                     Date = v.CharityVolunteer.Date,
-                    IsFirstTime = v.IsFirstTime
+                    //IsFirstTime = v.IsFirstTime
                 })
                 .ToList();
 
@@ -52,13 +53,13 @@ namespace AtharPlatform.Services
                     Type = "VendorOffer",
                     Name = v.VendorName,
                     Phone = v.PhoneNumber,
-                    Country = v.Country,
-                    City = v.City,
-                    ItemName = v.ItemName,
-                    Quantity = v.Quantity,
+                   // Country = v.Country,
+                   // City = v.City,
+                   // ItemName = v.ItemName,
+                   // Quantity = v.Quantity,
                     Description = v.Description,
-                    PriceBefore = v.PriceBeforDiscount,
-                    PriceAfter = v.PriceAfterDiscount,
+                   // PriceBefore = v.PriceBeforDiscount,
+                   /// PriceAfter = v.PriceAfterDiscount,
                     Date = v.CharityVendorOffer.Date
                 })
                 .ToList();
