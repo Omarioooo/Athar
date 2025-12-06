@@ -4,6 +4,7 @@ import { submitVolunteerOffer } from "../../../services/formsService";
 
 export default function VolunteerModalMenu({ closeModal, id }) {
     const [formData, setFormData] = useState({
+        id: id,
         firstName: "",
         lastName: "",
         age: "",
@@ -11,8 +12,9 @@ export default function VolunteerModalMenu({ closeModal, id }) {
         country: "",
         city: "",
         isFirstTime: true,
-        charityVolunteerId: id,
+        charityId: id,
     });
+
 
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
@@ -156,13 +158,6 @@ export default function VolunteerModalMenu({ closeModal, id }) {
                             />
                             <span>هذه أول مرة أتطوع فيها</span>
                         </label>
-                    </div>
-                    <div className="form-group">
-                        <input
-                            type="hidden"
-                            name="charityVolunteerId"
-                            value={formData.charityVolunteerId}
-                        />
                     </div>
 
                     <button

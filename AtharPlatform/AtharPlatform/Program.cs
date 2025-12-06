@@ -105,6 +105,7 @@ builder.Services.AddScoped<IContentService, ContentService>();
 builder.Services.AddScoped<ICharityService, CharityService>();
 builder.Services.AddScoped<IVolunteerApplicationService, VolunteerApplicationService>();
 
+
 builder.Services.AddHttpContextAccessor();
 
 
