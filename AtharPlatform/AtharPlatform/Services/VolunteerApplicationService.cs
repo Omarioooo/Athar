@@ -28,6 +28,7 @@ namespace AtharPlatform.Services
             {
                 slot = new CharityVolunteer
                 {
+                    CharityId = dto.CharityId,
                     Date = DateTime.UtcNow,
                     IsOpen = true
                 };
@@ -71,7 +72,8 @@ namespace AtharPlatform.Services
             Country = application.Country,
             City = application.City,
             IsFirstTime = application.IsFirstTime,
-          
+            CharityId = application.CharityVolunteer?.CharityId ?? 0
+
         };
     }
 }
