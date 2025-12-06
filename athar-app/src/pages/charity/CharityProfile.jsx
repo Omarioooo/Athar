@@ -11,7 +11,8 @@ import { getCharityView } from "../../services/charityService";
 
 export default function CharityProfile() {
     const { id } = useParams();
-console.log("Charity id is ,", id);
+    
+    console.log("Charity id from useParams (BEFORE):", id, "Type:", typeof id);
 
     const [charity, setCharity] = useState(null);
     const [loading, setLoading] = useState(true);

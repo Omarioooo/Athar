@@ -1,10 +1,17 @@
 import { X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { submitVolunteerOffer } from "../../../services/formsService";
+import { UseAuth } from "../../../Auth/Auth";
+import { useNavigate } from "react-router-dom";
 
 export default function VolunteerModalMenu({ closeModal, id }) {
+    const { user } = UseAuth();
+    const navigate = useNavigate();
+
+    const [loading, setLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
+
     const [formData, setFormData] = useState({
-        id: id,
         firstName: "",
         lastName: "",
         age: "",
@@ -12,12 +19,7 @@ export default function VolunteerModalMenu({ closeModal, id }) {
         country: "",
         city: "",
         isFirstTime: true,
-        charityId: id,
     });
-
-
-    const [loading, setLoading] = useState(false);
-    const [errorMsg, setErrorMsg] = useState("");
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -27,18 +29,73 @@ export default function VolunteerModalMenu({ closeModal, id }) {
         });
     };
 
+    useEffect(() => {
+        if (!id || isNaN(Number(id)) || Number(id) <= 0) {
+            setErrorMsg("خطأ: معرف الجمعية غير صالح");
+        }
+
+        if (!user || !user.id) {
+            setErrorMsg("يجب تسجيل الدخول أولاً لتقديم طلب التطوع");
+            navigate("/login", { replace: true });
+        }
+    }, [id, user, navigate]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
         setErrorMsg("");
 
+        const ageNum = Number(formData.age);
+
+        // Validations
+        if (!formData.firstName.trim() || !formData.lastName.trim()) {
+            setErrorMsg("الاسم الأول واسم العائلة مطلوبان");
+            return;
+        }
+        if (!formData.phoneNumber.trim()) {
+            setErrorMsg("رقم الهاتف مطلوب");
+            return;
+        }
+        if (!formData.country.trim() || !formData.city.trim()) {
+            setErrorMsg("الدولة والمدينة مطلوبان");
+            return;
+        }
+        if (isNaN(ageNum) || ageNum < 16 || ageNum > 100) {
+            setErrorMsg("العمر يجب أن يكون بين 16 و 100 سنة");
+            return;
+        }
+
+        setLoading(true);
+
         try {
-            console.log("data form ,",formData);
-            await submitVolunteerOffer(formData);
-            
+            const dataToSend = {
+                id: user.id,
+                firstName: formData.firstName.trim(),
+                lastName: formData.lastName.trim(),
+                age: ageNum,
+                phoneNumber: formData.phoneNumber.trim(),
+                country: formData.country.trim(),
+                city: formData.city.trim(),
+                isFirstTime: formData.isFirstTime,
+                charityId: Number(id),
+                date: new Date().toISOString(),
+            };
+
+            await submitVolunteerOffer(dataToSend);
+
+            setFormData({
+                firstName: "",
+                lastName: "",
+                age: "",
+                phoneNumber: "",
+                country: "",
+                city: "",
+                isFirstTime: true,
+            });
+
             closeModal();
         } catch (err) {
-            setErrorMsg(err.message || "حدث خطأ، حاول لاحقًا");
+            console.error(err);
+            setErrorMsg("حدث خطأ أثناء إرسال الطلب. حاول مرة أخرى.");
         }
 
         setLoading(false);
@@ -50,22 +107,19 @@ export default function VolunteerModalMenu({ closeModal, id }) {
                 <button className="modal-close" onClick={closeModal}>
                     <X size={22} />
                 </button>
-
                 <div className="modal-header">
                     <h2 className="modal-title">تطوع معنا</h2>
                 </div>
-
                 {errorMsg && (
-                    <p className="text-red-600 bg-red-100 p-3 rounded mb-4">
+                    <p className="text-red-600 error-msg">
                         {errorMsg}
                     </p>
                 )}
-
                 <form className="modal-form" onSubmit={handleSubmit}>
                     <div className="grid grid-cols-2 gap-5">
                         <div className="form-group">
                             <label>
-                                الاسم الأول{" "}
+                                الاسم الأول
                                 <span className="text-red-500">*</span>
                             </label>
                             <input
@@ -76,10 +130,9 @@ export default function VolunteerModalMenu({ closeModal, id }) {
                                 onChange={handleChange}
                             />
                         </div>
-
                         <div className="form-group">
                             <label>
-                                اسم العائلة{" "}
+                                اسم العائلة
                                 <span className="text-red-500">*</span>
                             </label>
                             <input
@@ -91,7 +144,6 @@ export default function VolunteerModalMenu({ closeModal, id }) {
                             />
                         </div>
                     </div>
-
                     <div className="form-group">
                         <label>
                             العمر <span className="text-red-500">*</span>
@@ -106,7 +158,6 @@ export default function VolunteerModalMenu({ closeModal, id }) {
                             onChange={handleChange}
                         />
                     </div>
-
                     <div className="form-group">
                         <label>
                             رقم الهاتف <span className="text-red-500">*</span>
@@ -119,7 +170,6 @@ export default function VolunteerModalMenu({ closeModal, id }) {
                             onChange={handleChange}
                         />
                     </div>
-
                     <div className="grid grid-cols-2 gap-5">
                         <div className="form-group">
                             <label>
@@ -133,7 +183,6 @@ export default function VolunteerModalMenu({ closeModal, id }) {
                                 onChange={handleChange}
                             />
                         </div>
-
                         <div className="form-group">
                             <label>
                                 المدينة <span className="text-red-500">*</span>
@@ -147,7 +196,6 @@ export default function VolunteerModalMenu({ closeModal, id }) {
                             />
                         </div>
                     </div>
-
                     <div className="form-group">
                         <label className="flex items-center gap-3 cursor-pointer">
                             <input
@@ -159,7 +207,6 @@ export default function VolunteerModalMenu({ closeModal, id }) {
                             <span>هذه أول مرة أتطوع فيها</span>
                         </label>
                     </div>
-
                     <button
                         type="submit"
                         className="submit-btn"
