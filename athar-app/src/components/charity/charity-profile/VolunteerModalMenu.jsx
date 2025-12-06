@@ -1,7 +1,8 @@
 import { X } from "lucide-react";
 import { useState } from "react";
+import { submitVolunteerOffer } from "../../../services/formsService";
 
-export default function VolunteerModalMenu({ closeModal }) {
+export default function VolunteerModalMenu({ closeModal, id }) {
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
@@ -10,8 +11,11 @@ export default function VolunteerModalMenu({ closeModal }) {
         country: "",
         city: "",
         isFirstTime: true,
-        charityVolunteerId: "",
+        charityVolunteerId: id,
     });
+
+    const [loading, setLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -21,20 +25,27 @@ export default function VolunteerModalMenu({ closeModal }) {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Volunteer Form Submitted:", formData);
-        closeModal();
+        setLoading(true);
+        setErrorMsg("");
+
+        try {
+            console.log("data form ,",formData);
+            await submitVolunteerOffer(formData);
+            
+            closeModal();
+        } catch (err) {
+            setErrorMsg(err.message || "حدث خطأ، حاول لاحقًا");
+        }
+
+        setLoading(false);
     };
 
     return (
         <div className="modal-overlay" onClick={closeModal}>
             <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-                <button
-                    className="modal-close"
-                    onClick={closeModal}
-                    aria-label="إغلاق"
-                >
+                <button className="modal-close" onClick={closeModal}>
                     <X size={22} />
                 </button>
 
@@ -42,35 +53,37 @@ export default function VolunteerModalMenu({ closeModal }) {
                     <h2 className="modal-title">تطوع معنا</h2>
                 </div>
 
+                {errorMsg && (
+                    <p className="text-red-600 bg-red-100 p-3 rounded mb-4">
+                        {errorMsg}
+                    </p>
+                )}
+
                 <form className="modal-form" onSubmit={handleSubmit}>
                     <div className="grid grid-cols-2 gap-5">
                         <div className="form-group">
-                            <label htmlFor="firstName">
+                            <label>
                                 الاسم الأول{" "}
                                 <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
-                                id="firstName"
                                 name="firstName"
                                 required
-                                placeholder="أحمد"
                                 value={formData.firstName}
                                 onChange={handleChange}
                             />
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="lastName">
+                            <label>
                                 اسم العائلة{" "}
                                 <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
-                                id="lastName"
                                 name="lastName"
                                 required
-                                placeholder="محمد"
                                 value={formData.lastName}
                                 onChange={handleChange}
                             />
@@ -78,33 +91,28 @@ export default function VolunteerModalMenu({ closeModal }) {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="age">
+                        <label>
                             العمر <span className="text-red-500">*</span>
                         </label>
                         <input
                             type="number"
-                            id="age"
                             name="age"
-                            required
                             min="16"
                             max="100"
-                            placeholder="25"
+                            required
                             value={formData.age}
                             onChange={handleChange}
                         />
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="phoneNumber">
-                            رقم الجوال <span className="text-red-500">*</span>
+                        <label>
+                            رقم الهاتف <span className="text-red-500">*</span>
                         </label>
                         <input
                             type="tel"
-                            id="phoneNumber"
                             name="phoneNumber"
                             required
-                            placeholder="05xxxxxxxxx"
-                            pattern="^05[0-9]{8}$"
                             value={formData.phoneNumber}
                             onChange={handleChange}
                         />
@@ -112,30 +120,26 @@ export default function VolunteerModalMenu({ closeModal }) {
 
                     <div className="grid grid-cols-2 gap-5">
                         <div className="form-group">
-                            <label htmlFor="country">
+                            <label>
                                 الدولة <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
-                                id="country"
                                 name="country"
                                 required
-                                placeholder="المملكة العربية السعودية"
                                 value={formData.country}
                                 onChange={handleChange}
                             />
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="city">
+                            <label>
                                 المدينة <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
-                                id="city"
                                 name="city"
                                 required
-                                placeholder="الرياض"
                                 value={formData.city}
                                 onChange={handleChange}
                             />
@@ -149,22 +153,24 @@ export default function VolunteerModalMenu({ closeModal }) {
                                 name="isFirstTime"
                                 checked={formData.isFirstTime}
                                 onChange={handleChange}
-                                className="w-5 h-5 text-yellow-500 rounded focus:ring-yellow-400"
                             />
-                            <span className="select-none">
-                                هذه أول مرة أتطوع فيها
-                            </span>
+                            <span>هذه أول مرة أتطوع فيها</span>
                         </label>
                     </div>
+                    <div className="form-group">
+                        <input
+                            type="hidden"
+                            name="charityVolunteerId"
+                            value={formData.charityVolunteerId}
+                        />
+                    </div>
 
-                    <input
-                        type="hidden"
-                        name="charityVolunteerId"
-                        value={formData.charityVolunteerId}
-                    />
-
-                    <button type="submit" className="submit-btn">
-                        إرسال الطلب
+                    <button
+                        type="submit"
+                        className="submit-btn"
+                        disabled={loading}
+                    >
+                        {loading ? "جاري الإرسال..." : "إرسال الطلب"}
                     </button>
                 </form>
             </div>

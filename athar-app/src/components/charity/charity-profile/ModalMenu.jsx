@@ -1,19 +1,16 @@
 import VolunteerModalMenu from "./VolunteerModalMenu";
 import MerchantModalMenu from "./MerchantModalMenu";
 
-export default function ModalMenu({ modalType, closeModal }) {
+export default function ModalMenu({ modalType, closeModal, id }) {
     if (!modalType) return null;
 
     return (
         <>
             {modalType === "volunteer" && (
-                <VolunteerModalMenu closeModal={closeModal} />
+                <VolunteerModalMenu id={id} closeModal={closeModal} />
             )}
             {modalType === "merchant" && (
-                <MerchantModalMenu closeModal={closeModal} />
-            )}
-            {modalType === "donation" && (
-                <MerchantModalMenu closeModal={closeModal} /> // change it
+                <MerchantModalMenu id={id} closeModal={closeModal} />
             )}
         </>
     );

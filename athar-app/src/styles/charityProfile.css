@@ -236,7 +236,7 @@
 /***** MENU SECTION *****/
 .action-buttons-section {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
 }
 
@@ -256,7 +256,7 @@
 }
 
 .merchant-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--yellow-bg);
     color: white;
 }
 
@@ -266,27 +266,13 @@
 }
 
 .volunteer-btn {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    background: var(--blue-bg);
     color: white;
 }
 
 .volunteer-btn:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 25px rgba(245, 87, 108, 0.4);
-}
-
-.donation-btn {
-    background: linear-gradient(
-        31deg,
-        rgba(78, 182, 230, 1) 0%,
-        rgba(255, 202, 40, 1) 100%
-    );
-    color: white;
-}
-
-.donation-btn:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 25px rgba(78, 182, 230, 0.4);
 }
 
 .modal-overlay {
@@ -315,7 +301,7 @@
     background: white;
     border-radius: 20px;
     width: 100%;
-    max-width: 500px;
+    max-width: 600px;
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -440,7 +426,6 @@
     box-shadow: 0 6px 20px rgba(78, 182, 230, 0.4);
 }
 
-
 .grid {
     display: grid;
 }
@@ -452,7 +437,6 @@
 .gap-5 {
     gap: 20px;
 }
-
 
 input[type="checkbox"] {
     accent-color: #ffca28;
@@ -619,4 +603,20 @@ input[type="checkbox"] {
     .modal-form {
         padding: 24px;
     }
+}
+
+
+
+/*/*/**/
+.modal-box {
+    overflow-y: scroll;
+}
+
+.modal-box::-webkit-scrollbar {
+    display: none;
+}
+
+.modal-box {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }

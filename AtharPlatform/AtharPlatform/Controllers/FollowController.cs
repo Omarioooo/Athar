@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AtharPlatform.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/")]
     [ApiController]
     public class FollowController : ControllerBase
     {
@@ -17,7 +17,7 @@ namespace AtharPlatform.Controllers
             _accountContextService = accountContextService;
         }
 
-        [HttpPost("{id}")]
+        [HttpPost("follow/{id}")]
         public async Task<IActionResult> Follow([FromRoute] int id)
         {
             try
@@ -50,8 +50,8 @@ namespace AtharPlatform.Controllers
         }
 
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Unfollow(int id)
+        [HttpDelete("unfollow/{id}")]
+        public async Task<IActionResult> Unfollow([FromRoute] int id)
         {
             try
             {
@@ -82,18 +82,26 @@ namespace AtharPlatform.Controllers
             }
         }
 
-        [HttpGet("{id}/followers/count")]
-        public async Task<IActionResult> GetFollowersCount(int id)
+        [HttpGet("followerscount/{id}")]
+        public async Task<IActionResult> GetFollowersCount([FromRoute] int id)
         {
            
             var count = await _followService.GetFollowersCountAsync(id);
 
-            if (count < 0) // مثلا لو الـ charity مش موجودة
+            if (count < 0)
                 return NotFound(new { message = "Charity not found." });
 
             return Ok(count);
         }
 
+        [HttpGet("isfollowed/{id}")]
+        public async Task<IActionResult> IsFollowed([FromRoute] int id)
+        {
+            var userId = _accountContextService.GetCurrentAccountId();
 
+            var check = await _followService.IsFollowedAsync(userId, id);
+
+            return Ok(check);
+        }
     }
 }

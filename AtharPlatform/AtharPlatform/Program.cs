@@ -84,7 +84,7 @@ builder.Services.AddScoped<IFollowRepository, FollowRepository>();
 builder.Services.AddScoped<IReactionRepository, ReactionRepository>();
 builder.Services.AddScoped<IVendorOfferRepository, VendorOfferRepository>();
 builder.Services.AddScoped<IVolunteerApplicationRepository, VolunteerApplicationRepository>();
- 
+
 
 
 // Inject Services
@@ -103,6 +103,7 @@ builder.Services.AddScoped<IDonorService, DonorService>();
 builder.Services.AddScoped<ICampaignService, CampaignService>();
 builder.Services.AddScoped<IContentService, ContentService>();
 builder.Services.AddScoped<ICharityService, CharityService>();
+builder.Services.AddScoped<IVolunteerApplicationService, VolunteerApplicationService>();
 
 builder.Services.AddHttpContextAccessor();
 
@@ -248,7 +249,7 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
-            var roles = new[] { "Admin", "SuperAdmin", "CharityAdmin", "Donor" };
+        var roles = new[] { "Admin", "SuperAdmin", "CharityAdmin", "Donor" };
         foreach (var r in roles)
         {
             if (!await roleManager.RoleExistsAsync(r))
@@ -259,29 +260,29 @@ using (var scope = app.Services.CreateScope())
             }
         }
 
-            // Ensure documented SuperAdmin user exists and is assigned role
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserAccount>>();
-            const string superAdminEmail = "admin@athar.local";
-            var superAdmin = await userManager.FindByEmailAsync(superAdminEmail);
-            if (superAdmin == null)
+        // Ensure documented SuperAdmin user exists and is assigned role
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserAccount>>();
+        const string superAdminEmail = "admin@athar.local";
+        var superAdmin = await userManager.FindByEmailAsync(superAdminEmail);
+        if (superAdmin == null)
+        {
+            superAdmin = new UserAccount
             {
-                superAdmin = new UserAccount
-                {
-                    UserName = "admin",
-                    Email = superAdminEmail,
-                    EmailConfirmed = true,
-                    Country = "EG",
-                    City = "Alexandria",
-                    CreatedAt = DateTime.UtcNow
-                };
-                var create = await userManager.CreateAsync(superAdmin, "Admin#123");
-                Console.WriteLine(create.Succeeded ? "[Startup] SuperAdmin user created." : "[Startup] Failed to create SuperAdmin user: " + string.Join(',', create.Errors.Select(e => e.Description)));
-            }
-            if (!await userManager.IsInRoleAsync(superAdmin, "SuperAdmin"))
-            {
-                var addRole = await userManager.AddToRoleAsync(superAdmin, "SuperAdmin");
-                Console.WriteLine(addRole.Succeeded ? "[Startup] SuperAdmin role assigned to admin@athar.local" : "[Startup] Failed to assign SuperAdmin role: " + string.Join(',', addRole.Errors.Select(e => e.Description)));
-            }
+                UserName = "admin",
+                Email = superAdminEmail,
+                EmailConfirmed = true,
+                Country = "EG",
+                City = "Alexandria",
+                CreatedAt = DateTime.UtcNow
+            };
+            var create = await userManager.CreateAsync(superAdmin, "Admin#123");
+            Console.WriteLine(create.Succeeded ? "[Startup] SuperAdmin user created." : "[Startup] Failed to create SuperAdmin user: " + string.Join(',', create.Errors.Select(e => e.Description)));
+        }
+        if (!await userManager.IsInRoleAsync(superAdmin, "SuperAdmin"))
+        {
+            var addRole = await userManager.AddToRoleAsync(superAdmin, "SuperAdmin");
+            Console.WriteLine(addRole.Succeeded ? "[Startup] SuperAdmin role assigned to admin@athar.local" : "[Startup] Failed to assign SuperAdmin role: " + string.Join(',', addRole.Errors.Select(e => e.Description)));
+        }
     }
     catch (Exception rex)
     {

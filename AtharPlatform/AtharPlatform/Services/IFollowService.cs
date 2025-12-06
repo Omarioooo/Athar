@@ -23,5 +23,7 @@
 
         Task<int> GetFollowersCountAsync(int charityId);
 
+        Task<bool> IsFollowedAsync(int donorId, int charityId);
+
     }
 }

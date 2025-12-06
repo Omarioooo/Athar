@@ -67,5 +67,16 @@ namespace AtharPlatform.Services
                 .CountAsync(f => f.CharityId == charityId);
         }
 
+        public async Task<bool> IsFollowedAsync(int donorId, int charityId)
+        {
+            try
+            {
+                return await _unitOfWork.Follows.IsFollowedAsync(donorId, charityId);
+
+            }catch
+            {
+                return  false;
+            }
+        }
     }
 }

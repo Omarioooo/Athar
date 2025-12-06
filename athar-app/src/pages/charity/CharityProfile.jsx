@@ -11,11 +11,12 @@ import { getCharityView } from "../../services/charityService";
 
 export default function CharityProfile() {
     const { id } = useParams();
+console.log("Charity id is ,", id);
 
     const [charity, setCharity] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    const formatNumber = (num) => (num ? num.toLocaleString("ar-SA") : "0");
+    const formatNumber = (num) => (num ? num.toLocaleString("ar-EG") : "0");
 
     useEffect(() => {
         const loadProfile = async () => {
@@ -24,8 +25,6 @@ export default function CharityProfile() {
             try {
                 setLoading(true);
                 const data = await getCharityView(id);
-                console.log(data);
-                
                 setCharity(data);
             } catch (err) {
                 console.error("فشل تحميل بيانات الجمعية:", err);
@@ -61,17 +60,17 @@ export default function CharityProfile() {
         <div className="charity-profile">
             {/* Cover */}
             <div className="charity-profile-cover">
-                <img src={charity.coverImage} alt="غلاف الجمعية" />
+                <img src={charity.imgUrl} alt="غلاف الجمعية" />
                 <div className="cover-overlay"></div>
             </div>
 
             {/* Header */}
-            <CharityHeader charity={charity} formatNumber={formatNumber} />
+            <CharityHeader id={id} charity={charity} formatNumber={formatNumber} />
 
             {/* Content */}
             <div className="profile-container">
                 <CharityDescription description={charity.description} />
-                <CharityActions />
+                <CharityActions id={id} />
 
                 {/* Campaigns */}
                 {charity.campaigns && charity.campaigns.length > 0 && (
@@ -82,9 +81,9 @@ export default function CharityProfile() {
                 )}
 
                 {/* Media Posts */}
-                {charity.mediaPosts && charity.mediaPosts.length > 0 && (
+                {charity.mediaPosts && charity.contents.length > 0 && (
                     <CharityMedia
-                        mediaPosts={charity.mediaPosts}
+                        mediaPosts={charity.contents}
                         formatNumber={formatNumber}
                     />
                 )}

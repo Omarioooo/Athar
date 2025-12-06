@@ -1,7 +1,8 @@
 import { X } from "lucide-react";
 import { useState } from "react";
+import { submitVendorOffer } from "../../../services/formsService";
 
-export default function MerchantModalMenu({ closeModal }) {
+export default function MerchantModalMenu({ closeModal, id }) {
     const [formData, setFormData] = useState({
         vendorName: "",
         phoneNumber: "",
@@ -12,7 +13,7 @@ export default function MerchantModalMenu({ closeModal }) {
         description: "",
         priceBeforeDiscount: "",
         priceAfterDiscount: "",
-        charityVendorOfferId: "",
+        charityId: id,
     });
 
     const handleChange = (e) => {
@@ -23,19 +24,29 @@ export default function MerchantModalMenu({ closeModal }) {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         const submittedData = {
-            ...formData,
+            vendorName: formData.vendorName,
+            phoneNumber: formData.phoneNumber,
+            country: formData.country,
+            city: formData.city,
+            itemName: formData.itemName,
             quantity: parseInt(formData.quantity, 10),
-            priceBeforeDiscount: parseFloat(formData.priceBeforeDiscount),
+            description: formData.description,
+            priceBeforDiscount: parseFloat(formData.priceBeforeDiscount),
             priceAfterDiscount: parseFloat(formData.priceAfterDiscount),
-            status: "Pending",
+            charityId: id,
         };
 
-        console.log("Merchant Offer Submitted:", submittedData);
-        closeModal();
+        try {
+            await submitVendorOffer(submittedData);
+            alert("تم إرسال عرض التاجر بنجاح");
+            closeModal();
+        } catch (err) {
+            alert(err.message || "حدث خطأ أثناء إرسال العرض");
+        }
     };
 
     return (
@@ -65,7 +76,7 @@ export default function MerchantModalMenu({ closeModal }) {
                                 id="vendorName"
                                 name="vendorName"
                                 required
-                                placeholder="متجر الخير"
+                                placeholder=""
                                 value={formData.vendorName}
                                 onChange={handleChange}
                             />
@@ -81,9 +92,7 @@ export default function MerchantModalMenu({ closeModal }) {
                                 id="phoneNumber"
                                 name="phoneNumber"
                                 required
-                                placeholder="05xxxxxxxxx"
-                                pattern="^05[0-9]{8}$"
-                                title="رقم الجوال يجب أن يبدأ بـ 05 ويتكون من 10 أرقام"
+                                title=""
                                 value={formData.phoneNumber}
                                 onChange={handleChange}
                             />
@@ -100,7 +109,7 @@ export default function MerchantModalMenu({ closeModal }) {
                                 id="country"
                                 name="country"
                                 required
-                                placeholder="المملكة العربية السعودية"
+                                placeholder=""
                                 value={formData.country}
                                 onChange={handleChange}
                             />
@@ -115,7 +124,7 @@ export default function MerchantModalMenu({ closeModal }) {
                                 id="city"
                                 name="city"
                                 required
-                                placeholder="جدة"
+                                placeholder=""
                                 value={formData.city}
                                 onChange={handleChange}
                             />
@@ -133,7 +142,6 @@ export default function MerchantModalMenu({ closeModal }) {
                                 id="itemName"
                                 name="itemName"
                                 required
-                                placeholder="أرز، تمور، ملابس..."
                                 value={formData.itemName}
                                 onChange={handleChange}
                             />
@@ -149,7 +157,6 @@ export default function MerchantModalMenu({ closeModal }) {
                                 name="quantity"
                                 required
                                 min="1"
-                                placeholder="50"
                                 value={formData.quantity}
                                 onChange={handleChange}
                             />
@@ -159,7 +166,7 @@ export default function MerchantModalMenu({ closeModal }) {
                     <div className="grid grid-cols-2 gap-5">
                         <div className="form-group">
                             <label htmlFor="priceBeforeDiscount">
-                                السعر قبل الخصم (ريال){" "}
+                                السعر قبل الخصم
                                 <span className="text-red-500">*</span>
                             </label>
                             <input
@@ -169,7 +176,7 @@ export default function MerchantModalMenu({ closeModal }) {
                                 name="priceBeforeDiscount"
                                 required
                                 min="0"
-                                placeholder="1000.00"
+                                placeholder=""
                                 value={formData.priceBeforeDiscount}
                                 onChange={handleChange}
                             />
@@ -177,7 +184,7 @@ export default function MerchantModalMenu({ closeModal }) {
 
                         <div className="form-group">
                             <label htmlFor="priceAfterDiscount">
-                                السعر بعد الخصم (ريال){" "}
+                                السعر بعد الخصم
                                 <span className="text-red-500">*</span>
                             </label>
                             <input
@@ -187,7 +194,7 @@ export default function MerchantModalMenu({ closeModal }) {
                                 name="priceAfterDiscount"
                                 required
                                 min="0"
-                                placeholder="750.00"
+                                placeholder=""
                                 value={formData.priceAfterDiscount}
                                 onChange={handleChange}
                             />
@@ -196,7 +203,7 @@ export default function MerchantModalMenu({ closeModal }) {
 
                     <div className="form-group">
                         <label htmlFor="description">
-                            وصف العرض (اختياري لكن مطلوب حسب DTO){" "}
+                            معلومات اضافية
                             <span className="text-red-500">*</span>
                         </label>
                         <textarea
@@ -204,18 +211,11 @@ export default function MerchantModalMenu({ closeModal }) {
                             name="description"
                             required
                             rows="4"
-                            placeholder="تفاصيل العرض، حالة المنتج، مدة الصلاحية إن وجدت..."
+                            placeholder=""
                             value={formData.description}
                             onChange={handleChange}
                         />
                     </div>
-
-                    <input
-                        type="hidden"
-                        name="charityVendorOfferId"
-                        value={formData.charityVendorOfferId}
-                    />
-
                     <button type="submit" className="submit-btn">
                         إرسال عرض التبرع
                     </button>
