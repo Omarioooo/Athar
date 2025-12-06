@@ -101,7 +101,8 @@ namespace AtharPlatform.Controllers
                 slot = new CharityVendorOffer
                 {
                     CharityId = offerDto.CharityId,
-                    Date = DateTime.UtcNow
+                    Date = DateTime.UtcNow,
+                    IsOpen = true
                 };
                 await _unitOfWork.CharityVendorOffers.AddAsync(slot);
                 await _unitOfWork.SaveAsync();
@@ -177,6 +178,7 @@ namespace AtharPlatform.Controllers
             PriceBeforDiscount = o.PriceBeforDiscount,
             PriceAfterDiscount = o.PriceAfterDiscount,
             Status = o.Status,
+            CharityId = o.CharityVendorOffer?.CharityId ?? 0
         };
     }
 }
