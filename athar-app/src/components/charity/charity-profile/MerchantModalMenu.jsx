@@ -16,6 +16,9 @@ export default function MerchantModalMenu({ closeModal, id }) {
         charityId: id,
     });
 
+    const [loading, setLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
@@ -26,27 +29,90 @@ export default function MerchantModalMenu({ closeModal, id }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setErrorMsg("");
 
-        const submittedData = {
-            vendorName: formData.vendorName,
-            phoneNumber: formData.phoneNumber,
-            country: formData.country,
-            city: formData.city,
-            itemName: formData.itemName,
-            quantity: parseInt(formData.quantity, 10),
-            description: formData.description,
-            priceBeforDiscount: parseFloat(formData.priceBeforeDiscount),
-            priceAfterDiscount: parseFloat(formData.priceAfterDiscount),
-            charityId: id,
-        };
+        // Validations
+        if (!formData.vendorName.trim()) {
+            setErrorMsg("اسم التاجر / المتجر مطلوب");
+            return;
+        }
+        if (!formData.phoneNumber.trim()) {
+            setErrorMsg("رقم الجوال مطلوب");
+            return;
+        }
+        if (!formData.country.trim()) {
+            setErrorMsg("الدولة مطلوبة");
+            return;
+        }
+        if (!formData.city.trim()) {
+            setErrorMsg("المدينة مطلوبة");
+            return;
+        }
+        if (!formData.itemName.trim()) {
+            setErrorMsg("اسم الصنف / المنتج مطلوب");
+            return;
+        }
+        if (!formData.quantity || parseInt(formData.quantity, 10) <= 0) {
+            setErrorMsg("الكمية يجب أن تكون أكبر من 0");
+            return;
+        }
+        if (
+            !formData.priceBeforeDiscount ||
+            parseFloat(formData.priceBeforeDiscount) < 0
+        ) {
+            setErrorMsg("السعر قبل الخصم مطلوب ويجب أن يكون ≥ 0");
+            return;
+        }
+        if (
+            !formData.priceAfterDiscount ||
+            parseFloat(formData.priceAfterDiscount) < 0
+        ) {
+            setErrorMsg("السعر بعد الخصم مطلوب ويجب أن يكون ≥ 0");
+            return;
+        }
+        if (!formData.description.trim()) {
+            setErrorMsg("معلومات إضافية مطلوبة");
+            return;
+        }
+
+        setLoading(true);
 
         try {
+            const submittedData = {
+                vendorName: formData.vendorName.trim(),
+                phoneNumber: formData.phoneNumber.trim(),
+                country: formData.country.trim(),
+                city: formData.city.trim(),
+                itemName: formData.itemName.trim(),
+                quantity: parseInt(formData.quantity, 10),
+                description: formData.description.trim(),
+                priceBeforeDiscount: parseFloat(formData.priceBeforeDiscount),
+                priceAfterDiscount: parseFloat(formData.priceAfterDiscount),
+                charityId: id,
+            };
+
             await submitVendorOffer(submittedData);
-            alert("تم إرسال عرض التاجر بنجاح");
+
+            setFormData({
+                vendorName: "",
+                phoneNumber: "",
+                country: "",
+                city: "",
+                itemName: "",
+                quantity: "",
+                description: "",
+                priceBeforeDiscount: "",
+                priceAfterDiscount: "",
+                charityId: id,
+            });
+
             closeModal();
         } catch (err) {
-            alert(err.message || "حدث خطأ أثناء إرسال العرض");
+            console.error(err);
+            setErrorMsg("حدث خطأ أثناء إرسال العرض. حاول مرة أخرى.");
         }
+
+        setLoading(false);
     };
 
     return (
@@ -63,6 +129,12 @@ export default function MerchantModalMenu({ closeModal, id }) {
                 <div className="modal-header">
                     <h2 className="modal-title">عرض تبرع من تاجر</h2>
                 </div>
+
+                {errorMsg && (
+                    <p className="text-red-600 bg-red-100 p-3 rounded mb-4">
+                        {errorMsg}
+                    </p>
+                )}
 
                 <form className="modal-form" onSubmit={handleSubmit}>
                     <div className="grid grid-cols-2 gap-5">
@@ -92,7 +164,6 @@ export default function MerchantModalMenu({ closeModal, id }) {
                                 id="phoneNumber"
                                 name="phoneNumber"
                                 required
-                                title=""
                                 value={formData.phoneNumber}
                                 onChange={handleChange}
                             />
@@ -109,7 +180,6 @@ export default function MerchantModalMenu({ closeModal, id }) {
                                 id="country"
                                 name="country"
                                 required
-                                placeholder=""
                                 value={formData.country}
                                 onChange={handleChange}
                             />
@@ -124,7 +194,6 @@ export default function MerchantModalMenu({ closeModal, id }) {
                                 id="city"
                                 name="city"
                                 required
-                                placeholder=""
                                 value={formData.city}
                                 onChange={handleChange}
                             />
@@ -176,7 +245,6 @@ export default function MerchantModalMenu({ closeModal, id }) {
                                 name="priceBeforeDiscount"
                                 required
                                 min="0"
-                                placeholder=""
                                 value={formData.priceBeforeDiscount}
                                 onChange={handleChange}
                             />
@@ -194,7 +262,6 @@ export default function MerchantModalMenu({ closeModal, id }) {
                                 name="priceAfterDiscount"
                                 required
                                 min="0"
-                                placeholder=""
                                 value={formData.priceAfterDiscount}
                                 onChange={handleChange}
                             />
@@ -211,13 +278,17 @@ export default function MerchantModalMenu({ closeModal, id }) {
                             name="description"
                             required
                             rows="4"
-                            placeholder=""
                             value={formData.description}
                             onChange={handleChange}
                         />
                     </div>
-                    <button type="submit" className="submit-btn">
-                        إرسال عرض التبرع
+
+                    <button
+                        type="submit"
+                        className="submit-btn"
+                        disabled={loading}
+                    >
+                        {loading ? "جاري الإرسال..." : "إرسال عرض التبرع"}
                     </button>
                 </form>
             </div>

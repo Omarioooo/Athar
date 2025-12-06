@@ -22,17 +22,9 @@ export default function VolunteeringForms() {
         donation: Gift,
     };
 
-    const labels = {
-        status: {
-            new: "جديد",
-            replied: "تم الرد",
-            pending: "قيد المراجعة",
-        },
-        type: {
-            volunteer: "تطوع",
-            merchant: "تاجر",
-            donation: "تبرع نوعي",
-        },
+    const type = {
+        volunteer: "تطوع",
+        merchant: "تاجر",
     };
 
     const filteredForms =
@@ -84,7 +76,9 @@ export default function VolunteeringForms() {
                             onClick={() => setSelectedItem(item)}
                         >
                             <div className="volunteering-line-wrapper">
-                                <div className={`volunteering-circle ${item.type}`}>
+                                <div
+                                    className={`volunteering-circle ${item.type}`}
+                                >
                                     <Icon size={20} />
                                 </div>
                                 {index < filteredForms.length - 1 && (

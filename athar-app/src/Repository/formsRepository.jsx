@@ -7,3 +7,7 @@ export function createVendorOffer(data) {
 export function createVolunteerOffer(data) {
     return api.post("/VolunteerApplications/apply", data);
 }
+
+export function getAllOffers(id) {
+    return api.get(`/${id}`);
+}
