@@ -5,8 +5,9 @@ import defaultAvatar from "../../assets/images/profile.png";
 import { getDonorProfile } from "../../services/donorService";
 import { getCharityProfile } from "../../services/charityService";
 
-export default function ProfileIcon({user}) {
+export default function ProfileIcon({ user }) {
     const [profileImage, setProfileImage] = useState(defaultAvatar);
+    console.log(user);
 
     useEffect(() => {
         if (!user?.id) {
@@ -23,12 +24,11 @@ export default function ProfileIcon({user}) {
                     data = await getCharityProfile({ id: user.id });
                 }
 
+                console.log(data);
+
                 const imgUrl = data?.imageUrl;
                 if (imgUrl) {
-                    // setProfileImage(imgUrl);
-                    setProfileImage(
-                        "https://image.shutterstock.com/image-vector/businessman-multi-tasking-skill-260nw-150498062.jpg"
-                    );
+                    setProfileImage(data.imageUrl);
                 }
             } catch (err) {
                 setProfileImage(defaultAvatar);
@@ -39,7 +39,7 @@ export default function ProfileIcon({user}) {
     }, [user?.id, user?.role]);
 
     const isProfile = user && ["Donor", "CharityAdmin"].includes(user.role);
-    
+
     const content = (
         <img
             src={profileImage}
@@ -47,7 +47,7 @@ export default function ProfileIcon({user}) {
             className="profile-icon"
             onError={(e) => {
                 e.target.onerror = null;
-                e.target.src = defaultAvatar;
+                e.target.src = profileImage;
             }}
         />
     );
