@@ -119,7 +119,7 @@ namespace AtharPlatform.Controllers
                 Description = offerDto.Description,
                 PriceBeforDiscount = offerDto.PriceBeforDiscount,
                 PriceAfterDiscount = offerDto.PriceAfterDiscount,
-                CharityVendorOfferId = slot.CharityId,
+                CharityVendorOfferId = slot.CharityVendorOfferId,
                 Status = OfferStatus.Pending
             };
 
