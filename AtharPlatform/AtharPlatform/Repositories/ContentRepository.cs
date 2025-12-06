@@ -36,7 +36,7 @@ namespace AtharPlatform.Repositories
 
         public async Task<PagingResponse<Content>> GetPagedByCampaignIdAsync(int campaignId, int pageNumber, int pageSize)
         {
-            var query = _dbSet.Where(c => c.CampaignId == campaignId);
+            var query = _dbSet.Where(c => c.CampaignId == campaignId && !c.IsDeleted);
 
             var totalItems = await query.CountAsync();
             var items = await query
