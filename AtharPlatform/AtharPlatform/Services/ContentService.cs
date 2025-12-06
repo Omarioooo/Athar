@@ -23,6 +23,7 @@ namespace AtharPlatform.Services
             var baseUrl = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}";
 
             var query = _unitOfWork.Contents.GetAll()
+                .Where(c=>!c.IsDeleted)
                 .Include(c => c.Campaign)
                 .ThenInclude(ca => ca.Charity);
 
@@ -135,7 +136,7 @@ namespace AtharPlatform.Services
                 Title = dto.Title,
                 Description = dto.Description,
                 CampaignId = dto.CampaignId,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
             };
             if (dto.PostImage != null)
             {
@@ -238,7 +239,7 @@ namespace AtharPlatform.Services
 
         public async Task<PagingResponse<ContentListDTO>> GetPagedByCampaignIdAsync(int campaignId, int pageNumber, int pageSize)
         {
-            var query = _contentRepository.GetAll().Where(c => c.CampaignId == campaignId).OrderByDescending(c => c.CreatedAt);
+            var query = _contentRepository.GetAll().Where(c => c.CampaignId == campaignId &&  !c.IsDeleted).OrderByDescending(c => c.CreatedAt);
 
             var totalItems = query.Count();
 
