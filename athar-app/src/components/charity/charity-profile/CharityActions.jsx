@@ -2,9 +2,10 @@ import { useState } from "react";
 import { MessageCircle, Heart, Gift } from "lucide-react";
 import ModalMenu from "./ModalMenu";
 
-export default function CharityActions({id}) {
+export default function CharityActions({ id }) {
     const [modalType, setModalType] = useState(null);
 
+    console.log("Charity ID in Actions (RECEIVED):", id, "Type:", typeof id);
     const closeModal = () => setModalType(null);
 
     return (
@@ -29,7 +30,11 @@ export default function CharityActions({id}) {
 
             {/* Modal */}
             {modalType && (
-                <ModalMenu modalType={modalType} closeModal={closeModal} id={id}/>
+                <ModalMenu
+                    modalType={modalType}
+                    closeModal={closeModal}
+                    id={id}
+                />
             )}
         </>
     );

@@ -4,6 +4,8 @@ import MerchantModalMenu from "./MerchantModalMenu";
 export default function ModalMenu({ modalType, closeModal, id }) {
     if (!modalType) return null;
 
+    console.log("ModalMenu id:", id, "Type:", typeof id);
+
     return (
         <>
             {modalType === "volunteer" && (
