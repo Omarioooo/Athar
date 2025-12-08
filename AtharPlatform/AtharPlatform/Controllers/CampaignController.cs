@@ -414,6 +414,17 @@ namespace AtharPlatform.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreateCampaign([FromForm] CreateCampaignDto dto)
         {
+
+            var check = await _unitOfWork.Charities.GetAsync(dto.CharityId);
+            if (check.Status==Models.Enums.CharityStatusEnum.Pending)
+            {
+                return BadRequest("Charity is under review.");
+            }
+            else if (check.Status == Models.Enums.CharityStatusEnum.Rejected)
+            {
+                return BadRequest("Charity is Rejected");
+            }
+
             if (dto.ImageFile == null)
                 return BadRequest("Campaign image is required.");
 
