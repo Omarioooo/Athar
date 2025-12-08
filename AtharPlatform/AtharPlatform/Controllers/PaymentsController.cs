@@ -45,50 +45,65 @@ public class PaymentsController : ControllerBase
     [HttpPost("callback")]
     public async Task<IActionResult> PaymentCallback([FromForm] PaymobCallbackDto dto)
     {
-        var donation = await _unit.Donations
-            .FirstOrDefaultAsync(d => d.PaymentID == dto.paymentId);
+        #region Old Version 
+        //var donation = await _unit.Donations
+        //    .FirstOrDefaultAsync(d => d.PaymentID == dto.paymentId);
 
-        if (donation == null)
-            return NotFound();
+        //if (donation == null)
+        //    return NotFound();
 
-        if (dto.success)
-        {
-            donation.DonationStatus = TransactionStatusEnum.SUCCESSED;
-            donation.TransactionId = dto.transactionId;
-            donation.NetAmountToCharity = dto.amount * (1 - donation.PlatformFee);
+        //if (dto.success)
+        //{
+        //    donation.DonationStatus = TransactionStatusEnum.SUCCESSED;
+        //    donation.TransactionId = dto.transactionId;
+        //    donation.NetAmountToCharity = dto.amount * (1 - donation.PlatformFee);
 
-            // تحديث مبلغ الحملة
-            var campaignDonation = await _unit.CampaignDonations
-                .FirstOrDefaultAsync(c => c.DonationId == donation.Id);
+        //    // تحديث مبلغ الحملة
+        //    var campaignDonation = await _unit.CampaignDonations
+        //        .FirstOrDefaultAsync(c => c.DonationId == donation.Id);
 
-            if (campaignDonation != null)
-            {
-                var campaign = await _unit.Campaigns.GetAsync(campaignDonation.CampaignId);
-                if (campaign != null)
-                    campaign.RaisedAmount += (double)donation.NetAmountToCharity;
-            }
-        }
-        else
-        {
-            donation.DonationStatus = TransactionStatusEnum.FAILED;
-        }
+        //    if (campaignDonation != null)
+        //    {
+        //        var campaign = await _unit.Campaigns.GetAsync(campaignDonation.CampaignId);
+        //        if (campaign != null)
+        //            campaign.RaisedAmount += (double)donation.NetAmountToCharity;
+        //    }
+        //}
+        //else
+        //{
+        //    donation.DonationStatus = TransactionStatusEnum.FAILED;
+        //}
 
-        await _unit.SaveAsync();
+        //await _unit.SaveAsync();
 
-        return Ok($"received\nTotalAmount: {donation.TotalAmount}\nNetAmountToCharity: {donation.NetAmountToCharity}");
+        //return Ok($"received\nTotalAmount: {donation.TotalAmount}\nNetAmountToCharity: {donation.NetAmountToCharity}"); 
+        #endregion
+        var data = new Dictionary<string, string>
+    {
+       
+        { "success", dto.success.ToString() },
+        { "id", dto.transactionId },
+        { "amount", dto.amount.ToString() }
+    };
+
+        await _paymob.HandleWebHookAsync(data);
+
+        return Ok("Callback handled successfully");
     }
 
-    
     [HttpGet("{donationId}/status")]
     public async Task<IActionResult> GetDonationStatus(int donationId)
     {
         var donation = await _unit.Donations.FirstOrDefaultAsync(d => d.Id == donationId);
-        if (donation == null) return NotFound();
+        if (donation == null)
+            return NotFound(new { message = "Donation not found" });
 
         return Ok(new
         {
+            donation.Id,
             donation.DonationStatus,
-           
+            donation.TotalAmount,
+            donation.NetAmountToCharity
         });
     }
 
