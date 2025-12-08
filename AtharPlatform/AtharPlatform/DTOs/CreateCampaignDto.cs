@@ -1,4 +1,6 @@
-﻿namespace AtharPlatform.DTOs
+﻿using AtharPlatform.Models.Enum;
+
+namespace AtharPlatform.DTOs
 {
     public class CreateCampaignDto
     {
@@ -8,5 +10,6 @@
         public double GoalAmount { get; set; }
         public int CharityId { get; set; }
         public IFormFile ImageFile { get; set; } = null!;
+        public CampaignCategoryEnum Category { get; set; }
     }
 }
