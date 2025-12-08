@@ -429,7 +429,7 @@ namespace AtharPlatform.Controllers
                 await dto.ImageFile.CopyToAsync(stream);
             }
 
-            string imageUrl = $"/uploads/campaigns/{fileName}";
+            string imageUrl = $"https://localhost:5192/uploads/campaigns/{fileName}";
 
             // 2) Save campaign
             Campaign campaign = new()

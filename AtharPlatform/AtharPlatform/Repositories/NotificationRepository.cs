@@ -13,7 +13,12 @@ namespace AtharPlatform.Repositories
 
         public override async Task<Notification?> GetAsync(int id)
         {
-            return await _dbSet.FirstOrDefaultAsync(n => n.Id == id);
+            return await _dbSet
+         .Include(n => n.Sender)
+             .ThenInclude(s => s.Sender)  
+         .Include(n => n.Receivers)
+             .ThenInclude(r => r.Receiver)  
+         .FirstOrDefaultAsync(n => n.Id == id);
         }
 
         public override async Task<Notification?> GetWithExpressionAsync(Expression<Func<Notification, bool>> expression)
@@ -75,6 +80,7 @@ namespace AtharPlatform.Repositories
             return await _context.Notifications
                 .Include(n => n.Receivers)
                 .Include(n => n.Sender)
+                .ThenInclude(ns => ns.Sender) 
                 .Where(n => n.Receivers.Any(r => r.ReceiverId == userId))
                 .ToListAsync();
         }
