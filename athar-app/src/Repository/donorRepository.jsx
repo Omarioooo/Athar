@@ -17,3 +17,14 @@ export async function fetchDonorByIdFromApi(id) {
         throw new Error(msg);
     }
 }
+
+export async function fetchDonorAtharById(id) {
+    try {
+        const res = await api.get(`/Donor/athar/${id}`);
+        return res.data;
+    } catch (error) {
+        const msg =
+            error.response?.data?.message || "فشل جلب بيانات المتبرع";
+        throw new Error(msg);
+    }
+}

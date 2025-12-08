@@ -53,6 +53,21 @@ export async function registerDonor(user) {
 }
 
 export async function getDonorProfile(id) {
-    const profile = await fetchDonorByIdFromApi(id);
-    return profile;
+    try {
+        const profile = await fetchDonorByIdFromApi(id);
+        return profile;
+    } catch (err) {
+        console.error("Failed to get donor profile:", err);
+        throw err;
+    }
+}
+
+export async function getDonorAthar(id) {
+    try {
+        const profile = await fetchDonorByIdFromApi(id);
+        return profile;
+    } catch (err) {
+        console.error("Failed to get donor athar:", err);
+        throw err;
+    }
 }
