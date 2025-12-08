@@ -429,7 +429,7 @@ namespace AtharPlatform.Controllers
                 await dto.ImageFile.CopyToAsync(stream);
             }
 
-            string imageUrl = $"/uploads/campaigns/{fileName}";
+            string imageUrl = $"https://localhost:5192/uploads/campaigns/{fileName}";
 
             // 2) Save campaign
             Campaign campaign = new()
@@ -531,6 +531,23 @@ namespace AtharPlatform.Controllers
         }
 
 
+        [HttpGet("Campaing_count_For_Charity/{charityId}")]
+        public async Task<IActionResult> GetCharityCampaignCount(int charityId)
+        {
+
+            if (charityId <= 0)
+                return BadRequest("Invalid Charity ID");
+
+            // تحقق هل الجمعية موجودة
+            var charityExists = await _unitOfWork.Charities.GetAll()
+                .AnyAsync(c => c.Id == charityId );
+
+            if (!charityExists)
+                return NotFound("Charity Not Found");
+
+            var result = await _campaignService.GetCountOfCampaignsByCharityIdAsync(charityId);
+            return Ok(result);
+        }
 
     }
 }

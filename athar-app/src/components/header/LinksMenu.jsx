@@ -42,7 +42,7 @@ export default function LinksMenu({ open, setOpen, user }) {
                         </div>
                     </NavLink>
 
-                    {["SuperAdmin", "Donor", "CharityAdmin"].includes(
+                    {["Admin", "Donor", "CharityAdmin"].includes(
                         user.role
                     ) && (
                         <NavLink to="/media" onClick={() => setOpen(false)}>
@@ -53,7 +53,7 @@ export default function LinksMenu({ open, setOpen, user }) {
                         </NavLink>
                     )}
 
-                    {(user.role === "SuperAdmin" ||
+                    {(user.role === "Admin" ||
                         user.role === "CharityAdmin") && (
                         <NavLink to="/dashboard" onClick={() => setOpen(false)}>
                             <div className="link">

@@ -1,9 +1,15 @@
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
+import { useNavigate } from "react-router-dom";
 
 export default function FirstSection() {
     const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.2 });
+  const navigate = useNavigate();
 
+  const goToCharities = () => {
+    navigate("/charities"); 
+   
+  };
     return (
         <motion.div
             ref={ref}
@@ -24,10 +30,10 @@ export default function FirstSection() {
                     <i className="fa-solid fa-heart first-section-i"></i> ابدا
                     بالتبرع الان
                 </button>
-                <button className="first-section-btn2">
-                    تصفح الجمعيات{" "}
-                    <i className="fa-solid fa-arrow-left first-section-i"></i>
-                </button>
+                <button className="first-section-btn2" onClick={goToCharities}>
+               تصفح الجمعيات{" "}
+            <i className="fa-solid fa-arrow-left first-section-i"></i>
+           </button>
             </div>
         </motion.div>
     );

@@ -20,6 +20,7 @@ import Charities from "../pages/charity/Charities";
 import CharityProfile from "../pages/charity/CharityProfile";
 import NotFound from "../pages/callback/NotFound";
 import ProfilePageRoute from "./ProfilePageRoute";
+import AboutUs from "../pages/knowaboutus";
 
 export default function AppRoutes() {
     const location = useLocation();
@@ -30,6 +31,7 @@ export default function AppRoutes() {
                 <Route element={<MainLayout />}>
                     <Route index element={<Home />} />
                     <Route path="zakaa" element={<Zakaa />} />
+                     <Route path="aboutus" element={<AboutUs />} />
                     <Route path="content" element={<Content />} />
                     <Route path="campaigns" element={<Campaigns />} />
                     <Route path="charities" element={<Charities />} />

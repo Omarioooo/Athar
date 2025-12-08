@@ -27,5 +27,6 @@ namespace AtharPlatform.Services
 
         Task<PaginatedResultDto<ContentList_Detailes_DTO>> GetFollowedCharitiesContentAsync(int donorId, int page, int pageSize);
 
+        Task<int> GetCharityContentCountAsync(int CharityId);
     }
 }

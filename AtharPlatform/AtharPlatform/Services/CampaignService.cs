@@ -399,8 +399,8 @@ namespace AtharPlatform.Services
         public async Task<bool> DeleteAsync(int id)
         {
             var campaign = await _unitOfWork.Campaigns.GetAsync(id, includeCharity: false);
-            if (campaign == null)
-                throw new KeyNotFoundException("Campaign not found");
+            //if (campaign == null)
+            //    throw new KeyNotFoundException("Campaign not found");
 
             await _unitOfWork.Campaigns.DeleteAsync(id);
             await _unitOfWork.SaveAsync();
@@ -490,5 +490,11 @@ namespace AtharPlatform.Services
             };
         }
 
+        public async Task<int> GetCountOfCampaignsByCharityIdAsync(int CharityId)
+        {
+            return await _unitOfWork.Campaigns.GetAll()
+                 .Where(c => c.CharityID == CharityId)
+                 .CountAsync();
+        }
     }
 }

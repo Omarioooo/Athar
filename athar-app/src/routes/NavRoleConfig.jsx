@@ -61,8 +61,8 @@ export const roleConfig = {
         defaultPage: "donorhomeinfo",
     },
 
-    SuperAdmin: {
-        role: "superAdmin",
+    Admin: {
+        role: "Admin",
         nav: [
             { label: "الرئيسية", path: "adminhomeinfo", icon: <RiHome9Line /> },
         ],

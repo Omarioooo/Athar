@@ -1,4 +1,5 @@
 ﻿using AtharPlatform.DTO;
+using AtharPlatform.DTOs;
 using AtharPlatform.Hubs;
 using AtharPlatform.Models.Enum;
 using AtharPlatform.Repositories;
@@ -27,20 +28,40 @@ namespace AtharPlatform.Services
             var result = notifications.Select(n => new NotificationMessageDto
             {
                 Message = n.Message,
-                CreatedAt = n.CreatedAt
+                CreatedAt = n.CreatedAt,
+                SenderName=n.Sender.Sender.UserName
             }).ToList();
 
             return result;
         }
 
-        public async Task<List<Notification>> GetUserNotificationsFullAsync(int userId)
+        public async Task<NotificationFullDto?> GetNotificationByIdAsync(int notificationId)
         {
-            var notifications = await _unitOfWork.Notifications.GetNotificationsByUserAsync(userId);
+            var notification = await _unitOfWork.Notifications.GetAsync(notificationId);
 
-            
-            return notifications;
+            if (notification == null)
+                return null;
+
+            var result = new NotificationFullDto
+            {
+                Id = notification.Id,
+                Message = notification.Message,
+                CreatedAt = notification.CreatedAt,
+                Sender = notification.Sender != null ? new SenderDto
+                {
+                    SenderId = notification.Sender.SenderId,
+                    UserName = notification.Sender.Sender.UserName
+                } : null,
+                Receivers = notification.Receivers.Select(r => new ReceiverDto
+                {
+                    ReceiverId = r.ReceiverId,
+                    UserName = r.Receiver.UserName,
+                    IsRead = r.IsRead
+                }).ToList()
+            };
+
+            return result;
         }
-
         public async Task<List<NotificationReceiver>> GetUserNotificationsAsync(int id)
         {
             var notifications = await _unitOfWork.Notifications.GetNotificationsByUserAsync(id);

@@ -25,14 +25,14 @@ namespace AtharPlatform.Controllers
             if (page <= 0 || pageSize <= 0)
                 return BadRequest("Page number and page size must be greater than zero.");
 
-            var contents = await _contentService.GetPagedAllAsync(page,pageSize);
+            var contents = await _contentService.GetPagedAllAsync(page, pageSize);
 
             if (contents == null || !contents.Items.Any())
             {
                 return NotFound("No contents found");
             }
             return Ok(contents);
-                
+
         }
 
 
@@ -51,12 +51,25 @@ namespace AtharPlatform.Controllers
             return Ok(result);
         }
 
+        [HttpGet("Count_Of_Posts{CharityId}")]
+        //[Authorize(Roles = "CharityAdmin,Donor,SuperAdmin")]
+        public async Task<IActionResult> GetCharityContentCount(int CharityId)
+        {
+            if (CharityId <= 0)
+                return BadRequest("Invalid Charity ID");
+
+            var result = await _contentService.GetCharityContentCountAsync(CharityId);
+
+            return Ok(result);
+
+
+        }
 
 
 
         [HttpPost("create")]
         [Consumes("multipart/form-data")]// بيقول علشان Swagger يعرف انه بيتم رفع صورة
-       //// [Authorize(Roles = "CharityAdmin")]
+                                         //// [Authorize(Roles = "CharityAdmin")]
         public async Task<IActionResult> CreateContent([FromForm] CreateContentDTO dto)
         {
             if (!ModelState.IsValid)
@@ -79,7 +92,6 @@ namespace AtharPlatform.Controllers
 
             return File(content.PostImage, "image/png");
         }
-
 
 
         //[HttpGet("campaign/{campaignId}")]
@@ -128,19 +140,17 @@ namespace AtharPlatform.Controllers
         }
 
 
-
         [HttpDelete("{id}")]
         //[Authorize(Roles = "CharityAdmin,SuperAdmin")]
-        
+
         public async Task<IActionResult> DeleteContent(int id)
         {
             var result = await _contentService.DeleteContentAsync(id);
             if (!result)
                 return NotFound("Content not found");
 
-            return NoContent(); 
+            return NoContent();
         }
-
 
 
         [HttpGet("charity/{charityId}/paged")]
@@ -154,13 +164,11 @@ namespace AtharPlatform.Controllers
 
             var pagedContents = await _contentService.GetPagedByCharityIdAsync(charityId, page, pageSize);
 
-            if (pagedContents == null|| !pagedContents.Items.Any())
+            if (pagedContents == null || !pagedContents.Items.Any())
                 return NotFound("No contents found for this Charity");
 
             return Ok(pagedContents);
         }
-
-
 
         //علشان تدور باسم الجمعية او اسم الحملة عنوانها يعني
         [HttpGet("search")]
@@ -173,9 +181,5 @@ namespace AtharPlatform.Controllers
             var results = await _contentService.SearchContentsAsync(Word);
             return Ok(results);
         }
-
-
     }
-
-
 }

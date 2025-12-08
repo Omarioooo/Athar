@@ -3,7 +3,7 @@ import { useInView } from "react-intersection-observer";
 import { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.rtl.min.css";
 import Pagination from "../components/Pagination";
-import ContentCard from "../components/content/content";
+import ContentCard from "../components/content/contentcard";
 import { UseAuth } from "../Auth/Auth";
 import {
     getAllContentsService,
@@ -31,6 +31,7 @@ export default function Content() {
         setTotalPages(data.totalPages || 1);
         if (data.error) setErrorMessage(data.error);
         setLoading(false);
+
     };
 
     const handleSearch = async () => {

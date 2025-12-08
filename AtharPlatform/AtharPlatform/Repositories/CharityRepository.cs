@@ -11,11 +11,9 @@ namespace AtharPlatform.Repositories
         {
             var charity = await _dbSet
                 .Include(c => c.Account)
-                .Where(c => c.IsActive)
+                .Where(c => c.IsActive == true)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
-            if (charity == null)
-                throw new KeyNotFoundException($"Charity with id {id} not found");
 
             return charity;
         }
@@ -25,11 +23,10 @@ namespace AtharPlatform.Repositories
         {
             var charities = await _dbSet
                 .Include(c => c.Account)
-                .Where(c => c.IsActive)
+                .Where(c => c.IsActive==true)
                 .ToListAsync();
 
-            if (charities == null)
-                throw new KeyNotFoundException($"Charities not found");
+            
 
             return charities;
         }
@@ -163,6 +160,7 @@ namespace AtharPlatform.Repositories
         public async Task<Charity> GetCharityFullProfileAsync(int id)
         {
             return await _dbSet
+                .Where(c=>c.IsActive)
                 .Include(c => c.Account)
                 .Include(c => c.Campaigns)
                     .ThenInclude(c => c.CampaignDonations)
