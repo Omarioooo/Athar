@@ -26,11 +26,15 @@ namespace AtharPlatform.Controllers
             return Ok(notifications);
         }
 
-        [HttpGet("notifications/full/{userId}")]
-        public async Task<IActionResult> GetUserNotificationsFull(int userId)
+        [HttpGet("notification/{id}")]
+        public async Task<IActionResult> GetNotificationById(int id)
         {
-            var notifications = await _notificationService.GetUserNotificationsFullAsync(userId);
-            return Ok(notifications);
+            var notification = await _notificationService.GetNotificationByIdAsync(id);
+
+            if (notification == null)
+                return NotFound();
+
+            return Ok(notification);
         }
     }
 }
