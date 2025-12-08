@@ -76,5 +76,19 @@ namespace AtharPlatform.Repositories
             return donor;
         }
 
+        public async Task<Donor> getDonorWithId(int id)
+        {
+            var donor = await _dbSet
+                .Include(d => d.Account)
+                .Include(d => d.Follows)
+                .Include(d => d.Donations)
+                .Where(d => d.Role == RolesEnum.Donor)
+                 .FirstOrDefaultAsync(d => d.Id == id);
+
+            if (donor == null)
+                throw new KeyNotFoundException($"Donor with id {id} not found");
+
+            return donor;
+        }
     }
 }

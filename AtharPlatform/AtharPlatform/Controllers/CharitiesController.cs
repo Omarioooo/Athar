@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using AtharPlatform.DTO;
 using AtharPlatform.Dtos;
 using AtharPlatform.DTOs;
@@ -52,11 +53,38 @@ namespace AtharPlatform.Controllers
 
 
 
-        [HttpGet("{charityId}/applications")]
-        public async Task<IActionResult> GetCharityApplications(int charityId)
+        [HttpGet("applications/{id}")]
+        public async Task<IActionResult> GetCharityApplications(int id)
         {
-            var result = await _charityService.GetAllApplicationsForCharityAsync(charityId);
+            var result = await _charityService.GetAllApplicationsForCharityAsync(id);
             return Ok(result);
+        }
+
+        [HttpGet("application/{id}")]
+        public async Task<IActionResult> GetOneCharityApplication(int id, string type)
+        {
+            try
+            {
+                if (type == "VendorOffer")
+                {
+                    var result = await _charityService.GetVendorOfferForCharityByIdAsync(id);
+                    return Ok(result);
+
+                }
+                else if (type == "Volunteer")
+                {
+                    var result = await _charityService.GetVolunteerOfferForCharityByIdAsync(id);
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest("type is not valied...");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
 
@@ -88,19 +116,53 @@ namespace AtharPlatform.Controllers
 
         //اسف لبشاعة المنظر بس ده حل شات 
         //انما الي انا عمله  الكيوت الي فوقيه **:)
-        [HttpGet("{id}/image")]
-        public IActionResult GetImageFromFile(int id)
+        //[HttpGet("{id}/image")]
+        //public async Task<IActionResult> GetImageFromFile(int id)
+        //{
+        //    var charity = await _charityService.GetCharityFullProfileAsync(id);
+
+        //    if (charity == null || string.IsNullOrEmpty(charity.ImageUrl))
+        //        return Ok("No Photo");
+
+        //    // لو الرابط خارجي (http أو https)
+        //    if (charity.ImageUrl.StartsWith("http"))
+        //        return Redirect(charity.ImageUrl);
+
+        //    // لو الصورة داخل wwwroot
+        //    var relativePath = charity.ImageUrl.TrimStart('/');
+        //    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", relativePath);
+
+        //    if (!System.IO.File.Exists(filePath))
+        //        return Ok("No Photo");
+
+        //    var bytes = System.IO.File.ReadAllBytes(filePath);
+        //    return File(bytes, "image/png");
+        //}
+
+
+        [HttpGet("image/{id}")]
+        public async Task<IActionResult> GetImageFromFile(int id)
         {
-            var charity = _charityService.GetCharityFullProfileAsync(id).Result;
+            var charity = await _charityService.GetCharityFullProfileAsync(id);
 
             if (charity == null || string.IsNullOrEmpty(charity.ImageUrl))
                 return Ok("No Photo");
 
-            // لو الرابط خارجي (http أو https)
+            // External URL
             if (charity.ImageUrl.StartsWith("http"))
-                return Redirect(charity.ImageUrl);
+            {
+                using var httpClient = new HttpClient();
+                var response = await httpClient.GetAsync(charity.ImageUrl);
+                if (!response.IsSuccessStatusCode)
+                    return Ok("No Photo");
 
-            // لو الصورة داخل wwwroot
+                var imageBytes = await response.Content.ReadAsByteArrayAsync();
+                var contentType = response.Content.Headers.ContentType?.MediaType ?? "application/octet-stream";
+                Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:3000");
+                return File(imageBytes, contentType);
+            }
+
+            // Internal file
             var relativePath = charity.ImageUrl.TrimStart('/');
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", relativePath);
 
@@ -108,9 +170,16 @@ namespace AtharPlatform.Controllers
                 return Ok("No Photo");
 
             var bytes = System.IO.File.ReadAllBytes(filePath);
-            return File(bytes, "image/png");
+            var contentTypeInternal = Path.GetExtension(filePath).ToLower() switch
+            {
+                ".jpg" or ".jpeg" => "image/jpeg",
+                ".png" => "image/png",
+                ".gif" => "image/gif",
+                _ => "application/octet-stream"
+            };
+            Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:3000");
+            return File(bytes, contentTypeInternal);
         }
-
 
         // (GET) /api/charities?query=&page=1&pageSize=12
         [HttpGet("[action]")]
@@ -403,31 +472,25 @@ namespace AtharPlatform.Controllers
         }
 
         // (PUT) /api/charities/{id} - update charity (name/description/image and optional external links)
-        [HttpPut("{id:int}")]
-        // [Authorize(Roles = "CharityAdmin,SuperAdmin")]
-        public async Task<IActionResult> Update(int id, [FromBody] CharityUpdateDto body)
+        [HttpPut("update/{id:int}")]
+        public async Task<IActionResult> Update(int id, [FromForm] UpdateCharityDto model)
         {
-            var userId = _accountContextService.GetCurrentAccountId();
-
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            var charity = await _db.Charities.Include(c => c.ScrapedInfo).FirstOrDefaultAsync(c => c.Id == id);
-            if (charity == null) return NotFound("Charity not found.");
-            if (!charity.IsActive) return BadRequest("Charity is deactivated.");
-
-            charity.Name = body.Name ?? charity.Name;
-            if (body.Description != null) charity.Description = body.Description;
-
-
-            if (body.ImageUrl != null || body.ExternalWebsiteUrl != null)
+            try
             {
-                if (charity.ScrapedInfo == null)
-                    charity.ScrapedInfo = new CharityExternalInfo { CharityId = charity.Id };
-                if (body.ImageUrl != null) charity.ScrapedInfo.ImageUrl = body.ImageUrl;
-                if (body.ExternalWebsiteUrl != null) charity.ScrapedInfo.ExternalWebsiteUrl = body.ExternalWebsiteUrl;
-            }
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-            await _unitOfWork.SaveAsync();
-            return NoContent();
+                var check = await _charityService.UpdateAsync(id, model);
+
+                if (check)
+                    return Ok("updated successfully");
+
+                return BadRequest("field to update");
+            }
+            catch(Exception ex)
+            {
+                return BadRequest("cannot update");
+            }
         }
 
         // (DELETE) /api/charities/{id} - soft delete / deactivate
@@ -612,7 +675,9 @@ namespace AtharPlatform.Controllers
                 StartDate = c.StartDate,
                 EndDate = c.EndDate,
                 Category = c.Category,
-                CharityName = c.Charity?.Name
+                CharityName = c.Charity?.Name,
+                Status = c.Status
+
             });
             return Ok(result);
         }

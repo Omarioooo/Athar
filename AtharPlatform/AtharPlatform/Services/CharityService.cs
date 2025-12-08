@@ -1,5 +1,6 @@
 ﻿using AtharPlatform.Dtos;
 using AtharPlatform.DTOs;
+using AtharPlatform.Models;
 using AtharPlatform.Repositories;
 
 namespace AtharPlatform.Services
@@ -34,7 +35,7 @@ namespace AtharPlatform.Services
                     // Country = v.Country,
                     //City = v.City,
                     ///Age = v.Age,
-                   Description = $"ارغب في التطوع لجمعية {v.CharityVolunteer?.Charity?.Name}",
+                    Description = $"ارغب في التطوع لجمعية {v.CharityVolunteer?.Charity?.Name}",
                     Date = v.CharityVolunteer.Date,
                     //IsFirstTime = v.IsFirstTime
                 })
@@ -53,13 +54,13 @@ namespace AtharPlatform.Services
                     Type = "VendorOffer",
                     Name = v.VendorName,
                     Phone = v.PhoneNumber,
-                   // Country = v.Country,
-                   // City = v.City,
-                   // ItemName = v.ItemName,
-                   // Quantity = v.Quantity,
+                    // Country = v.Country,
+                    // City = v.City,
+                    // ItemName = v.ItemName,
+                    // Quantity = v.Quantity,
                     Description = v.Description,
-                   // PriceBefore = v.PriceBeforDiscount,
-                   /// PriceAfter = v.PriceAfterDiscount,
+                    // PriceBefore = v.PriceBeforDiscount,
+                    /// PriceAfter = v.PriceAfterDiscount,
                     Date = v.CharityVendorOffer.Date
                 })
                 .ToList();
@@ -68,8 +69,56 @@ namespace AtharPlatform.Services
 
             return volunteerApps
                 .Concat(vendorOffers)
-                .OrderBy(c=> c.Date)
+                .OrderBy(c => c.Date)
                 .ToList();
+        }
+
+        public async Task<VendorOfferDTO> GetVendorOfferForCharityByIdAsync(int offerId)
+        {
+            var offer = await _unitOfWork.VendorOffers.GetAsync(offerId);
+
+            if (offer == null)
+                throw new Exception("offer not found");
+
+            var charityoffer = await _unitOfWork.CharityVendorOffers.GetByIdAsync(offerId);
+
+            return new VendorOfferDTO
+            {
+                Id = offer.Id,
+                VendorName = offer.VendorName,
+                PhoneNumber = offer.PhoneNumber,
+                City = offer.City,
+                Country = offer.Country,
+                Description = offer.Description,
+                ItemName = offer.ItemName,
+                Quantity = offer.Quantity,
+                PriceAfterDiscount = offer.PriceAfterDiscount,
+                PriceBeforDiscount = offer.PriceBeforDiscount,
+                Date = charityoffer?.Date ?? DateTime.Now
+            };
+        }
+
+        public async Task<VolunteerApplicationDTO> GetVolunteerOfferForCharityByIdAsync(int offerId)
+        {
+            var application = await _unitOfWork.VolunteerApplications.GetAsync(offerId);
+
+            if (application == null)
+                throw new Exception("application not found");
+
+            var charityOffer = await _unitOfWork.CharityVolunteers.GetByIdAsync(application.Id);
+
+            return new VolunteerApplicationDTO
+            {
+                Id = application.Id,
+                FirstName = application.FirstName,
+                LastName = application.LastName,
+                Age = application.Age,
+                City = application.City,
+                Country = application.Country,
+                PhoneNumber = application.PhoneNumber,
+                Description = $"ارغب في التطوع لجمعية {charityOffer?.Charity?.Name}" ?? "أرغب في التطوع",
+                Date = charityOffer?.Date ?? DateTime.Now
+            };
         }
 
         public async Task<CharityProfileDto> GetCharityByIdAsync(int id)
@@ -84,12 +133,12 @@ namespace AtharPlatform.Services
             if (charity == null)
                 return null;
 
-       
+
             string? imageUrl;
 
             if (!string.IsNullOrEmpty(charity.ImageUrl))
             {
-                imageUrl = charity.ImageUrl; // خارجي → رجعه كما هو
+                imageUrl = charity.ImageUrl;
             }
             else if (charity.Account?.ProfileImage != null)
             {
@@ -147,8 +196,6 @@ namespace AtharPlatform.Services
             return await _unitOfWork.Charities.GetCharityFullProfileAsync(id);
         }
 
-
-        // need some fix
         public async Task<CharityViewDto?> GetCharityViewAsync(int id)
         {
             try
@@ -207,6 +254,43 @@ namespace AtharPlatform.Services
             }
         }
 
+        public async Task<bool> UpdateAsync(int id, UpdateCharityDto model)
+        {
+            try
+            {
+                // check the charity
+                var charity = await _unitOfWork.Charities.GetAsync(id);
+                if (charity == null)
+                    throw new ArgumentNullException(nameof(model), "Charity not found");
+
+                // Handle image update
+                var imgFile = model.ProfileImage;
+                byte[] img = null;
+                if (imgFile != null && imgFile.Length > 0)
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        await imgFile.CopyToAsync(ms);
+                        img = ms.ToArray();
+                    }
+                }
+
+                charity.Name = model.CharityName;
+                charity.Description = model.Description;
+                charity.Account.City = model.City;
+                charity.Account.Country = model.Country;
+                charity.Account.ProfileImage = img;
+
+                await _unitOfWork.Charities.UpdateAsync(charity);
+                await _unitOfWork.SaveAsync();
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
     }
 }

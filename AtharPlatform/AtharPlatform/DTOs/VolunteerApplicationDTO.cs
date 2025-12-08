@@ -33,9 +33,9 @@ namespace AtharPlatform.DTOs
 
         public string Type = "Volunteer";
 
-        public DateTime Date { get; set; }
+        public DateTime Date { get; set; } = DateTime.Now;
 
-   
+        public string Description { get; set; } = "";
 
     }
 }

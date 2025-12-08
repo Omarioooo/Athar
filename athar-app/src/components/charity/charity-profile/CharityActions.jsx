@@ -5,7 +5,6 @@ import ModalMenu from "./ModalMenu";
 export default function CharityActions({ id }) {
     const [modalType, setModalType] = useState(null);
 
-    console.log("Charity ID in Actions (RECEIVED):", id, "Type:", typeof id);
     const closeModal = () => setModalType(null);
 
     return (

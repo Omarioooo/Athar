@@ -17,6 +17,26 @@ namespace AtharPlatform.Controllers
             _donorService = donorService;
         }
 
+
+        [HttpGet("athar/{id}")]
+        public async Task<IActionResult> GetDonorAthar(int id)
+        {
+            try
+            {
+                var model = await _donorService.GetAtharByDonorIdAsync(id);
+
+                if (model == null)
+                    return BadRequest("field");
+
+                return Ok(model.follows);
+            }
+            catch
+            {
+                return BadRequest("field");
+            }
+        }
+
+
         [HttpGet("donorProfile/{id}")]
         public async Task<IActionResult> GetDonorProfile(int id)
         {

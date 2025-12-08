@@ -32,9 +32,6 @@ export default function Notifications() {
         filteredNotifications.length,
         itemsPerPage
     );
-    console.log("page no# : " + page);
-    console.log("no# items per page is " + itemsPerPage);
-    console.log("items are " + currentItems);
 
     return (
         <div className="notifications-modern-container">

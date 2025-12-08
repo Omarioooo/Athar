@@ -8,6 +8,12 @@ export function createVolunteerOffer(data) {
     return api.post("/VolunteerApplications/apply", data);
 }
 
-export function getAllOffers(id) {
-    return api.get(`/${id}`);
+export function getCharityApplications(id) {
+    return api.get(`/Charities/applications/${id}`);
+}
+
+export function getOneCharityApplication(id, type) {
+    return api.get(`/Charities/application/${id}`, {
+        params: { type },
+    });
 }

@@ -164,6 +164,7 @@ builder.Services.AddCors(options =>
     });
 });
 
+
 //Paymob Setting
 //builder.Services.AddPaymobCashIn(config =>
 //{
@@ -324,10 +325,21 @@ if (app.Environment.IsDevelopment())
 
 // Always redirect HTTP->HTTPS; we will trust the dev cert locally
 app.UseHttpsRedirection();
-app.UseStaticFiles(); // Enable serving static files from wwwroot
+// app.UseStaticFiles(); // Enable serving static files from wwwroot
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        // Add CORS header to allow frontend localhost access
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "http://localhost:3000");
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Methods", "GET, OPTIONS");
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Headers", "Origin, Content-Type, Accept");
+    }
+});
 
 // Map SignalR Hub
 app.MapHub<NotificationHubHelper>("/notificationHub");

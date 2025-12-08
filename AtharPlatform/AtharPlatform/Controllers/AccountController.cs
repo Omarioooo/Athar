@@ -102,7 +102,6 @@ namespace AtharPlatform.Controllers
             }
             catch (Exception ex)
             {
-                // اطبع الاستثناء عشان تشوف السبب الحقيقي
                 Console.WriteLine(ex);
                 return StatusCode(500, new { message = ex.Message, stackTrace = ex.StackTrace });
             }

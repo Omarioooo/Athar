@@ -1,4 +1,3 @@
-// components/header/ProfileIcon.jsx
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import defaultAvatar from "../../assets/images/profile.png";
@@ -7,7 +6,6 @@ import { getCharityProfile } from "../../services/charityService";
 
 export default function ProfileIcon({ user }) {
     const [profileImage, setProfileImage] = useState(defaultAvatar);
-    console.log(user);
 
     useEffect(() => {
         if (!user?.id) {
@@ -19,14 +17,12 @@ export default function ProfileIcon({ user }) {
             try {
                 let data = null;
                 if (user.role === "Donor") {
-                    data = await getDonorProfile({ id: user.id });
+                    data = await getDonorProfile(user.id);
                 } else if (user.role === "CharityAdmin") {
-                    data = await getCharityProfile({ id: user.id });
+                    data = await getCharityProfile(user.id);
                 }
 
-                console.log(data);
-
-                const imgUrl = data?.imageUrl;
+                const imgUrl = data?.imageUrl || defaultAvatar;
                 if (imgUrl) {
                     setProfileImage(data.imageUrl);
                 }
@@ -39,7 +35,6 @@ export default function ProfileIcon({ user }) {
     }, [user?.id, user?.role]);
 
     const isProfile = user && ["Donor", "CharityAdmin"].includes(user.role);
-
     const content = (
         <img
             src={profileImage}

@@ -2,6 +2,7 @@
 {
     public interface IDonorRepository : IRepository<Donor>
     {
+        Task<Donor> getDonorWithId(int id);
         Task<List<int>> GetAllAdminsIdsAsync();
         Task<bool> ExistsAsync(int id);
         Task<Donor> GetDonorFullProfileAsync(int id);

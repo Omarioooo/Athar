@@ -18,7 +18,7 @@ namespace AtharPlatform.Dtos
 
         public double GoalAmount { get; set; }
         public double RaisedAmount { get; set; }
-        public CampainStatusEnum Status { get; set; }
+        public CampainStatusEnum Status { get; set; } = CampainStatusEnum.inProgress;
         public CampaignCategoryEnum Category { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }

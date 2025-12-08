@@ -12,7 +12,6 @@ const getRequest = async (endpoint, params = {}) => {
 
 export const fetchAllCampaigns = async (page = 1, pageSize = 12) => {
     const data = await getRequest("GetAll", { page, pageSize });
-   console.log(data)
     return {
 
         campaigns: data.items ||data,

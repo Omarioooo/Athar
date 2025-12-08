@@ -5,7 +5,6 @@ export default function ProfileLayout({ navLinks, baseUrl, children }) {
         <div className="profile-body">
             <Nav links={navLinks} baseUrl={baseUrl} />
             <div className="profile-section">
-                {/* <Outlet /> */}
                 {children}
             </div>
         </div>

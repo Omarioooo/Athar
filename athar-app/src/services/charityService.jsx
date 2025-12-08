@@ -2,6 +2,9 @@ import {
     charityRegisterRequest as repoRegister,
     fetchCharities,
     fetchCharityProfileById,
+    fetchCharityImageById,
+    fetchCampaignsByCharityId,
+    updateCharity,
 } from "../Repository/charityRepository";
 import { validateEmail } from "../utils/validation/validateEmail";
 import {
@@ -14,9 +17,7 @@ import {
 } from "../utils/validation/validateCharityData";
 import { parseRegisterError } from "../utils/errors/parseRegisterError";
 
-import {
-    fetchCharityViewById
-} from "../Repository/charityRepository";
+import { fetchCharityViewById } from "../Repository/charityRepository";
 
 function validateCharityForm(user) {
     return {
@@ -33,6 +34,7 @@ function validateCharityForm(user) {
     };
 }
 
+// register service
 export async function registerCharity(user) {
     const formErrors = validateCharityForm(user);
     if (Object.values(formErrors).some((err) => err !== null)) {
@@ -73,6 +75,7 @@ export async function registerCharity(user) {
     }
 }
 
+// get all charities
 export async function getAllCharities(
     searchQuery = "",
     currentPage = 1,
@@ -102,17 +105,58 @@ export async function getAllCharities(
     return data;
 }
 
+// get the charity view for donor
 export const getCharityView = async (charityId) => {
     try {
         const fetchedData = await fetchCharityViewById(charityId);
         return fetchedData;
     } catch (error) {
-        console.error("Failed to load charity profile:", error);
+        console.error("Failed to load charity view:", error);
         throw error;
     }
 };
 
-export async function getCharityProfile({ id }) {
-    const profile = await fetchCharityProfileById(id);
-    return profile;
+// get the charity profile for personal profile
+export async function getCharityProfile(id) {
+    try {
+        const profile = await fetchCharityProfileById(id);
+        return profile;
+    } catch (error) {
+        console.error("Failed to load charity profile:", error);
+        throw error;
+    }
+}
+
+// get charity image
+export async function getCharityImage(id) {
+    try {
+        const image = await fetchCharityImageById(id);
+        return image;
+    } catch (err) {
+        console.error("Failed to load charity image:", err);
+        throw err;
+    }
+}
+
+// get charity's campaign
+export async function getCharityCampaigns(id) {
+    try {
+        const image = await fetchCampaignsByCharityId(id);
+        return image;
+    } catch (err) {
+        console.error("Failed to load charity campaigns:", err);
+        throw err;
+    }
+}
+
+export async function UpdateCharityData(id, data) {
+    try {
+        console.log("data is ,", data);
+        
+        const image = await updateCharity(id, data);
+        return image;
+    } catch (err) {
+        console.error("Failed to update charity:", err);
+        throw err;
+    }
 }

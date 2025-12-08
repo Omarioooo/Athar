@@ -40,5 +40,7 @@ namespace AtharPlatform.DTOs
         [Required]
         // public int CharityVendorOfferId { get; set; }
         public int CharityId { get; set; }
+
+        public DateTime Date { get; set; } = DateTime.Now;
     }
 }

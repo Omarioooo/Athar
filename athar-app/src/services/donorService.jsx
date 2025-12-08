@@ -52,7 +52,7 @@ export async function registerDonor(user) {
     }
 }
 
-export async function getDonorProfile({ id }) {
+export async function getDonorProfile(id) {
     const profile = await fetchDonorByIdFromApi(id);
     return profile;
 }

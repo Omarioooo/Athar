@@ -4,6 +4,7 @@ using AtharPlatform.Models;
 using AtharPlatform.Models.Enum;
 using AtharPlatform.Models.Enums;
 using AtharPlatform.Repositories;
+using System.Buffers.Text;
 using System.Drawing;
 
 namespace AtharPlatform.Services
@@ -99,7 +100,7 @@ namespace AtharPlatform.Services
                 {
                     DonationId = d.Id,
                     Amount = (double)d.NetAmountToCharity,
-                    DonationDate = d.CreatedAt,
+                    Date = d.CreatedAt,
                     Currency = d.Currency,
                     Status = d.DonationStatus.ToString(),
                     CampaignId = d.CampaignId,
@@ -113,5 +114,83 @@ namespace AtharPlatform.Services
             return await _unitOfWork.Donors.GetDonorFullProfileAsync(id);
         }
 
+        public async Task<DonorAtharDto> GetAtharByDonorIdAsync(int id)
+        {
+            // Check the donor
+            var donor = await _unitOfWork.Donors.getDonorWithId(id);
+            if (donor == null)
+                throw new Exception($"Donor with id {id} not found");
+
+            // charity follows
+            var follows = donor.Follows;
+            List<int> charitiesIds = new();
+            follows.ForEach(f => charitiesIds.Add(f.CharityId));
+
+            var followsAthar = new List<FollowAtharHistoryDto>();
+            foreach(int charityId in charitiesIds)
+            {
+                var charity = await _unitOfWork.Charities.GetAsync(charityId);
+                followsAthar.Add(new FollowAtharHistoryDto
+                {
+                    charityId = charityId,
+                    charityName = charity.Name,
+                    charityImageUrl = GetImgUrl(charityId, charity.ImageUrl, charity?.Account.ProfileImage)
+                });
+            }
+
+            // charity donations
+            var donations = donor.Donations.ToList();
+            var donationsAthar = new List<DonorDonationAtharHistoryDto>();
+
+            decimal total = 0;
+            foreach (var don in donations)
+            {
+                var campaign = await _unitOfWork.Campaigns.GetAsync(don.CampaignId);
+                var charity = await _unitOfWork.Charities.GetCharityByCampaignAsync(don.CampaignId);
+                var donation = await _unitOfWork.Donations.FindAsync(don.DonorId);
+
+                donationsAthar.Add(new DonorDonationAtharHistoryDto
+                {
+                    CampaignName = campaign.Title,
+                    CharityName = charity.Name,
+                    DonationId = don.DonationId,
+                    Amount = donation.TotalAmount,
+                    Date = donation.CreatedAt
+                });
+
+                total += donation.TotalAmount;
+            }
+
+            return new DonorAtharDto()
+            {
+                DonationsAmount = total,
+                donations = donationsAthar,
+                follows = followsAthar
+            };
+        }
+        private string? GetImgUrl(int id, string charityImageURL, byte[] charityAccountImage)
+        {
+            var http = _httpContextAccessor.HttpContext;
+            var baseUrl = http != null
+                ? $"{http.Request.Scheme}://{http.Request.Host}"
+                : "";
+
+            string? imageUrl;
+
+            if (!string.IsNullOrEmpty(charityImageURL))
+            {
+                imageUrl = charityImageURL;
+            }
+            else if (charityAccountImage != null)
+            {
+                imageUrl = $"{baseUrl}/api/charities/profile-image/{id}";
+            }
+            else
+            {
+                imageUrl = null;
+            }
+
+            return imageUrl;
+        }
     }
 }

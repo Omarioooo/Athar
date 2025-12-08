@@ -5,41 +5,12 @@ import { UseAuth } from "../../../Auth/Auth";
 import { getDonorProfile } from "../../../services/donorService";
 
 export default function DonorHomeInfo() {
-    function useDonorProfile() {
-        const { user } = UseAuth();
-        console.log(user);
-
-        const [profile, setProfile] = useState(null);
-        const [loading, setLoading] = useState(true);
-        const [error, setError] = useState(null);
-
-        useEffect(() => {
-            if (!user?.id) {
-                setError("يجب تسجيل الدخول أولاً");
-                setLoading(false);
-                return;
-            }
-
-            getDonorProfile({ id: user.id })
-                .then((data) => {
-                    if (data!==null) {
-                        setProfile(data);
-                    } else {
-                        setError("غير مسموح لك بعرض هذه الصفحة");
-                    }
-                })
-                .catch((err) => {
-                    setError(err.message || "فشل تحميل الملف الشخصي");
-                })
-                .finally(() => {
-                    setLoading(false);
-                });
-        }, [user?.id]);
-
-        return { profile, loading, error };
-    }
-
-    const { profile, loading, error } = useDonorProfile();
+    const { user } = UseAuth();
+    console.log(user);
+    
+    
+    const [profile, setProfile] = useState(null);
+    const [loading, setLoading] = useState(true);
     const [now, setNow] = useState(new Date());
 
     useEffect(() => {
@@ -47,24 +18,33 @@ export default function DonorHomeInfo() {
         return () => clearInterval(interval);
     }, []);
 
+    
+    useEffect(() => {
+        if (!user) {
+            setLoading(false);
+            return;
+        }
+
+        const fetchData = async () => {
+            try {
+                const data = await getDonorProfile(user.id);
+                setProfile(data);
+            } catch (err) {
+                console.error("Failed to fetch donor profile", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, [user]);
+
     if (loading) {
         return (
-            <div className="text-center py-5">
-                <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">
-                        جاري تحميل بياناتك...
-                    </span>
-                </div>
-            </div>
-        );
-    }
-
-    if (error || !profile) {
-        return (
-            <div className="text-center py-5">
-                <div className="alert alert-danger">
-                    {error || "فشل تحميل الملف الشخصي"}
-                </div>
+            <div className="d-flex justify-content-center py-5">
+                <div
+                    className="spinner-border text-warning"
+                    style={{ width: "4rem", height: "4rem" }}
+                ></div>
             </div>
         );
     }

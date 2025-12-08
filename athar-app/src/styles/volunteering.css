@@ -82,14 +82,11 @@
 }
 
 /* Colors */
-.volunteering-circle.volunteer {
+.volunteering-circle.Volunteer {
     background: #15b981;
 }
-.volunteering-circle.merchant {
+.volunteering-circle.VendorOffer {
     background: #1d72e8;
-}
-.volunteering-circle.donation {
-    background: #f97316;
 }
 
 /* Vertical line */
@@ -100,14 +97,11 @@
     margin: 5px auto 0;
 }
 
-.volunteering-line.volunteer {
+.volunteering-line.Volunteer {
     background: #15b981;
 }
-.volunteering-line.merchant {
+.volunteering-line.VendorOffer {
     background: #1d72e8;
-}
-.volunteering-line.donation {
-    background: #f97316;
 }
 
 /***** Card *****/
@@ -209,17 +203,13 @@
 }
 
 /* Type */
-.type-badge.volunteer {
+.type-badge.Volunteer {
     background: #d1f7e4;
     color: #0e9f6e;
 }
-.type-badge.merchant {
+.type-badge.VendorOffer {
     background: #d6eaff;
     color: #1d72e8;
-}
-.type-badge.donation {
-    background: #ffe1c7;
-    color: #f97316;
 }
 
 .card-description {
@@ -240,10 +230,10 @@
 }
 
 /* ======================
-   MODAL
+MODAL
 ====================== */
 
-.modal-overlay {
+.application-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -256,11 +246,10 @@
     z-index: 999;
 }
 
-.modal-content {
+.application-modal-content {
     background: #fff;
     width: 600px;
     max-width: 90%;
-    padding: 25px;
     border-radius: 20px;
     position: relative;
     animation: fadeIn 0.25s ease;
@@ -277,24 +266,28 @@
     }
 }
 
-.modal-close {
+.application-modal-close {
     background: transparent;
     border: none;
     position: absolute;
     left: 15px;
     top: 15px;
     cursor: pointer;
+    color: var(--yellow) !important;
 }
 
-.modal-header {
+.application-header {
     display: flex;
     align-items: center;
     gap: 15px;
-    padding-bottom: 15px;
+    padding: 25px;
     border-bottom: 1px solid #eee;
+    background: var(--blue-bg);
+    border-radius: 20px 20px 0 0;
 }
 
-.modal-icon {
+
+.application-modal-icon {
     width: 50px;
     height: 50px;
     border-radius: 50%;
@@ -305,25 +298,29 @@
 }
 
 /* icon colors */
-.modal-icon.volunteer {
+.application-modal-icon.Volunteer {
     background: #0e9f6e;
 }
-.modal-icon.merchant {
+.application-modal-icon.VendorOffer {
     background: #1d72e8;
 }
-.modal-icon.donation {
-    background: #f97316;
+
+.application-modal-body {
+    padding: 25px;
 }
 
-.modal-body {
-    padding-top: 20px;
-}
-
-.modal-section {
+.application-modal-section,
+.application-modal-info-grid,
+.application-modal-info-item:last-of-type {
     margin-bottom: 20px;
 }
 
-.modal-section-header {
+.application-modal-section:not(:last-of-type),
+.application-modal-info-grid {
+    border-bottom: 1px solid var(--border);
+}
+
+.application-modal-section-header {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -331,20 +328,21 @@
     color: #0d1b2a;
 }
 
-.modal-section p {
+.application-modal-section p {
     color: #4b5563;
     line-height: 1.7;
 }
 
-.modal-info-grid {
+.application-modal-info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 18px;
     margin-top: 20px;
 }
 
-.modal-info-item {
+.application-modal-info-item {
     display: flex;
+    align-items: center;
     gap: 10px;
     color: #334155;
 }
@@ -357,39 +355,4 @@
 .info-value {
     font-size: 15px;
     font-weight: 600;
-}
-
-/* Buttons */
-.modal-actions {
-    margin-top: 25px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.action-button {
-    padding: 10px 20px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: 600;
-    transition: 0.2s ease;
-}
-
-.action-button.primary.volunteer {
-    background: #0e9f6e;
-    color: white;
-}
-.action-button.primary.merchant {
-    background: #1d72e8;
-    color: white;
-}
-.action-button.primary.donation {
-    background: #f97316;
-    color: white;
-}
-
-.action-button.secondary {
-    background: #eef2ff;
-    color: #3f3f46;
 }

@@ -1,7 +1,8 @@
 import {
     createVendorOffer,
     createVolunteerOffer,
-    getAllOffers,
+    getCharityApplications,
+    getOneCharityApplication,
 } from "../Repository/formsRepository";
 
 export async function submitVendorOffer(offerData) {
@@ -22,9 +23,18 @@ export async function submitVolunteerOffer(offerData) {
     }
 }
 
-export async function getAllCharityOffers(id) {
+export async function fetchCharityApplications(id) {
     try {
-        const response = await getAllOffers(id);
+        const response = await getCharityApplications(id);
+        return response.data;
+    } catch (err) {
+        throw err.response?.data || { message: "Unexpected error occurred" };
+    }
+}
+
+export async function fetchApplicationDetails(id, type) {
+    try {
+        const response = await getOneCharityApplication(id, type);
         return response.data;
     } catch (err) {
         throw err.response?.data || { message: "Unexpected error occurred" };

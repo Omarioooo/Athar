@@ -17,13 +17,13 @@ import "./styles/charities.css";
 import "./styles/zakaa.css";
 import "./styles/charityHomePage.css";
 import "./styles/campaignCard.css";
-import "./styles/myCampaigns.css";
 import "./styles/addCampaignModal.css";
 import "./styles/charityProfile.css";
 import "./styles/charityCard.css";
 import "./styles/notFound.css";
 import "./styles/notAuth.css";
 import "./styles/volunteering.css";
+import "./styles/myCampaigns.css";
 
 
 const root = ReactDOM.createRoot(document.getElementById("root"));

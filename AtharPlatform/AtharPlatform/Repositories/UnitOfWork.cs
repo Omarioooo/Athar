@@ -6,6 +6,7 @@ namespace AtharPlatform.Repositories
     public class UnitOfWork : IUnitOfWork
     {
         public Context _context { get; }
+        public IUserAccountRepository Accounts { get; private set; }
         public IDonorRepository Donors { get; private set; }
         public ICharityRepository Charities { get; private set; }
         public ICampaignRepository Campaigns { get; private set; }

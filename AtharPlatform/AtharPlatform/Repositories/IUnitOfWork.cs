@@ -3,6 +3,8 @@
     public interface IUnitOfWork : IDisposable
     {
         Context _context { get; }
+
+        IUserAccountRepository Accounts { get; }
         IDonorRepository Donors { get; }
         ICharityRepository Charities { get; }
         ICampaignRepository Campaigns { get; }

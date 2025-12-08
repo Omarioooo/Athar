@@ -1,42 +1,74 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     UserCheck,
     Store,
-    Gift,
     X,
     Phone,
     MessageSquare,
     Calendar,
     Clock,
 } from "lucide-react";
-import { forms } from "../../../utils/data";
 import { getRelativeTimeForNotification as getRelativeTime } from "../../../utils/HelpersUtils";
+import { UseAuth } from "../../../Auth/Auth";
+import { fetchCharityApplications } from "../../../services/formsService";
+import VolunteerModal from "../../../components/modals/VolunteerModal";
+import VendorModal from "../../../components/modals/VendorModal";
 
 export default function VolunteeringForms() {
+    const { user } = UseAuth();
+
+    const [applications, setApplications] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [selectedType, setSelectedType] = useState("all");
     const [selectedItem, setSelectedItem] = useState(null);
 
     const icons = {
-        volunteer: UserCheck,
-        merchant: Store,
-        donation: Gift,
+        Volunteer: UserCheck,
+        VendorOffer: Store,
     };
 
     const type = {
-        volunteer: "تطوع",
-        merchant: "تاجر",
+        Volunteer: "تطوع",
+        VendorOffer: "تاجر",
     };
+
+    useEffect(() => {
+        async function loadApplications() {
+            try {
+                const data = await fetchCharityApplications(user.id);
+                console.log("data apps are", data);
+
+                setApplications(data);
+            } catch (err) {
+                console.error("Failed to fetch applications:", err);
+            } finally {
+                setLoading(false);
+            }
+        }
+        if (user?.id) loadApplications();
+    }, [user?.id]);
+
+    if (loading) {
+        return (
+            <div className="d-flex justify-content-center py-5">
+                <div
+                    className="spinner-border text-warning"
+                    style={{ width: "4rem", height: "4rem" }}
+                ></div>
+            </div>
+        );
+    }
 
     const filteredForms =
         selectedType === "all"
-            ? forms
-            : forms.filter((f) => f.type === selectedType);
+            ? applications
+            : applications.filter((f) => f.type === selectedType);
 
     const counts = {
-        all: forms.length,
-        volunteer: forms.filter((f) => f.type === "volunteer").length,
-        merchant: forms.filter((f) => f.type === "merchant").length,
-        donation: forms.filter((f) => f.type === "donation").length,
+        all: applications.length,
+        Volunteer: applications.filter((f) => f.type === "Volunteer").length,
+        VendorOffer: applications.filter((f) => f.type === "VendorOffer")
+            .length,
     };
 
     return (
@@ -50,7 +82,7 @@ export default function VolunteeringForms() {
 
             {/* FILTER BAR */}
             <div className="filter-bar">
-                {["all", "volunteer", "merchant", "donation"].map((t) => (
+                {["all", "Volunteer", "VendorOffer"].map((t) => (
                     <button
                         key={t}
                         className={`filter-pill ${t} ${
@@ -58,7 +90,7 @@ export default function VolunteeringForms() {
                         }`}
                         onClick={() => setSelectedType(t)}
                     >
-                        <span>{t === "all" ? "الكل" : labels.type[t]}</span>
+                        <span>{t === "all" ? "الكل" : type[t]}</span>
                         <span className="pill-count">{counts[t]}</span>
                     </button>
                 ))}
@@ -68,7 +100,6 @@ export default function VolunteeringForms() {
             <div className="volunteering-container">
                 {filteredForms.map((item, index) => {
                     const Icon = icons[item.type];
-
                     return (
                         <div
                             key={item.id}
@@ -88,28 +119,16 @@ export default function VolunteeringForms() {
                                 )}
                             </div>
 
-                            <div
-                                className={`volunteering-card ${
-                                    !item.read ? "unread" : ""
-                                }`}
-                            >
+                            <div className={`volunteering-card`}>
                                 <div className="card-header">
                                     <div className="card-name">
-                                        <h3>{item.fullName}</h3>
-                                        {!item.read && (
-                                            <span className="unread-dot"></span>
-                                        )}
+                                        <h3>{item.name}</h3>
                                     </div>
                                     <div className="card-badges">
                                         <span
-                                            className={`status-badge ${item.status}`}
-                                        >
-                                            {labels.status[item.status]}
-                                        </span>
-                                        <span
                                             className={`type-badge ${item.type}`}
                                         >
-                                            {labels.type[item.type]}
+                                            {type[item.type]}
                                         </span>
                                     </div>
                                 </div>
@@ -135,109 +154,20 @@ export default function VolunteeringForms() {
             </div>
 
             {/* MODAL */}
-            {selectedItem && (
-                <div
-                    className="modal-overlay"
-                    onClick={() => setSelectedItem(null)}
-                >
-                    <div
-                        className="modal-content"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button
-                            className="modal-close"
-                            onClick={() => setSelectedItem(null)}
-                        >
-                            <X size={24} />
-                        </button>
+            {selectedItem && selectedItem.type === "Volunteer" && (
+                <VolunteerModal
+                    id={selectedItem.id}
+                    onClose={() => setSelectedItem(null)}
+                    getRelativeTime={getRelativeTime}
+                />
+            )}
 
-                        <div className={`modal-header ${selectedItem.type}`}>
-                            <div className={`modal-icon ${selectedItem.type}`}>
-                                {(() => {
-                                    const Icon = icons[selectedItem.type];
-                                    return <Icon size={24} />;
-                                })()}
-                            </div>
-                            <div className="modal-header-text">
-                                <h2>{selectedItem.fullName}</h2>
-                                <span
-                                    className={`type-badge ${selectedItem.type}`}
-                                >
-                                    {labels.type[selectedItem.type]}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="modal-body">
-                            <div className="modal-section">
-                                <div className="modal-section-header">
-                                    <MessageSquare size={18} />
-                                    <h3>الوصف</h3>
-                                </div>
-                                <p>{selectedItem.description}</p>
-                            </div>
-
-                            <div className="modal-section">
-                                <div className="modal-section-header">
-                                    <MessageSquare size={18} />
-                                    <h3>الرسالة</h3>
-                                </div>
-                                <p>{selectedItem.message}</p>
-                            </div>
-
-                            <div className="modal-info-grid">
-                                <div className="modal-info-item">
-                                    <Phone size={18} />
-                                    <div>
-                                        <span className="info-label">
-                                            رقم الهاتف
-                                        </span>
-                                        <span className="info-value">
-                                            {selectedItem.phone}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div className="modal-info-item">
-                                    <Calendar size={18} />
-                                    <div>
-                                        <span className="info-label">
-                                            التاريخ
-                                        </span>
-                                        <span className="info-value">
-                                            {new Date(
-                                                selectedItem.date
-                                            ).toLocaleDateString("ar-SA")}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div className="modal-info-item">
-                                    <Clock size={18} />
-                                    <div>
-                                        <span className="info-label">
-                                            الوقت
-                                        </span>
-                                        <span className="info-value">
-                                            {getRelativeTime(selectedItem.date)}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="modal-actions">
-                                <button
-                                    className={`action-button primary ${selectedItem.type}`}
-                                >
-                                    الرد على الطلب
-                                </button>
-                                <button className="action-button secondary">
-                                    تحديد كمقروء
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            {selectedItem && selectedItem.type === "VendorOffer" && (
+                <VendorModal
+                    id={selectedItem.id}
+                    onClose={() => setSelectedItem(null)}
+                    getRelativeTime={getRelativeTime}
+                />
             )}
         </div>
     );

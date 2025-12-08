@@ -1,5 +1,4 @@
 import { GrInProgress } from "react-icons/gr";
-import imageSrc from "../../../assets/images/campaign.jpg";
 import { FaCalendarAlt } from "react-icons/fa";
 import {
     computeDaysLeftForCampaigns,
@@ -7,6 +6,7 @@ import {
 } from "../../../utils/HelpersUtils";
 
 export default function CampaignCard({
+    id,
     title,
     description,
     raisedAmount,
@@ -14,17 +14,28 @@ export default function CampaignCard({
     startDate,
     endDate,
     charityName,
+    imageUrl,
+    progress,
+    status,
+    statusArabic,
 }) {
+    // progress لو جاية من الـ API استخدمها، لو مش موجودة احسبها
+    const computedProgress =
+        progress ?? computeProgressPercentageForCampaigns(raisedAmount, goalAmount);
+
     const daysLeft = computeDaysLeftForCampaigns(startDate, endDate);
-    const progress = computeProgressPercentageForCampaigns(
-        raisedAmount,
-        goalAmount
-    );
+
     return (
         <div className="card campaign-card">
+
             {/* IMAGE */}
             <div className="img-campaign">
-                <img className="card-img-top" src={imageSrc} alt={title} />
+                <img
+                    className="card-img-top"
+                    src={imageUrl}
+                    alt={title}
+                    onError={(e) => (e.target.src = "/images/fallback.jpg")}
+                />
             </div>
 
             {/* CONTENT */}
@@ -33,18 +44,26 @@ export default function CampaignCard({
 
                 <p className="card-text campaign-description">{description}</p>
 
+                {/* Status (Arabic) */}
+                {statusArabic && (
+                    <p className="campaign-status">
+                        <strong>الحالة:</strong> {statusArabic}
+                    </p>
+                )}
+
                 <div className="progress">
                     <div
                         className="progress-bar bg-warning progress-bar-striped"
-                        style={{ width: `${progress}%` }}
+                        style={{ width: `${computedProgress}%` }}
                     ></div>
                 </div>
 
                 <div className="progress-info">
                     <span className="p-complete">
                         <GrInProgress />
-                        مكتمل {progress}%
+                        مكتمل {computedProgress}%
                     </span>
+
                     <span className="time-left">
                         <FaCalendarAlt />
                         متبقي: {daysLeft} يوم

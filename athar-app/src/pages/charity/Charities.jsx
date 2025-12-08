@@ -19,9 +19,7 @@ export default function Charities() {
         setLoading(true);
         getAllCharities("", page)
             .then((response) => {
-                console.log(response);
                 setCharities(response.charities || []);
-
                 setTotalPages(getTotalPages(response.total, 9) || 1);
             })
             .catch((err) => {
@@ -42,15 +40,12 @@ export default function Charities() {
 
     if (loading) {
         return (
-            <>
-                <div className="d-flex justify-content-center py-5">
-                    <div
-                        className="spinner-border text-warning"
-                        style={{ width: "4rem", height: "4rem" }}
-                    ></div>
-                </div>
-                ;
-            </>
+            <div className="d-flex justify-content-center py-5">
+                <div
+                    className="spinner-border text-warning"
+                    style={{ width: "4rem", height: "4rem" }}
+                ></div>
+            </div>
         );
     }
 
