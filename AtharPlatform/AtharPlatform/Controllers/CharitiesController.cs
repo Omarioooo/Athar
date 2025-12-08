@@ -330,7 +330,7 @@ namespace AtharPlatform.Controllers
             // Public endpoint; no authentication required
 
             var c = await _unitOfWork.Charities.GetWithCampaignsAsync(id);
-            if (c == null) return NotFound("Charity not found.");
+            if (c == null || c.IsActive==false) return NotFound("Charity not found.");
 
             var dto = new CharityCardDto
             {
@@ -374,7 +374,7 @@ namespace AtharPlatform.Controllers
                     .FirstOrDefaultAsync();
             }
 
-            if (c == null) return NotFound("Charity not found.");
+            if (c == null || c.IsActive==false) return NotFound("Charity not found.");
 
             var dto = new CharityCardDto
             {
@@ -495,7 +495,7 @@ namespace AtharPlatform.Controllers
 
         // (DELETE) /api/charities/{id} - soft delete / deactivate
         [HttpDelete("{id:int}")]
-        [Authorize(Roles = "SuperAdmin")]
+       // [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> SoftDelete(int id)
         {
             var charity = await _db.Charities.FirstOrDefaultAsync(c => c.Id == id);

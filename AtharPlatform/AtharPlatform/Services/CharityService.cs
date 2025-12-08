@@ -10,12 +10,14 @@ namespace AtharPlatform.Services
         private readonly Context _context;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IFileService _fileService;
 
-        public CharityService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor, Context context)
+        public CharityService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor, Context context, IFileService fileService)
         {
             _unitOfWork = unitOfWork;
             _httpContextAccessor = httpContextAccessor;
             _context = context;
+           _fileService = fileService;
         }
 
 
@@ -130,7 +132,7 @@ namespace AtharPlatform.Services
 
             var charity = await _unitOfWork.Charities.GetCharityFullProfileAsync(id);
 
-            if (charity == null)
+            if (charity == null || charity.IsActive==false)//علشان ميرجعش المحذوف
                 return null;
 
 
@@ -205,7 +207,7 @@ namespace AtharPlatform.Services
                     .Include(c => c.Follows)
                     .FirstOrDefaultAsync(c => c.Id == id);
 
-                if (charity == null)
+                if (charity == null || charity.IsActive==false)
                     return null;
 
                 var campaignIds = charity.Campaigns.Select(c => c.Id).ToList();
@@ -254,33 +256,73 @@ namespace AtharPlatform.Services
             }
         }
 
+        //public async Task<bool> UpdateAsync(int id, UpdateCharityDto model)
+        //{
+        //    try
+        //    {
+        //        // check the charity
+        //        var charity = await _unitOfWork.Charities.GetAsync(id);
+        //        if (charity == null)
+        //            throw new ArgumentNullException(nameof(model), "Charity not found");
+
+        //        // Handle image update
+        //        var imgFile = model.ProfileImage;
+        //        byte[] img = null;
+        //        if (imgFile != null && imgFile.Length > 0)
+        //        {
+        //            using (var ms = new MemoryStream())
+        //            {
+        //                await imgFile.CopyToAsync(ms);
+        //                img = ms.ToArray();
+        //            }
+        //        }
+
+        //        charity.Name = model.CharityName;
+        //        charity.Description = model.Description;
+        //        charity.Account.City = model.City;
+        //        charity.Account.Country = model.Country;
+        //        charity.Account.ProfileImage = img;
+
+        //        await _unitOfWork.Charities.UpdateAsync(charity);
+        //        await _unitOfWork.SaveAsync();
+
+        //        return true;
+        //    }
+        //    catch
+        //    {
+        //        return false;
+        //    }
+        //}
+
+
         public async Task<bool> UpdateAsync(int id, UpdateCharityDto model)
         {
             try
             {
-                // check the charity
+                // 1 - جلب الجمعية
                 var charity = await _unitOfWork.Charities.GetAsync(id);
                 if (charity == null)
                     throw new ArgumentNullException(nameof(model), "Charity not found");
 
-                // Handle image update
-                var imgFile = model.ProfileImage;
-                byte[] img = null;
-                if (imgFile != null && imgFile.Length > 0)
-                {
-                    using (var ms = new MemoryStream())
-                    {
-                        await imgFile.CopyToAsync(ms);
-                        img = ms.ToArray();
-                    }
-                }
-
+                // 2 - تحديث البيانات الأساسية
                 charity.Name = model.CharityName;
                 charity.Description = model.Description;
+
+                if (charity.Account == null)
+                    throw new Exception("Charity account not found.");
+
                 charity.Account.City = model.City;
                 charity.Account.Country = model.Country;
-                charity.Account.ProfileImage = img;
 
+                // 3 - تحديث الصورة لو تم رفع صورة جديدة
+                if (model.ProfileImage != null && model.ProfileImage.Length > 0)
+                {
+                    // حفظ الصورة كملف على السيرفر (مثل CharityRegisterAsync)
+                    var imageUrl = await _fileService.SaveFileAsync(model.ProfileImage, "charities");
+                    charity.ImageUrl = imageUrl;
+                }
+
+                // 4 - حفظ التغييرات
                 await _unitOfWork.Charities.UpdateAsync(charity);
                 await _unitOfWork.SaveAsync();
 
@@ -291,6 +333,7 @@ namespace AtharPlatform.Services
                 return false;
             }
         }
+
 
     }
 }

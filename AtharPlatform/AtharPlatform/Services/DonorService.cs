@@ -88,7 +88,6 @@ namespace AtharPlatform.Services
             if (donor.Account != null)
             {
                 donor.Account.IsDeleted = true;
-                await _unitOfWork.Accounts.UpdateAsync(donor.Account);
             }
 
 
