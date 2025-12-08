@@ -21,7 +21,7 @@ public class PaymentsController : ControllerBase
     }
 
     [HttpPost("create")]
-    [Authorize(Roles = "Donor")]
+    //[Authorize(Roles = "Donor")]
     public async Task<IActionResult> CreatePayment([FromBody] CreatePaymentDto model)
     {
         if (model == null)
@@ -89,6 +89,28 @@ public class PaymentsController : ControllerBase
         {
             donation.DonationStatus,
            
+        });
+    }
+
+
+    [HttpGet("charity/{charityId}/total-donations")]
+    public async Task<IActionResult> GetTotalDonationsForCharity(int charityId)
+    {
+        if (charityId <= 0)
+            return BadRequest("Invalid charity ID");
+
+        // Check if charity exists
+        var charityExists = await _unit.Charities.GetByIdAsync(charityId);
+        if (charityExists==null)
+            return NotFound("Charity not found");
+
+        var total = await _paymob.GetTotalDonationsForCharityAsync(charityId);
+
+        return Ok(new
+        {
+            CharityId = charityId,
+            CharityName= charityExists.Name,
+            TotalDonation = total
         });
     }
 }

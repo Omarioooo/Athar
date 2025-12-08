@@ -368,6 +368,11 @@ namespace AtharPlatform.Services
             return dtoList;
         }
 
-
+        public async Task<int> GetCharityContentCountAsync(int CharityId)
+        {
+            return await _unitOfWork.Contents.GetAll()
+                .Where(c => !c.IsDeleted && c.Campaign.CharityID == CharityId)
+                .CountAsync();
+        }
     }
 }

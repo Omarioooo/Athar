@@ -51,6 +51,19 @@ namespace AtharPlatform.Controllers
             return Ok(result);
         }
 
+        [HttpGet("Count_Of_Posts{CharityId}")]
+        //[Authorize(Roles = "CharityAdmin,Donor,SuperAdmin")]
+        public async Task<IActionResult> GetCharityContentCount(int CharityId)
+        {
+            if (CharityId <= 0)
+                return BadRequest("Invalid Charity ID");
+
+            var result = await _contentService.GetCharityContentCountAsync(CharityId);
+
+            return Ok(result);
+
+            
+        }
 
 
 
