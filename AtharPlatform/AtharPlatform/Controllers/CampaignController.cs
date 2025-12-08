@@ -415,7 +415,7 @@ namespace AtharPlatform.Controllers
         public async Task<IActionResult> CreateCampaign(int id, [FromForm] CreateCampaignDto dto)
         {
 
-            var check = await _unitOfWork.Charities.GetAsync(dto.CharityId);
+            var check = await _unitOfWork.Charities.GetAsync(id);
             if (check.Status==Models.Enums.CharityStatusEnum.Pending)
             {
                 return BadRequest("Charity is under review.");
@@ -447,7 +447,6 @@ namespace AtharPlatform.Controllers
             {
                 Title = dto.Title,
                 Description = dto.Description,
-                Category=dto.Category,
                 GoalAmount = dto.GoalAmount,
                 RaisedAmount = 0,
                 Duration = dto.Duration,
