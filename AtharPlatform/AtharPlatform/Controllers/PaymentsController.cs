@@ -1,10 +1,7 @@
 ﻿using AtharPlatform.DTO;
 using AtharPlatform.DTOs;
-using AtharPlatform.Models;
-using AtharPlatform.Models.Enums;
 using AtharPlatform.Repositories;
 using AtharPlatform.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -27,21 +24,21 @@ public class PaymentsController : ControllerBase
         if (model == null)
             return BadRequest("Invalid model");
 
-   
-        
+
+
         var result = await _paymob.CreatePaymentAsync(model);
 
 
 
         return Ok(new
         {
-           result.DonationId ,
+            result.DonationId,
             result.PaymentUrl,
             result.PaymentId
         });
     }
 
-    
+
     [HttpPost("callback")]
     public async Task<IActionResult> PaymentCallback([FromForm] PaymobCallbackDto dto)
     {
@@ -80,7 +77,7 @@ public class PaymentsController : ControllerBase
         #endregion
         var data = new Dictionary<string, string>
     {
-       
+
         { "success", dto.success.ToString() },
         { "id", dto.transactionId },
         { "amount", dto.amount.ToString() }
@@ -100,6 +97,7 @@ public class PaymentsController : ControllerBase
 
         return Ok(new
         {
+
             donation.Id,
             donation.DonationStatus,
             donation.TotalAmount,
@@ -116,7 +114,7 @@ public class PaymentsController : ControllerBase
 
         // Check if charity exists
         var charityExists = await _unit.Charities.GetByIdAsync(charityId);
-        if (charityExists==null)
+        if (charityExists == null)
             return NotFound("Charity not found");
 
         var total = await _paymob.GetTotalDonationsForCharityAsync(charityId);
@@ -124,7 +122,7 @@ public class PaymentsController : ControllerBase
         return Ok(new
         {
             CharityId = charityId,
-            CharityName= charityExists.Name,
+            CharityName = charityExists.Name,
             TotalDonation = total
         });
     }
