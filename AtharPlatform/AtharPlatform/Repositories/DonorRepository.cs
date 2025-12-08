@@ -85,8 +85,7 @@ namespace AtharPlatform.Repositories
                 .Where(d => d.Role == RolesEnum.Donor)
                  .FirstOrDefaultAsync(d => d.Id == id);
 
-            if (donor == null)
-                throw new KeyNotFoundException($"Donor with id {id} not found");
+          
 
             return donor;
         }
