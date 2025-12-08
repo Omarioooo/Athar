@@ -2,10 +2,15 @@ import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import descriptonImg from "../../assets/images/section2-img2.jpg";
 import descriptonImg2 from "../../assets/images/section2-img11.jpg";
+import { useNavigate } from "react-router-dom";
 
 export default function SecondSection() {
     const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.2 });
+  const navigate = useNavigate();
 
+  const goToaboutus = () => {
+    navigate("/aboutus"); 
+  };
     return (
         <motion.div
         ref={ref}
@@ -24,7 +29,7 @@ export default function SecondSection() {
               بنوفّر ليهم الدعم الرقمي والتقني، وبنساعدهم في بناء الثقة والوصول للمتبرعين بسهولة.
               هدفنا إن الخير يوصل لكل مكان، وإن كل جمعية يكون ليها أثر حقيقي
             </p>
-            <button className="second-section-btn1">
+            <button className="second-section-btn1" onClick={goToaboutus}>
               اعرف اكتر عنا<i className="fa-solid fa-arrow-left first-section-i"></i>
             </button>
           </div>

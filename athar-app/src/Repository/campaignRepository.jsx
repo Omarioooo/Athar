@@ -35,3 +35,4 @@ export const searchCampaigns = async (keyword) => {
 export const fetchCampaignById = async (id) => {
     return getRequest(`GetCampaign/${id}`, { inProgress: true });
 };
+
