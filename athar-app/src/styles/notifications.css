@@ -187,6 +187,14 @@
     gap: 6px;
 }
 
+.empty-notifications {
+    margin: 120px auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .notifications-title {

@@ -15,26 +15,23 @@ namespace AtharPlatform.Controllers
             _notificationService = notificationService;
         }
 
-        [HttpGet("user/{userId}/notifications")]
-        public async Task<IActionResult> GetUserNotificationsSummary(int userId)
+        [HttpGet("all/{id}")]
+        public async Task<IActionResult> GetUserNotificationsSummary(int id)
         {
-            var notifications = await _notificationService.GetUserNotificationsSummaryAsync(userId);
+            var notifications = await _notificationService.GetUserNotificationsSummaryAsync(id);
 
-            if (notifications == null || notifications.Count == 0)
+            if (notifications == null)
                 return NotFound(new { message = "No notifications found." });
 
             return Ok(notifications);
         }
 
-        [HttpGet("notification/{id}")]
-        public async Task<IActionResult> GetNotificationById(int id)
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserNotificationsFull(int id)
         {
-            var notification = await _notificationService.GetNotificationByIdAsync(id);
-
-            if (notification == null)
-                return NotFound();
-
-            return Ok(notification);
+            var notifications = await _notificationService.GetNotificationByIdAsync(id);
+            return Ok(notifications);
         }
     }
 }

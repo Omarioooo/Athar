@@ -5,6 +5,7 @@
         public int DonationId { get; set; }
         public string CharityName { get; set; }
         public string CampaignName { get; set; }
+        public string CampaignImgUrl { get; set; }
         public decimal Amount { get; set; }
         public DateTime? Date { get; set; }
     }

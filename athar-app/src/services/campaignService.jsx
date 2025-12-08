@@ -3,6 +3,7 @@ import {
     fetchAllCampaigns as fetchAllRepo,
     fetchCampaignsByType as fetchByTypeRepo,
     fetchCampaignById as fetchByIdRepo,
+    createCampaignByCharityId,
 } from "../Repository/campaignRepository";
 import {
     computeDaysLeft,
@@ -76,5 +77,15 @@ export const fetchCampaignById = async (id) => {
     } catch (error) {
         console.error("Service Layer Error:", error.message);
         throw new Error("حدث خطأ أثناء جلب تفاصيل الحملة: " + error.message);
+    }
+};
+
+export const CreateCampaign = async (id, formData) => {
+    try {
+        const campaign = await createCampaignByCharityId(id, formData);
+        return campaign;
+    } catch (error) {
+        console.error("Service Layer Error:", error.message);
+        throw new Error("حدث خطأ أثناء إنشاء الحملة: " + error.message);
     }
 };

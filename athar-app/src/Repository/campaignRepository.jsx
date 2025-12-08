@@ -36,3 +36,12 @@ export const fetchCampaignById = async (id) => {
     return getRequest(`GetCampaign/${id}`, { inProgress: true });
 };
 
+
+export const createCampaignByCharityId = async (id, formData) => {
+    const res = await api.post(`/Campaign/create/${id}`, formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+    return res.data;
+};

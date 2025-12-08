@@ -199,6 +199,7 @@ namespace AtharPlatform.Services
 
                 resultFollows.Add(new FollowAtharHistoryDto
                 {
+                    id = f.Id,
                     charityId = f.CharityId,
                     charityName = charity?.Name,
                     charityImageUrl = GetImgUrl(f.CharityId, charity?.ImageUrl, charity?.Account?.ProfileImage)
@@ -219,6 +220,7 @@ namespace AtharPlatform.Services
                 donationsAthar.Add(new DonorDonationAtharHistoryDto
                 {
                     CampaignName = campaign.Title,
+                    CampaignImgUrl = campaign.ImageUrl,
                     CharityName = charity.Name,
                     DonationId = don.DonationId,
                     Amount = donation.TotalAmount,
@@ -260,7 +262,28 @@ namespace AtharPlatform.Services
             return imageUrl;
         }
 
- 
+        public async Task<DonorInfoDto> GetDonorInfoByIdAsync(int id)
+        {
+            var donor = await _unitOfWork.Donors.GetAsync(id);
 
+            if (donor == null)
+                throw new Exception($"Donor with id {id} not found");
+
+            var baseUrl = _httpContextAccessor.HttpContext != null
+               ? $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host}"
+               : "";
+
+            string ImageUrl = donor.Account?.ProfileImage != null ? $"{baseUrl}/api/Donor/profile-image/{donor.Id}" : null;
+
+            return new DonorInfoDto
+            {
+                FirstName = donor.FirstName,
+                LastName = donor.LastName,
+                City = donor.Account.City,
+                Country = donor.Account.Country,
+                ImageUrl = ImageUrl,
+                Email = donor.Account.Email
+            };
+        }
     }
 }

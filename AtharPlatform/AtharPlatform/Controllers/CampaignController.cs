@@ -411,8 +411,8 @@ namespace AtharPlatform.Controllers
         // }
         #endregion
 
-        [HttpPost("create")]
-        public async Task<IActionResult> CreateCampaign([FromForm] CreateCampaignDto dto)
+        [HttpPost("create/{id}")]
+        public async Task<IActionResult> CreateCampaign(int id, [FromForm] CreateCampaignDto dto)
         {
 
             var check = await _unitOfWork.Charities.GetAsync(dto.CharityId);
@@ -451,7 +451,8 @@ namespace AtharPlatform.Controllers
                 GoalAmount = dto.GoalAmount,
                 RaisedAmount = 0,
                 Duration = dto.Duration,
-                CharityID = dto.CharityId,
+                CharityID = id,
+                Category = dto.Category,
                 ImageUrl = imageUrl
             };
 

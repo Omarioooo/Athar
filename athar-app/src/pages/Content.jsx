@@ -31,11 +31,7 @@ export default function Content() {
         setTotalPages(data.totalPages || 1);
         if (data.error) setErrorMessage(data.error);
         setLoading(false);
-<<<<<<< HEAD
-=======
-         
 
->>>>>>> 75e6be3 (Add SuperAdminDashboard with charity approval/reject)
     };
 
     const handleSearch = async () => {

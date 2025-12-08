@@ -1,4 +1,4 @@
-import { donorRegister as repoRegister } from "../Repository/donorRepository";
+import { deleteDonorById, fetchDonorAtharById, fetchDonorInfoById, donorRegister as repoRegister, updateDonor } from "../Repository/donorRepository";
 import { validateEmail } from "../utils//validation/validateEmail";
 import {
     validatePassword,
@@ -64,10 +64,41 @@ export async function getDonorProfile(id) {
 
 export async function getDonorAthar(id) {
     try {
-        const profile = await fetchDonorByIdFromApi(id);
+        const profile = await fetchDonorAtharById(id);
         return profile;
     } catch (err) {
         console.error("Failed to get donor athar:", err);
         throw err;
     }
 }
+
+export async function getDonorInfo(id) {
+    try {
+        const profile = await fetchDonorInfoById(id);
+        return profile;
+    } catch (err) {
+        console.error("Failed to get donor athar:", err);
+        throw err;
+    }
+}
+
+export async function UpdateDonorData(id, data) {
+    try {        
+        const donor = await updateDonor(id, data);
+        return donor;
+    } catch (err) {
+        console.error("Failed to update donor:", err);
+        throw err;
+    }
+}
+
+export async function deleteDonor(id) {
+    try {        
+        const donor = await deleteDonorById(id);
+        return donor;
+    } catch (err) {
+        console.error("Failed to delete donor:", err);
+        throw err;
+    }
+}
+

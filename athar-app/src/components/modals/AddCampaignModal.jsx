@@ -1,37 +1,83 @@
-export default function AddCampaignModal() {
-    return (
-        <form className="add-campaign-form">
-            <h4>إنشاء حملة جديدة</h4>
+import { useState } from "react";
+import { CreateCampaign } from "../../services/campaignService";
 
-            {/* Title */}
+export default function AddCampaignModal({ open, setOpen, id }) {
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [duration, setDuration] = useState("");
+    const [goalAmount, setGoalAmount] = useState("");
+    const [category, setCategory] = useState("");
+    const [imageFile, setImageFile] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            setLoading(true);
+            const formData = new FormData();
+            formData.append("Title", title);
+            formData.append("Description", description);
+            formData.append("Duration", duration);
+            formData.append("GoalAmount", goalAmount);
+            formData.append("Category", category);
+            formData.append("ImageFile", imageFile);
+
+            await CreateCampaign(id, formData);
+        } catch (err) {
+            console.error(err);
+            alert("فشل إنشاء الحملة");
+        } finally {
+            setOpen(false);
+            setLoading(false);
+        }
+    };
+
+    return (
+        <form className="add-campaign-form" onSubmit={handleSubmit}>
+            <h4>إنشاء حملة جديدة</h4>
             <div className="input-group">
-                <input type="text" required />
+                <input
+                    type="text"
+                    required
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                />
                 <label className="input-title">عنوان الحملة</label>
             </div>
-
-            {/* Description */}
             <div className="input-group textarea-group">
-                <textarea required></textarea>
+                <textarea
+                    required
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                ></textarea>
                 <label className="input-title">وصف الحملة</label>
             </div>
-
-            {/* Image Upload */}
             <div className="file-group">
                 <label className="file-label">
                     اختر صورة الحملة
-                    <input type="file" accept="image/*" />
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => setImageFile(e.target.files[0])}
+                    />
                 </label>
             </div>
-
-            {/* Duration */}
             <div className="input-group">
-                <input type="number" required />
+                <input
+                    type="number"
+                    required
+                    value={duration}
+                    onChange={(e) => setDuration(e.target.value)}
+                />
                 <label className="input-title">مدة الحملة بالأيام</label>
             </div>
-
-            {/* Category */}
             <div className="input-group select-group">
-                <select required>
+                <select
+                    required
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                >
                     <option value="">اختر الفئة</option>
                     <option value="0">تعليم</option>
                     <option value="1">صحة</option>
@@ -42,35 +88,24 @@ export default function AddCampaignModal() {
                 </select>
                 <label className="input-title">الفئة</label>
             </div>
-
-            {/* Goal Amount */}
             <div className="input-group">
-                <input type="number" required />
+                <input
+                    type="number"
+                    required
+                    value={goalAmount}
+                    onChange={(e) => setGoalAmount(e.target.value)}
+                />
                 <label className="input-title">المبلغ المستهدف</label>
             </div>
-
-            {/* Checkbox group */}
-            <div className="checkbox-wrapper">
-                <label className="checkbox-card">
-                    <input type="checkbox" />
-                    <span className="checkmark"></span>
-                    <span className="text">حملة عاجلة</span>
-                </label>
-
-                <label className="checkbox-card">
-                    <input type="checkbox" />
-                    <span className="checkmark"></span>
-                    <span className="text">تبرعات عينية</span>
-                </label>
-            </div>
-
-            {/* Actions */}
             <div className="form-actions">
                 <button type="submit" className="btn btn-warning">
-                    إنشاء الحملة
+                    {loading ? "جاري الإنشاء..." : "إنشاء الحملة"}
                 </button>
-
-                <button type="button" className="btn btn-secondary">
+                <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setOpen(false)}
+                >
                     إغلاق
                 </button>
             </div>
