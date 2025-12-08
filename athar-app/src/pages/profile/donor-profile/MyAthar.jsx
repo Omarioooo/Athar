@@ -1,9 +1,6 @@
 import { motion } from "framer-motion";
-import { atharData } from "../../../utils/data";
 import MyAtharSlide from "../../../components/donor-myathar/MyAtharSlide";
 import MyAtharSlider from "../../../components/donor-myathar/MyAtharSlider";
-import athar1 from "../../../assets/images/athar1.png";
-import athar5 from "../../../assets/images/athar5.png";
 import { useEffect, useState } from "react";
 import { getFilteredDonations } from "../../../utils/HelpersUtils";
 import { getTotalPages, paginate } from "../../../utils/PaginationHelper";
@@ -16,8 +13,9 @@ export default function MyAthar() {
     const { user } = UseAuth();
 
     const [athar, setAthar] = useState();
-    const [follows, setfollows] = useState();
-    const [donations, setDonations] = useState();
+    const [totalDonationsAmount, setTotal] = useState(0);
+    const [follows, setFollows] = useState([]);
+    const [donations, setDonations] = useState([]);
     const [loading, setLoading] = useState();
     const [page, setPage] = useState(1);
     const [filter, setFilter] = useState("all");
@@ -26,13 +24,20 @@ export default function MyAthar() {
         async function loadAtharData() {
             try {
                 const data = await getDonorAthar(user.id);
+                console.log("athar data ", data);
                 setAthar(data);
+
+                setTotal(data.amount);
+                setFollows(data.follows);
+                setDonations(data.donations);
             } catch (err) {
                 console.error("Failed to fetch athar data: ", err);
             } finally {
                 setLoading(false);
             }
         }
+
+        loadAtharData();
     }, [user.id]);
 
     if (loading) {
@@ -46,13 +51,10 @@ export default function MyAthar() {
         );
     }
 
-    follows = athar.follows;
-donations = athar.
-
     // Pagination
     const itemsPerPage = 6;
-    const currentItems = paginate(athar.follows, page, itemsPerPage);
-    const totalPages = getTotalPages(athar.length, itemsPerPage);
+    const currentItems = paginate(donations, page, itemsPerPage);
+    const totalPages = getTotalPages(donations, itemsPerPage);
 
     // Filter
     const filteredDonations = getFilteredDonations(currentItems, filter);
@@ -71,11 +73,11 @@ donations = athar.
                     <MyAtharSlider key="follow-slider">
                         {follows.map((follow) => (
                             <MyAtharSlide
-                                key={follow.id}
                                 className="follow-card"
-                                id={follow.id}
-                                imgSrc={athar5}
-                                name={follow.name}
+                                key={follow.id}
+                                id={follow.charityId}
+                                imgSrc={follow.charityImageUrl}
+                                name={follow.charityName}
                             />
                         ))}
                     </MyAtharSlider>
@@ -85,8 +87,7 @@ donations = athar.
                 <div className="total-donation-box">
                     <h2>إجمالي تبرعاتك حتى الآن</h2>
                     <div className="big-amount">
-                        {athar.DonationsAmount.toString()}{" "}
-                        <span>جنيه مصري</span>
+                        {totalDonationsAmount.toString()} <span>جنيه مصري</span>
                     </div>
                 </div>
 
@@ -116,13 +117,13 @@ donations = athar.
                             <div className="donations-list">
                                 {filteredDonations.map((don) => (
                                     <DonationCard
-                                        key={don.id}
-                                        id={don.id}
-                                        imgSrc={athar1}
-                                        campaign={don.campaign}
-                                        amount={don.amount}
-                                        date={don.date}
-                                        charity={don.charity}
+                                        key={don.DonationId}
+                                        id={don.DonationId}
+                                        imgSrc={don.CampaignImgUrl}
+                                        campaign={don.CampaignName}
+                                        amount={don.Amount}
+                                        date={don.Date}
+                                        charity={don.CharityName}
                                     />
                                 ))}
                             </div>

@@ -30,7 +30,12 @@ namespace AtharPlatform.Controllers
                     return BadRequest("field");
 
                 /// return Ok(model.follows);
-                return Ok(model);
+                return Ok(new
+                {
+                    amount = model.DonationsAmount,
+                    follows = model.follows,
+                    donations = model.donations
+                });
             }
             catch
             {
@@ -71,7 +76,7 @@ namespace AtharPlatform.Controllers
         {
             try
             {
-                var result = await _donorService.UpdateDonorAsync(id,dto);
+                var result = await _donorService.UpdateDonorAsync(id, dto);
                 if (!result)
                     return BadRequest("Update failed");
 
@@ -84,7 +89,7 @@ namespace AtharPlatform.Controllers
         }
 
 
-        [HttpDelete("{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteDonor(int id)
         {
             try
@@ -95,6 +100,24 @@ namespace AtharPlatform.Controllers
                     return NotFound(new { message = "Donor not found." });
 
                 return Ok(new { message = "Donor deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("info/{id}")]
+         public async Task<IActionResult> getDonorInfo(int id)
+        {
+            try
+            {
+                var result = await _donorService.GetDonorInfoByIdAsync(id);
+
+                if (result == null)
+                    return NotFound(new { message = "Donor not found." });
+
+                return Ok(result);
             }
             catch (Exception ex)
             {

@@ -5,12 +5,14 @@ import { getTotalPages, paginate } from "../../../utils/PaginationHelper";
 import AddCampaignButton from "../../../components/charity/charity-campaigns/AddCampaignButton";
 import { UseAuth } from "../../../Auth/Auth";
 import { getCharityCampaigns } from "../../../services/charityService";
+import AddCampaignModal from "../../../components/modals/AddCampaignModal";
 
 export default function MyCampaigns() {
     const { user } = UseAuth();
 
     const [campaigns, setCampaigns] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [open, setOpen] = useState(false);
 
     const itemsPerPage = 6;
     const [page, setPage] = useState(1);
@@ -25,11 +27,11 @@ export default function MyCampaigns() {
         async function loadCampaigns() {
             try {
                 const data = await getCharityCampaigns(user.id);
-
                 setCampaigns(data);
             } catch (err) {
                 console.error("Failed to fetch campaigns:", err);
             } finally {
+                setOpen(false);
                 setLoading(false);
             }
         }
@@ -114,7 +116,17 @@ export default function MyCampaigns() {
                     </div>
                 )}
 
-                <AddCampaignButton />
+                <AddCampaignButton open={open} setOpen={setOpen} />
+
+                {open && (
+                    <div className="add-campaign-overlay">
+                        <div
+                            className="add-campaign-modal"
+                        >
+                            <AddCampaignModal open={open} setOpen={setOpen} id={user.id} />
+                        </div>
+                    </div>
+                )}
             </div>
         </>
     );
