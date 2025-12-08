@@ -16,6 +16,8 @@ export default function MyAthar() {
     const { user } = UseAuth();
 
     const [athar, setAthar] = useState();
+    const [follows, setfollows] = useState();
+    const [donations, setDonations] = useState();
     const [loading, setLoading] = useState();
     const [page, setPage] = useState(1);
     const [filter, setFilter] = useState("all");
@@ -43,6 +45,9 @@ export default function MyAthar() {
             </div>
         );
     }
+
+    follows = athar.follows;
+donations = athar.
 
     // Pagination
     const itemsPerPage = 6;
