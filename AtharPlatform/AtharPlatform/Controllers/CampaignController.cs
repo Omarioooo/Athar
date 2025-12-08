@@ -436,6 +436,7 @@ namespace AtharPlatform.Controllers
             {
                 Title = dto.Title,
                 Description = dto.Description,
+                Category=dto.Category,
                 GoalAmount = dto.GoalAmount,
                 RaisedAmount = 0,
                 Duration = dto.Duration,
