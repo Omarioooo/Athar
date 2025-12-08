@@ -94,5 +94,7 @@ namespace AtharPlatform.Services
         Task<bool> DeleteAsync(int id);
 
         Task<List<CampaignDto>> GetCampaignsByCharityIdAsync(int charityId);
+
+        Task<int> GetCountOfCampaignsByCharityIdAsync(int CharityId);
     }
 }

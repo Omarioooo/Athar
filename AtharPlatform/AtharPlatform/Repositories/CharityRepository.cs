@@ -14,8 +14,6 @@ namespace AtharPlatform.Repositories
                 .Where(c => c.IsActive)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
-            if (charity == null)
-                throw new KeyNotFoundException($"Charity with id {id} not found");
 
             return charity;
         }
@@ -28,8 +26,7 @@ namespace AtharPlatform.Repositories
                 .Where(c => c.IsActive)
                 .ToListAsync();
 
-            if (charities == null)
-                throw new KeyNotFoundException($"Charities not found");
+            
 
             return charities;
         }

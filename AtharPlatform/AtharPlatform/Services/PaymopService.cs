@@ -316,5 +316,15 @@ namespace AtharPlatform.Services
                 DonorEmail = data.billing_data?.email
             };
         }
+
+
+        public async Task<decimal> GetTotalDonationsForCharityAsync(int charityId)
+        {
+            return await _unit.PaymentDonations
+                .GetAll()
+                .Where(d => d.CharityId == charityId
+                            && d.DonationStatus == TransactionStatusEnum.SUCCESSED)
+                .SumAsync(d => d.NetAmountToCharity);
+        }
     }
 }

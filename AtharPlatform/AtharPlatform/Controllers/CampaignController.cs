@@ -530,6 +530,23 @@ namespace AtharPlatform.Controllers
         }
 
 
+        [HttpGet("Campaing_count_For_Charity/{charityId}")]
+        public async Task<IActionResult> GetCharityCampaignCount(int charityId)
+        {
+
+            if (charityId <= 0)
+                return BadRequest("Invalid Charity ID");
+
+            // تحقق هل الجمعية موجودة
+            var charityExists = await _unitOfWork.Charities.GetAll()
+                .AnyAsync(c => c.Id == charityId );
+
+            if (!charityExists)
+                return NotFound("Charity Not Found");
+
+            var result = await _campaignService.GetCountOfCampaignsByCharityIdAsync(charityId);
+            return Ok(result);
+        }
 
     }
 }

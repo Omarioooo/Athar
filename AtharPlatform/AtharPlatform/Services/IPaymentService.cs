@@ -15,6 +15,8 @@ namespace AtharPlatform.Services
         Task<string> CreatePaymentKeyAsync(int orderId, decimal amountCents);
         Task<bool> VerifyPaymentAsync(VerifyPaymentDto model);
         Task<PaymentDetailsDto> GetPaymentDetailsAsync(string transactionId);
+
+        Task<decimal> GetTotalDonationsForCharityAsync(int charityId);
     }
 
 }
