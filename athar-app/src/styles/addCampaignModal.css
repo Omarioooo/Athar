@@ -34,7 +34,7 @@
     border-radius: 8px;
     font-size: 14px;
     opacity: 0;
-    pointer-events: none;
+    pointer-events: auto;
     transition: all 0.3s;
 }
 
@@ -80,7 +80,7 @@
     padding: 20px;
     z-index: 1000;
     transform: translateY(30px);
-    pointer-events: none;
+    pointer-events: auto;
     transition: opacity 0.35s ease, transform 0.35s ease;
 }
 
@@ -103,7 +103,7 @@
 }
 
 .add-campaign-modal.open {
-    opacity: 1;
+     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
 }
@@ -158,7 +158,7 @@
     padding: 0 6px;
     font-size: 14px;
     color: #777;
-    pointer-events: none;
+    pointer-events: auto;
     transition: 0.3s ease;
 }
 

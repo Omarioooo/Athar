@@ -27,6 +27,7 @@ namespace AtharPlatform.Services
 
             var result = notifications.Select(n => new NotificationMessageDto
             {
+                id = n.Id,
                 Message = n.Message,
                 CreatedAt = n.CreatedAt,
                 SenderName=n.Sender.Sender.UserName

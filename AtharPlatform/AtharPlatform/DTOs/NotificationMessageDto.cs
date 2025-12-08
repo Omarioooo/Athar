@@ -2,6 +2,7 @@
 {
     public class NotificationMessageDto
     {
+        public int id { get; set; }
         public string? Message { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
