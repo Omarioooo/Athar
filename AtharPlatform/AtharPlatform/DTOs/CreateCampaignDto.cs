@@ -12,5 +12,6 @@ namespace AtharPlatform.DTOs
         public CampaignCategoryEnum Category { get; set; }
 
         public IFormFile ImageFile { get; set; } = null!;
+        public CampaignCategoryEnum Category { get; set; }
     }
 }
