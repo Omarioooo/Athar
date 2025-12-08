@@ -59,14 +59,41 @@ namespace AtharPlatform.Services
 
         public async Task<bool> DeleteDonorAsync(int id)
         {
-            // 1 - جلب الدونور مع كل علاقاته
             var donor = await _unitOfWork.Donors.getDonorWithId(id);
             if (donor == null)
-                throw new Exception("Donor not found.");
+                return false;
 
-             
+
+            // Delete Follows
+            if (donor.Follows != null && donor.Follows.Any())
+            {
+                foreach (var follow in donor.Follows.ToList())
+                {
+                    await _unitOfWork.Follows.DeleteAsync(follow.Id);
+                }
+            }
+
+            // Delete Reactions
+            if (donor.Reactions != null && donor.Reactions.Any())
+            {
+                foreach (var reaction in donor.Reactions.ToList())
+                {
+                    await _unitOfWork.Reactions.DeleteAsync(reaction.Id);
+                }
+            }
+
+
+
+
+            if (donor.Account != null)
+            {
+                donor.Account.IsDeleted = true;
+                await _unitOfWork.Accounts.UpdateAsync(donor.Account);
+            }
+
+
             await _unitOfWork.Donors.DeleteDonorAsync(id);
-            
+
             await _unitOfWork.SaveAsync();
 
             return true;
