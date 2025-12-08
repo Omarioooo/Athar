@@ -5,5 +5,10 @@
         public UserAccountRepository(Context context) : base(context)
         {
         }
+
+        public async Task DeleteAsync(UserAccount account)
+        {
+            _context.Users.Remove(account);
+        }
     }
 }

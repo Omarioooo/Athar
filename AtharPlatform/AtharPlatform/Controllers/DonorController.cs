@@ -1,8 +1,9 @@
-﻿using AtharPlatform.Repositories;
+﻿using System.Threading.Tasks;
+using AtharPlatform.DTOs;
+using AtharPlatform.Repositories;
 using AtharPlatform.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace AtharPlatform.Controllers
 {
@@ -28,7 +29,8 @@ namespace AtharPlatform.Controllers
                 if (model == null)
                     return BadRequest("field");
 
-                return Ok(model.follows);
+                /// return Ok(model.follows);
+                return Ok(model);
             }
             catch
             {
@@ -62,6 +64,42 @@ namespace AtharPlatform.Controllers
                 return Ok("No Photo");
 
             return File(donor.Account.ProfileImage, "image/PNG");
+        }
+
+        [HttpPut("update/{id}")]
+        public async Task<IActionResult> UpdateDonor(int id, [FromForm] DonorUpdateDto dto)
+        {
+            try
+            {
+                var result = await _donorService.UpdateDonorAsync(id,dto);
+                if (!result)
+                    return BadRequest("Update failed");
+
+                return Ok("Donor updated successfully");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteDonor(int id)
+        {
+            try
+            {
+                var result = await _donorService.DeleteDonorAsync(id);
+
+                if (!result)
+                    return NotFound(new { message = "Donor not found." });
+
+                return Ok(new { message = "Donor deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

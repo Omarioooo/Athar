@@ -30,6 +30,48 @@ namespace AtharPlatform.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
+        public async Task<bool> UpdateDonorAsync(int donorId, DonorUpdateDto dto)
+        {
+            var donor = await _unitOfWork.Donors.GetAsync(donorId);
+            if (donor == null)
+                throw new Exception($"Donor with id {donorId} not found");
+
+            // Update basic data
+            donor.FirstName = dto.FirstName ?? donor.FirstName;
+            donor.LastName = dto.LastName ?? donor.LastName;
+
+            donor.Account.City = dto.City ?? donor.Account.City;
+            donor.Account.Country = dto.Country ?? donor.Account.Country;
+
+            // Update Image if exists
+            if (dto.Image != null)
+            {
+                using var ms = new MemoryStream();
+                await dto.Image.CopyToAsync(ms);
+                donor.Account.ProfileImage = ms.ToArray();
+            }
+
+            await _unitOfWork.Donors.UpdateAsync(donor);
+            await _unitOfWork.SaveAsync();
+
+            return true;
+        }
+
+        public async Task<bool> DeleteDonorAsync(int id)
+        {
+            // 1 - جلب الدونور مع كل علاقاته
+            var donor = await _unitOfWork.Donors.getDonorWithId(id);
+            if (donor == null)
+                throw new Exception("Donor not found.");
+
+             
+            await _unitOfWork.Donors.DeleteDonorAsync(id);
+            
+            await _unitOfWork.SaveAsync();
+
+            return true;
+        }
+
         public async Task<bool> DonateToCharityAsync(DonationDto model)
         {
             // Check the donor
@@ -121,20 +163,19 @@ namespace AtharPlatform.Services
             if (donor == null)
                 throw new Exception($"Donor with id {id} not found");
 
-            // charity follows
-            var follows = donor.Follows;
-            List<int> charitiesIds = new();
-            follows.ForEach(f => charitiesIds.Add(f.CharityId));
+            //// 1) جيب كل الفولوز
+            var Follows = await _unitOfWork.Follows.GetAllAsync();
+            var resultFollows = new List<FollowAtharHistoryDto>();
 
-            var followsAthar = new List<FollowAtharHistoryDto>();
-            foreach(int charityId in charitiesIds)
+            foreach (var f in Follows.Where(a => a.DonorId == id))
             {
-                var charity = await _unitOfWork.Charities.GetAsync(charityId);
-                followsAthar.Add(new FollowAtharHistoryDto
+                var charity = await _unitOfWork.Charities.GetAsync(f.CharityId);
+
+                resultFollows.Add(new FollowAtharHistoryDto
                 {
-                    charityId = charityId,
-                    charityName = charity.Name,
-                    charityImageUrl = GetImgUrl(charityId, charity.ImageUrl, charity?.Account.ProfileImage)
+                    charityId = f.CharityId,
+                    charityName = charity?.Name,
+                    charityImageUrl = GetImgUrl(f.CharityId, charity?.ImageUrl, charity?.Account?.ProfileImage)
                 });
             }
 
@@ -165,7 +206,7 @@ namespace AtharPlatform.Services
             {
                 DonationsAmount = total,
                 donations = donationsAthar,
-                follows = followsAthar
+                follows = resultFollows
             };
         }
         private string? GetImgUrl(int id, string charityImageURL, byte[] charityAccountImage)
@@ -192,5 +233,8 @@ namespace AtharPlatform.Services
 
             return imageUrl;
         }
+
+ 
+
     }
 }

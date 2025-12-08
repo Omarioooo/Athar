@@ -13,6 +13,7 @@ namespace AtharPlatform.Repositories
         Task<bool> DeleteAsync(int id);
         Task<T?> GetByIdAsync(int id);
         IQueryable<T> GetAll();
+     
 
     }
 }
