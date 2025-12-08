@@ -90,5 +90,23 @@ namespace AtharPlatform.Repositories
 
             return donor;
         }
+
+
+        public async Task DeleteDonorAsync(int id)
+        {
+            var donor = await _dbSet
+                .Include(d => d.Account)
+                .FirstOrDefaultAsync(d => d.Id == id);
+
+            if (donor == null)
+                throw new KeyNotFoundException($"Donor with id {id} not found");
+
+            _dbSet.Remove(donor);
+        }
+
+        public async Task DeleteDonorAsync(Donor donor)
+        {
+            _context.Donors.Remove(donor);
+        }
     }
 }

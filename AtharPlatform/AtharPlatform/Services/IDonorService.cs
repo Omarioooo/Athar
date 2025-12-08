@@ -11,6 +11,7 @@ namespace AtharPlatform.Services
         Task<Donor> GetDonorFullProfileAsync(int id);
         Task<bool> DonateToCharityAsync(DonationDto model);
         Task<bool> DonateToCampaignAsync(DonationDto model);
-
+        Task<bool> UpdateDonorAsync(int donorId, DonorUpdateDto dto);
+        Task<bool> DeleteDonorAsync(int id);
     }
 }

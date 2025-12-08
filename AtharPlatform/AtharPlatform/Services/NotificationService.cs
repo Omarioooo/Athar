@@ -19,6 +19,27 @@ namespace AtharPlatform.Services
             _userManager = userManager;
             _hub = hub;
         }
+        public async Task<List<NotificationMessageDto>> GetUserNotificationsSummaryAsync(int userId)
+        {
+          
+            var notifications = await _unitOfWork.Notifications.GetNotificationsByUserAsync(userId);
+
+            var result = notifications.Select(n => new NotificationMessageDto
+            {
+                Message = n.Message,
+                CreatedAt = n.CreatedAt
+            }).ToList();
+
+            return result;
+        }
+
+        public async Task<List<Notification>> GetUserNotificationsFullAsync(int userId)
+        {
+            var notifications = await _unitOfWork.Notifications.GetNotificationsByUserAsync(userId);
+
+            
+            return notifications;
+        }
 
         public async Task<List<NotificationReceiver>> GetUserNotificationsAsync(int id)
         {
