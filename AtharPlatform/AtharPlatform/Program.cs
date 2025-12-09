@@ -216,35 +216,28 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var db = scope.ServiceProvider.GetRequiredService<Context>();
-        var hasMigrations = db.Database.GetMigrations().Any();
-        Console.WriteLine($"[Startup] Migrations detected: {hasMigrations}");
-        if (hasMigrations)
+        Console.WriteLine("[Startup] Ensuring database exists...");
+        
+        // Try to ensure the database exists (creates if needed)
+        try
         {
-            Console.WriteLine("[Startup] Applying migrations...");
-            db.Database.Migrate();
-            Console.WriteLine("[Startup] Migrations applied.");
-        }
-        else
-        {
-            Console.WriteLine("[Startup] No migrations found. Ensuring database created...");
             db.Database.EnsureCreated();
-            try
-            {
-                db.Database.ExecuteSqlRaw("SELECT 1 FROM [AspNetUsers]");
-                Console.WriteLine("[Startup] Identity tables already exist.");
-            }
-            catch (Exception idEx)
-            {
-                Console.WriteLine($"[Startup] Identity table check failed ({idEx.Message}). Creating tables explicitly...");
-                var creator = db.GetService<IRelationalDatabaseCreator>();
-                creator.CreateTables();
-                Console.WriteLine("[Startup] Tables created explicitly.");
-            }
+            Console.WriteLine("[Startup] Database exists.");
         }
+        catch
+        {
+            Console.WriteLine("[Startup] Database creation attempt via EnsureCreated failed, trying migrations...");
+        }
+        
+        Console.WriteLine("[Startup] Applying migrations...");
+        db.Database.Migrate();
+        Console.WriteLine("[Startup] Migrations applied successfully.");
     }
     catch (Exception ex)
     {
         Console.WriteLine($"[Startup] Database initialization failed: {ex.Message}");
+        Console.WriteLine($"[Startup] Please create the database 'neondb' manually in Neon console or wait 2-3 minutes for cache to clear.");
+        throw; // Fail fast if migrations fail
     }
 
     // Seed required Identity roles
