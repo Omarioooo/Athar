@@ -578,7 +578,6 @@ namespace AtharPlatform.Controllers
             var adminId = admins.FirstOrDefault()?.Id;
 
 
-
             // Receivers = charity owner
             var receivers = new List<int> { charity.Id };
 

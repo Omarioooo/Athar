@@ -121,3 +121,29 @@ export const fetchPendingCharities = async (id) => {
     const res = await api.get(`/charities/join`);
     return res.data;
 };
+
+
+// get a charity stats
+export const fetchCharityStatsById = async (id) => {
+    const res = await api.get(`/charities/Statistics/${id}`);
+    return res.data;
+};
+
+// approve charity
+export const approveCharityById = async (id) => {
+    const res = await api.post(`/charities/${id}/approve`);
+    return res.data;
+};
+
+// reject charity
+export const rejectCharityById = async (id) => {
+    const res = await api.post(`/charities/${id}/reject`);
+    return res.data;
+};
+
+
+// get charity status
+export const fetchCharityStatusById = async (id) => {
+    const res = await api.get(`/charities/status/${id}`);
+    return res.data;
+};

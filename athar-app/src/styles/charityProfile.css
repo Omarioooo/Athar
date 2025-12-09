@@ -605,10 +605,8 @@ input[type="checkbox"] {
     }
 }
 
-
-
-/*/*/**/
-.modal-box {
+/*/*/
+**/ .modal-box {
     overflow-y: scroll;
 }
 
@@ -619,4 +617,76 @@ input[type="checkbox"] {
 .modal-box {
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+/* =========================
+   Overlay الأساسي
+========================= */
+.pending-overlay,
+.rejected-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.75); /* خلفية داكنة */
+    backdrop-filter: blur(3px); /* ضبابية خلفية */
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+
+.pending-overlay .overlay-box,
+.rejected-overlay .overlay-box {
+    background: #fff;
+    padding: 30px;
+    border-radius: 14px;
+    max-width: 450px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    border-top: 8px solid;
+}
+
+
+.pending-overlay .overlay-box {
+    border-top-color: #f4b400;
+}
+
+.rejected-overlay .overlay-box {
+    border-top-color: #e53935;
+}
+
+.pending-overlay h2,
+.rejected-overlay h2 {
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+.pending-overlay p,
+.rejected-overlay p {
+    font-size: 16px;
+    color: #444;
+    line-height: 1.7;
+}
+
+.pending-overlay .overlay-button,
+.rejected-overlay .overlay-button {
+    margin-top: 20px;
+    background: #ff9800;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+.pending-overlay .overlay-button:hover,
+.rejected-overlay .overlay-button:hover {
+    background: #e68a00;
+    transform: translateY(-2px);
 }

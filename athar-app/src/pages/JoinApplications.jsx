@@ -1,23 +1,44 @@
 import { useEffect, useState } from "react";
-import { charitiesList } from "../utils/data";
-import { getPendingCharity } from "../services/charityService";
+import {
+    approveCharity,
+    getPendingCharity,
+    rejectCharity,
+} from "../services/charityService";
 
 export default function JoinApplications() {
     const [loading, setLoading] = useState(true);
     const [charities, setCharities] = useState([]);
 
-    const handleApprove = (id) => {
-        alert(`تم الموافقة على الجمعية رقم ${id}`);
-        setCharities((prev) =>
-            prev.map((c) => (c.id === id ? { ...c, status: "Approved" } : c))
-        );
+    const handleApprove = async (id) => {
+        try {
+            setLoading(true);
+            const result = await approveCharity(id);
+            setCharities((prev) =>
+                prev.map((c) =>
+                    c.id === id ? { ...c, status: result.status } : c
+                )
+            );
+        } catch (error) {
+            alert("حدث خطأ أثناء الموافقة على الجمعية");
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleReject = (id) => {
-        alert(`تم رفض الجمعية رقم ${id}`);
-        setCharities((prev) =>
-            prev.map((c) => (c.id === id ? { ...c, status: "Rejected" } : c))
-        );
+    const handleReject = async (id) => {
+        try {
+            setLoading(true);
+            const result = await rejectCharity(id);
+            setCharities((prev) =>
+                prev.map((c) =>
+                    c.id === id ? { ...c, status: result.status } : c
+                )
+            );
+        } catch (error) {
+            alert("حدث خطأ أثناء رفض الجمعية");
+        } finally {
+            setLoading(false);
+        }
     };
 
     function truncateText(text, maxLength) {
@@ -28,10 +49,12 @@ export default function JoinApplications() {
     }
 
     useEffect(() => {
-        setLoading(true);
         async function loadCharities() {
             try {
+                setLoading(true);
                 const data = await getPendingCharity();
+                console.log(data);
+                
                 setCharities(data);
             } catch (err) {
                 console.error("Failed to fetch campaigns:", err);
@@ -41,7 +64,18 @@ export default function JoinApplications() {
         }
 
         loadCharities();
-    }, charities);
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="d-flex justify-content-center py-5">
+                <div
+                    className="spinner-border text-warning"
+                    style={{ width: "4rem", height: "4rem" }}
+                ></div>
+            </div>
+        );
+    }
 
     return (
         <div className="cards-container">
@@ -54,16 +88,18 @@ export default function JoinApplications() {
                         <div className="charity-content">
                             <h2>{charity.name}</h2>
                             <p className="email">{charity.email}</p>
+
                             <p className="description">
-                                {truncateText(truncateText, 120)}
+                                {truncateText(charity.description, 120)}
                             </p>
+
                             <p className="location">
                                 {charity.city}, {charity.country} -{" "}
                                 {new Date(
                                     charity.createdAt
                                 ).toLocaleDateString()}
                             </p>
-                            {/* Verification Document */}
+
                             <div className="verification-doc">
                                 <p>وثيقة التحقق:</p>
                                 <img
@@ -73,7 +109,7 @@ export default function JoinApplications() {
                             </div>
                         </div>
                     </div>
-                    {/* Buttons */}
+
                     <div className="buttons">
                         <button
                             className="approve"

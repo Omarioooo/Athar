@@ -13,11 +13,9 @@ export default function Zakaa() {
     const [gold21, setGold21] = useState(0);
     const [rent, setRent] = useState(0);
 
-    // أسعار الذهب (ثابت مؤقتًا)
     const gold18Price = 3968.5;
     const gold21Price = 4630;
 
-    // الحسابات
     const zakatMoney = safeNumber(money) * 0.025;
 
     const zakatTrade =

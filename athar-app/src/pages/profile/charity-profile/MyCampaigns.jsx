@@ -3,10 +3,11 @@ import CampaignCard from "../../../components/charity/charity-campaigns/Campaign
 import Pagination from "../../../components/Pagination";
 import { getTotalPages, paginate } from "../../../utils/PaginationHelper";
 import { UseAuth } from "../../../Auth/Auth";
-import { getCharityCampaigns } from "../../../services/charityService";
+import { CharityStatus, getCharityCampaigns } from "../../../services/charityService";
 import { FaPlus } from "react-icons/fa";
 import { CreateCampaign } from "../../../services/campaignService";
 import { AnimatePresence, motion } from "framer-motion";
+import { Navigate } from "react-router-dom";
 
 export default function MyCampaigns() {
     const { user } = UseAuth();
@@ -22,6 +23,8 @@ export default function MyCampaigns() {
     const [goalAmount, setGoalAmount] = useState("");
     const [category, setCategory] = useState("");
     const [imageFile, setImageFile] = useState(null);
+        const [status, setStatus] = useState(1)
+
 
     const [page, setPage] = useState(1);
     const [filter, setFilter] = useState("all");
@@ -44,6 +47,26 @@ export default function MyCampaigns() {
     useEffect(() => {
         if (user?.id) loadCampaigns();
     }, [user?.id]);
+
+
+    useEffect(() => {
+        if (!user) return;
+
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const data = await CharityStatus(user.id);
+                setStatus(data);
+
+            } catch (err) {
+                console.error("Failed to fetch charity status", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [user.id]);
 
     const resetForm = () => {
         setTitle("");
@@ -109,6 +132,42 @@ export default function MyCampaigns() {
 
     return (
         <>
+            {status === 1 && (
+                <div className="pending-overlay">
+                    <div className="overlay-box">
+                        <h2>🚧 الجمعية قيد المراجعة</h2>
+                        <p>
+                            طلب انضمامك تحت المراجعة الآن. سيتم التواصل معك عند
+                            الانتهاء.
+                        </p>
+                        <button
+                            className="overlay-button"
+                            onClick={() => Navigate("/")}
+                        >
+                            الذهاب للصفحة الرئيسية
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {status === 3 && (
+                <div className="rejected-overlay">
+                    <div className="overlay-box">
+                        <h2>❌ تم رفض الطلب</h2>
+                        <p>
+                            نأسف، تم رفض طلب تسجيل الجمعية. يمكنك التواصل معنا
+                            لمزيد من التفاصيل.
+                        </p>
+                        <button
+                            className="overlay-button"
+                            onClick={() => Navigate("/")}
+                        >
+                            الذهاب للصفحة الرئيسية
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <div className="campaigns-wrapper">
                 {/* Filter buttons */}
                 <div className="campaigns-filter">

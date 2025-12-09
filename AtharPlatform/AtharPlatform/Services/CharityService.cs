@@ -66,7 +66,7 @@ namespace AtharPlatform.Services
                 .Where(d => d.CharityId == charityId)
                 .Select(d => new DonationInfoDto
                 {
-                    Id=d.Id,
+                    Id = d.Id,
                     Amount = d.NetAmountToCharity,
                     Date = d.CreatedAt,
                     Status = d.DonationStatus
@@ -111,7 +111,7 @@ namespace AtharPlatform.Services
 
             int totalReactions = reactionsList.Count;
 
-            
+
             //Result
             return new CharityStatusDto
             {
@@ -132,15 +132,15 @@ namespace AtharPlatform.Services
             };
         }
 
-        public async Task<string?> GetCharityStatusAsync(int id)
+        public async Task<CharityStatusEnum> GetCharityStatusAsync(int id)
         {
             var charity = await _unitOfWork.Charities.GetByIdAsync(id);
 
             if (charity == null)
-                return null;
+                throw new Exception("not found");
 
             // Convert enum to string
-            return charity.Status.ToString();
+            return charity.Status;
         }
 
 
@@ -187,10 +187,6 @@ namespace AtharPlatform.Services
 
 
 
-
-
-
-
         public async Task<List<CharityApplicationResponseDto>> GetAllApplicationsForCharityAsync(int charityId)
         {
             // 1) Get volunteer  to charity
@@ -206,7 +202,7 @@ namespace AtharPlatform.Services
                     Phone = v.PhoneNumber,
                     Description = $"ارغب في التطوع لجمعية {v.CharityVolunteer?.Charity?.Name}",
                     Date = v.CharityVolunteer.Date,
-                
+
                 })
                 .ToList();
 
@@ -489,6 +485,15 @@ namespace AtharPlatform.Services
                     imageUrl = null;
                 }
 
+                Console.WriteLine("doc is " + charity.VerificationDocument);
+                if (imageUrl == null || charity.VerificationDocument == null || charity.VerificationDocument.Length == 0)
+                    continue;
+
+                var doc = charity.VerificationDocument != null
+                ? $"data:image/png;base64,{Convert.ToBase64String(charity.VerificationDocument)}"
+                : null;
+
+
                 apps.Add(new CharityJoinDto
                 {
                     Id = charity.Id,
@@ -499,9 +504,7 @@ namespace AtharPlatform.Services
                     Description = charity.Description,
                     email = charity.Account.Email,
                     ImageUrl = imageUrl,
-                    VerificationDocument = charity.VerificationDocument != null
-                ? $"data:image/png;base64,{Convert.ToBase64String(charity.VerificationDocument)}"
-                : null,
+                    VerificationDocument = doc
                 });
 
             }
@@ -510,7 +513,10 @@ namespace AtharPlatform.Services
 
         }
 
-
+        Task<string?> ICharityService.GetCharityStatusAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }

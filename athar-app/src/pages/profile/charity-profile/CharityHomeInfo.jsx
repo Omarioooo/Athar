@@ -4,6 +4,7 @@ import defaultImg from "../../../assets/images/athar5.png";
 import { UseAuth } from "../../../Auth/Auth";
 import { useEffect, useState } from "react";
 import { getCharityProfile } from "../../../services/charityService";
+import { Navigate } from "react-router-dom";
 
 export default function CharityHomeInfo() {
     const { user } = UseAuth();
@@ -23,6 +24,8 @@ export default function CharityHomeInfo() {
         const fetchData = async () => {
             try {
                 const data = await getCharityProfile(user.id);
+                console.log(data);
+
                 setCharity(data);
             } catch (err) {
                 console.error("Failed to fetch charity profile", err);
@@ -53,70 +56,108 @@ export default function CharityHomeInfo() {
     };
 
     return (
-        <motion.div
-            className="charity-info-wrapper"
-            animate={{ opacity: 1 }}
-            initial={{ opacity: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-        >
-            {/* HEADER */}
-            <div className="charity-header">
-                <div className="charity-avatar">
-                    <img
-                        src={charity.imageUrl || defaultImg}
-                        alt={charity.name}
-                    />
+        <>
+            {charity.status === 1 && (
+                <div className="pending-overlay">
+                    <div className="overlay-box">
+                        <h2>🚧 الجمعية قيد المراجعة</h2>
+                        <p>
+                            طلب انضمامك تحت المراجعة الآن. سيتم التواصل معك عند
+                            الانتهاء.
+                        </p>
+                        <button
+                            className="overlay-button"
+                            onClick={() => Navigate("/")}
+                        >
+                            الذهاب للصفحة الرئيسية
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {charity.status === 3 && (
+                <div className="rejected-overlay">
+                    <div className="overlay-box">
+                        <h2>❌ تم رفض الطلب</h2>
+                        <p>
+                            نأسف، تم رفض طلب تسجيل الجمعية. يمكنك التواصل معنا
+                            لمزيد من التفاصيل.
+                        </p>
+                        <button
+                            className="overlay-button"
+                            onClick={() => Navigate("/")}
+                        >
+                            الذهاب للصفحة الرئيسية
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            <motion.div
+                className="charity-info-wrapper"
+                animate={{ opacity: 1 }}
+                initial={{ opacity: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+            >
+                {/* HEADER */}
+                <div className="charity-header">
+                    <div className="charity-avatar">
+                        <img
+                            src={charity.imageUrl || defaultImg}
+                            alt={charity.name}
+                        />
+                    </div>
+
+                    <div className="charity-main-info">
+                        <h1 className="charity-name">{charity.name}</h1>
+                        <p className="charity-location">
+                            {country} - {city}
+                        </p>
+                        <span
+                            className="charity-status"
+                            style={{ background: statusColor[charity.status] }}
+                        >
+                            {statusArabicById[charity.status]}
+                        </span>
+                    </div>
                 </div>
 
-                <div className="charity-main-info">
-                    <h1 className="charity-name">{charity.name}</h1>
-                    <p className="charity-location">
-                        {country} - {city}
-                    </p>
-                    <span
-                        className="charity-status"
-                        style={{ background: statusColor[charity.status] }}
-                    >
-                        {statusArabicById[charity.status]}
-                    </span>
-                </div>
-            </div>
-
-            {/* ABOUT */}
-            <div className="charity-description-box">
-                <h2>
-                    <FaInfoCircle /> عن الجمعية
-                </h2>
-                <p>{charity.description}</p>
-            </div>
-
-            {/* STATS */}
-            <div className="charity-stats">
-                <div className="stat-card">
-                    <FaUsers className="icon" />
-                    <span className="stat-number">
-                        {charity.followersCount}
-                    </span>
-                    <span className="stat-label">متابعين</span>
+                {/* ABOUT */}
+                <div className="charity-description-box">
+                    <h2>
+                        <FaInfoCircle /> عن الجمعية
+                    </h2>
+                    <p>{charity.description}</p>
                 </div>
 
-                <div className="stat-card">
-                    <FaFolderOpen className="icon" />
-                    <span className="stat-number">
-                        {charity.campaignsCount}
-                    </span>
-                    <span className="stat-label">عدد الحملات</span>
-                </div>
+                {/* STATS */}
+                <div className="charity-stats">
+                    <div className="stat-card">
+                        <FaUsers className="icon" />
+                        <span className="stat-number">
+                            {charity.followersCount}
+                        </span>
+                        <span className="stat-label">متابعين</span>
+                    </div>
 
-                <div className="stat-card">
-                    <FaWallet className="icon" />
-                    <span className="stat-number">
-                        {charity.totalRaised?.toString()} جنيه
-                    </span>
-                    <span className="stat-label">الرصيد</span>
+                    <div className="stat-card">
+                        <FaFolderOpen className="icon" />
+                        <span className="stat-number">
+                            {charity.campaignsCount}
+                        </span>
+                        <span className="stat-label">عدد الحملات</span>
+                    </div>
+
+                    <div className="stat-card">
+                        <FaWallet className="icon" />
+                        <span className="stat-number">
+                            {charity.totalRaised?.toString()} جنيه
+                        </span>
+                        <span className="stat-label">الرصيد</span>
+                    </div>
                 </div>
-            </div>
-        </motion.div>
+            </motion.div>
+        </>
     );
 }
