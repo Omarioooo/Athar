@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { IoCameraOutline } from "react-icons/io5";
 import ProfileImg from "../../../assets/images/profile.png";
 import {
+    CharityStatus,
     deleteCharity,
     getCharityProfile,
     UpdateCharityData,
@@ -62,6 +63,7 @@ export default function CharitySettings() {
 
         fetchData();
     }, [user]);
+
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;

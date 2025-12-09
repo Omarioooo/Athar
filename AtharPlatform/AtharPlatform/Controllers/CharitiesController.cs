@@ -53,6 +53,44 @@ namespace AtharPlatform.Controllers
         }
 
 
+        [HttpGet("status/{id}")]
+        public async Task<IActionResult> GetCharityStatus(int id)
+        {
+            try
+            {
+                var status = await _charityService.GetCharityStatusAsync(id);
+
+                if (status == null)
+                    return NotFound("Charity not found");
+
+                return Ok(status );
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+
+        [HttpGet("stats/numbers/{id}")]
+        public async Task<IActionResult> GetCharityStatsNumbersOnly(int id)
+        {
+            try
+            {
+                var stats = await _charityService.GetCharityStatisticsNumbersOnlyAsync(id);
+
+                if (stats == null)
+                    return NotFound("Statistics not found");
+
+                return Ok(stats);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpGet("Statistics/{id}")]
         public async Task<IActionResult> GetCharityStatistics(int id)
         {
@@ -151,30 +189,7 @@ namespace AtharPlatform.Controllers
         }
 
 
-        //اسف لبشاعة المنظر بس ده حل شات 
-        //انما الي انا عمله  الكيوت الي فوقيه **:)
-        //[HttpGet("{id}/image")]
-        //public async Task<IActionResult> GetImageFromFile(int id)
-        //{
-        //    var charity = await _charityService.GetCharityFullProfileAsync(id);
 
-        //    if (charity == null || string.IsNullOrEmpty(charity.ImageUrl))
-        //        return Ok("No Photo");
-
-        //    // لو الرابط خارجي (http أو https)
-        //    if (charity.ImageUrl.StartsWith("http"))
-        //        return Redirect(charity.ImageUrl);
-
-        //    // لو الصورة داخل wwwroot
-        //    var relativePath = charity.ImageUrl.TrimStart('/');
-        //    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", relativePath);
-
-        //    if (!System.IO.File.Exists(filePath))
-        //        return Ok("No Photo");
-
-        //    var bytes = System.IO.File.ReadAllBytes(filePath);
-        //    return File(bytes, "image/png");
-        //}
 
 
         [HttpGet("image/{id}")]

@@ -1,7 +1,5 @@
-﻿using System;
-using AtharPlatform.Dtos;
+﻿using AtharPlatform.Dtos;
 using AtharPlatform.DTOs;
-using AtharPlatform.Models;
 using AtharPlatform.Models.Enums;
 using AtharPlatform.Repositories;
 
@@ -25,57 +23,172 @@ namespace AtharPlatform.Services
 
         public async Task<CharityStatusDto> GetCharityStatisticsAsync(int charityId)
         {
+
             var charity = await _context.Charities
-               .FirstOrDefaultAsync(c => c.Id == charityId);
+        .FirstOrDefaultAsync(c => c.Id == charityId);
 
             if (charity == null)
                 throw new Exception("Charity not found");
 
-            int followsCount = await _context.Follows
-               .Where(f => f.CharityId == charityId)
-               .CountAsync();
+            // ================================
+            // 1) Follows + Dates
+            // ================================
+            var follows = await _context.Follows
+                .Where(f => f.CharityId == charityId)
+                .Select(f => new StatsFollowDto
+                {
+                    UserId = f.Id,
+                    Date = f.StartDate
+                })
+                .ToListAsync();
 
+            int followsCount = follows.Count;
 
-            int campaignsCount = await _context.Campaigns
+            // ================================
+            // 2) Campaign Counts by Category
+            // ================================
+            var campaignsByCategory = await _context.Campaigns
                 .Where(c => c.CharityID == charityId)
-                .CountAsync();
+                .GroupBy(c => c.Category)
+                .Select(g => new CampaignCategoryCountDto
+                {
+                    Category = g.Key,
+                    Count = g.Count()
+                })
+                .ToListAsync();
 
+            int campaignsCount = campaignsByCategory.Sum(x => x.Count);
 
-            decimal totalDonations = await _context.Donations
-                .Where(d => d.CharityId == charityId && d.DonationStatus == TransactionStatusEnum.SUCCESSED)
-                .SumAsync(d => d.NetAmountToCharity);
-
-
-            int donationsCount = await _context.Donations
+            // ================================
+            // 3) Total Donations + donation list
+            // ================================
+            var donationsList = await _context.Donations
                 .Where(d => d.CharityId == charityId)
-                .CountAsync();
+                .Select(d => new DonationInfoDto
+                {
+                    Id=d.Id,
+                    Amount = d.NetAmountToCharity,
+                    Date = d.CreatedAt,
+                    Status = d.DonationStatus
+                })
+                .ToListAsync();
 
+            var totalDonations = donationsList
+                .Where(d => d.Status == TransactionStatusEnum.SUCCESSED)
+                .Sum(d => d.Amount);
 
+            int donationsCount = donationsList.Count;
+
+            // ================================
+            // 4) Total Content in campaigns
+            // ================================
             var campaignsList = await _context.Campaigns
                 .Where(c => c.CharityID == charityId)
                 .ToListAsync();
 
-
             int totalContent = 0;
+
             foreach (var c in campaignsList)
             {
-                var contentsCount = await _context.Contents
+                int contentsCount = await _context.Contents
                     .Where(ct => !ct.IsDeleted && ct.CampaignId == c.Id)
                     .CountAsync();
 
                 totalContent += contentsCount;
             }
 
+            // ================================
+            // 5) Total Reactions + reaction list
+            // ================================
+            var reactionsList = await _context.Reactions
+                .Where(r => r.Content.Campaign.CharityID == charityId)
+                .Select(r => new ReactionDto
+                {
+                    ReactionId = r.Id,
+                    Date = r.ReactionDate
+                })
+                .ToListAsync();
 
+            int totalReactions = reactionsList.Count;
+
+            
+            //Result
             return new CharityStatusDto
             {
                 FollowsCount = followsCount,
+                Follows = follows,
+
                 CampaignsCount = campaignsCount,
+                CampaignsByCategory = campaignsByCategory,
+
                 TotalIncome = totalDonations,
                 DonationsCount = donationsCount,
-                ContentCount = totalContent
+                Donations = donationsList,
+
+                ContentCount = totalContent,
+
+                ReactionsCount = totalReactions,
+                Reactions = reactionsList
             };
         }
+
+        public async Task<CharityStatusEnum> GetCharityStatusAsync(int id)
+        {
+            var charity = await _unitOfWork.Charities.GetByIdAsync(id);
+
+            if (charity == null)
+                throw new Exception("not found");
+
+            // Convert enum to string
+            return charity.Status;
+        }
+
+
+        //only Numbers
+        public async Task<CharityStatsNumbersDto> GetCharityStatisticsNumbersOnlyAsync(int charityId)
+        {
+            var charity = await _context.Charities
+                .FirstOrDefaultAsync(c => c.Id == charityId);
+
+            if (charity == null)
+                throw new Exception("Charity not found");
+
+            int followsCount = await _context.Follows
+                .CountAsync(f => f.CharityId == charityId);
+
+            int campaignsCount = await _context.Campaigns
+                .CountAsync(c => c.CharityID == charityId);
+
+            decimal totalIncome = await _context.Donations
+                .Where(d => d.CharityId == charityId && d.DonationStatus == TransactionStatusEnum.SUCCESSED)
+                .SumAsync(d => d.NetAmountToCharity);
+
+            int donationsCount = await _context.Donations
+                .CountAsync(d => d.CharityId == charityId);
+
+            int contentCount = await _context.Contents
+                .Where(ct => !ct.IsDeleted && ct.Campaign.CharityID == charityId)
+                .CountAsync();
+
+            int reactionsCount = await _context.Reactions
+                .Where(r => r.Content.Campaign.CharityID == charityId)
+                .CountAsync();
+
+            return new CharityStatsNumbersDto
+            {
+                FollowsCount = followsCount,
+                ContentCount = contentCount,
+                DonationsCount = donationsCount,
+                CampaignsCount = campaignsCount,
+                ReactionsCount = reactionsCount,
+                TotalIncome = totalIncome
+            };
+        }
+
+
+
+
+
 
 
         public async Task<List<CharityApplicationResponseDto>> GetAllApplicationsForCharityAsync(int charityId)
@@ -91,12 +204,9 @@ namespace AtharPlatform.Services
                     Type = "Volunteer",
                     Name = v.FirstName + " " + v.LastName,
                     Phone = v.PhoneNumber,
-                    // Country = v.Country,
-                    //City = v.City,
-                    ///Age = v.Age,
                     Description = $"ارغب في التطوع لجمعية {v.CharityVolunteer?.Charity?.Name}",
                     Date = v.CharityVolunteer.Date,
-                    //IsFirstTime = v.IsFirstTime
+                
                 })
                 .ToList();
 
@@ -113,13 +223,7 @@ namespace AtharPlatform.Services
                     Type = "VendorOffer",
                     Name = v.VendorName,
                     Phone = v.PhoneNumber,
-                    // Country = v.Country,
-                    // City = v.City,
-                    // ItemName = v.ItemName,
-                    // Quantity = v.Quantity,
                     Description = v.Description,
-                    // PriceBefore = v.PriceBeforDiscount,
-                    /// PriceAfter = v.PriceAfterDiscount,
                     Date = v.CharityVendorOffer.Date
                 })
                 .ToList();

@@ -42,7 +42,6 @@ export default function AppRoutes() {
                     <Route path="charities" element={<Charities />} />
                     <Route path="campaign/:id" element={<CampaignDetails />} />
                     <Route path="charity/:id" element={<CharityProfile />} />
-                    <Route path="join" element={<JoinApplications />} />
 
                     {/* Protected Routes */}
                     <Route element={<RequireAuth />}>
@@ -54,6 +53,7 @@ export default function AppRoutes() {
                             path="profile/:id/*"
                             element={<ProfilePageRoute />}
                         />
+                        <Route path="join" element={<JoinApplications />} />
                     </Route>
                 </Route>
                 {/* Payment */}

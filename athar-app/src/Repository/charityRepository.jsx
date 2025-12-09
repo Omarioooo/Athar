@@ -140,3 +140,10 @@ export const rejectCharityById = async (id) => {
     const res = await api.post(`/charities/${id}/reject`);
     return res.data;
 };
+
+
+// get charity status
+export const fetchCharityStatusById = async (id) => {
+    const res = await api.get(`/charities/status/${id}`);
+    return res.data;
+};

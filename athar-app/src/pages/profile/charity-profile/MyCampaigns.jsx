@@ -23,6 +23,8 @@ export default function MyCampaigns() {
     const [goalAmount, setGoalAmount] = useState("");
     const [category, setCategory] = useState("");
     const [imageFile, setImageFile] = useState(null);
+        const [status, setStatus] = useState(1)
+
 
     const [page, setPage] = useState(1);
     const [filter, setFilter] = useState("all");
@@ -45,6 +47,26 @@ export default function MyCampaigns() {
     useEffect(() => {
         if (user?.id) loadCampaigns();
     }, [user?.id]);
+
+
+    useEffect(() => {
+        if (!user) return;
+
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const data = await CharityStatus(user.id);
+                setStatus(data);
+
+            } catch (err) {
+                console.error("Failed to fetch charity status", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [user.id]);
 
     const resetForm = () => {
         setTitle("");
@@ -110,7 +132,7 @@ export default function MyCampaigns() {
 
     return (
         <>
-            {/* {charity.status === 1 && (
+            {status === 1 && (
                 <div className="pending-overlay">
                     <div className="overlay-box">
                         <h2>🚧 الجمعية قيد المراجعة</h2>
@@ -128,7 +150,7 @@ export default function MyCampaigns() {
                 </div>
             )}
 
-            {charity.status === 3 && (
+            {status === 3 && (
                 <div className="rejected-overlay">
                     <div className="overlay-box">
                         <h2>❌ تم رفض الطلب</h2>
@@ -144,7 +166,7 @@ export default function MyCampaigns() {
                         </button>
                     </div>
                 </div>
-            )} */}
+            )}
 
             <div className="campaigns-wrapper">
                 {/* Filter buttons */}

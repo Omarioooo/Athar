@@ -10,6 +10,7 @@ import {
     fetchCharityStatsById,
     approveCharityById,
     rejectCharityById,
+    fetchCharityStatusById,
 } from "../Repository/charityRepository";
 import { validateEmail } from "../utils/validation/validateEmail";
 import {
@@ -212,6 +213,16 @@ export const approveCharity = async (id) => {
 export const rejectCharity = async (id) => {
     try {
         const result = await rejectCharityById(id);
+        return result;
+    } catch (error) {
+        console.error("Failed to reject charity:", error);
+        throw error;
+    }
+};
+
+export const CharityStatus = async (id) => {
+    try {
+        const result = await fetchCharityStatusById(id);
         return result;
     } catch (error) {
         console.error("Failed to reject charity:", error);

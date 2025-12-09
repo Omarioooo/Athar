@@ -15,5 +15,9 @@ namespace AtharPlatform.Services
         Task<List<CharityApplicationResponseDto>> GetAllApplicationsForCharityAsync(int charityId);
         Task<VendorOfferDTO> GetVendorOfferForCharityByIdAsync(int offerId);
         Task<VolunteerApplicationDTO> GetVolunteerOfferForCharityByIdAsync(int offerId);
+        Task<CharityStatsNumbersDto> GetCharityStatisticsNumbersOnlyAsync(int charityId);
+
+        Task<string?> GetCharityStatusAsync(int id);
+
     }
 }

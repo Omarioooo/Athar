@@ -1,6 +1,6 @@
 import { CgProfile } from "react-icons/cg";
 import { CiCalculator1 } from "react-icons/ci";
-import { FaHome } from "react-icons/fa";
+import { FaHome, FaUserLock } from "react-icons/fa";
 import { HiOutlineBuildingOffice2 } from "react-icons/hi2";
 import { ImStatsDots } from "react-icons/im";
 import {
@@ -78,6 +78,15 @@ export default function LinksMenu({ open, setOpen, user }) {
                     جمعياتنا
                 </div>
             </NavLink>
+
+            {["Admin"].includes(user.role) && (
+                <NavLink to="/join" onClick={() => setOpen(false)}>
+                <div className="link">
+                    <FaUserLock />
+                   طلبات الأنضمام
+                </div>
+            </NavLink>
+            )}
 
             <NavLink to="/zakaa" onClick={() => setOpen(false)}>
                 <div className="link">

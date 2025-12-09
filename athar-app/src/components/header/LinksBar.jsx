@@ -9,14 +9,16 @@ export default function LinksBar({ role }) {
             <NavLink to="/campaigns">حملاتنا</NavLink>
             <NavLink to="/charities">جمعياتنا</NavLink>
 
-            {/* let it after auth */}
-         
-                <NavLink to="/content">الميديا</NavLink>
-          
+            <NavLink to="/content">الميديا</NavLink>
 
             {["Admin", "CharityAdmin"].includes(role) && (
                 <NavLink to="/dashboard">لوحة التحكم</NavLink>
             )}
+
+            {["Admin"].includes(role) && (
+                <NavLink to="/join">طلبات الأنضمام</NavLink>
+            )}
+
             <NavLink to="/zakaa">زكاتي</NavLink>
         </div>
     );
