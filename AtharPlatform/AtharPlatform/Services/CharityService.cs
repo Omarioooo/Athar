@@ -132,6 +132,64 @@ namespace AtharPlatform.Services
             };
         }
 
+        public async Task<string?> GetCharityStatusAsync(int id)
+        {
+            var charity = await _unitOfWork.Charities.GetByIdAsync(id);
+
+            if (charity == null)
+                return null;
+
+            // Convert enum to string
+            return charity.Status.ToString();
+        }
+
+
+        //only Numbers
+        public async Task<CharityStatsNumbersDto> GetCharityStatisticsNumbersOnlyAsync(int charityId)
+        {
+            var charity = await _context.Charities
+                .FirstOrDefaultAsync(c => c.Id == charityId);
+
+            if (charity == null)
+                throw new Exception("Charity not found");
+
+            int followsCount = await _context.Follows
+                .CountAsync(f => f.CharityId == charityId);
+
+            int campaignsCount = await _context.Campaigns
+                .CountAsync(c => c.CharityID == charityId);
+
+            decimal totalIncome = await _context.Donations
+                .Where(d => d.CharityId == charityId && d.DonationStatus == TransactionStatusEnum.SUCCESSED)
+                .SumAsync(d => d.NetAmountToCharity);
+
+            int donationsCount = await _context.Donations
+                .CountAsync(d => d.CharityId == charityId);
+
+            int contentCount = await _context.Contents
+                .Where(ct => !ct.IsDeleted && ct.Campaign.CharityID == charityId)
+                .CountAsync();
+
+            int reactionsCount = await _context.Reactions
+                .Where(r => r.Content.Campaign.CharityID == charityId)
+                .CountAsync();
+
+            return new CharityStatsNumbersDto
+            {
+                FollowsCount = followsCount,
+                ContentCount = contentCount,
+                DonationsCount = donationsCount,
+                CampaignsCount = campaignsCount,
+                ReactionsCount = reactionsCount,
+                TotalIncome = totalIncome
+            };
+        }
+
+
+
+
+
+
 
         public async Task<List<CharityApplicationResponseDto>> GetAllApplicationsForCharityAsync(int charityId)
         {
