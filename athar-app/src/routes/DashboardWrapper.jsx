@@ -14,7 +14,7 @@ export function DashboardWrapper() {
 
     switch (role) {
         case "Admin":
-            return<AdminDashboard />;
+            return(<> <MainLayout /> <AdminDashboard /> </>);
             
         case "CharityAdmin":
                
