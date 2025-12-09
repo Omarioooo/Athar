@@ -25,6 +25,7 @@ import Checkout from "../pages/payment/Checkout";
 import PaymentSuccess from "../pages/payment/PaymentSuccess";
 import PaymentFailed from "../pages/payment/PaymentFailed";
 import JoinApplications from "../pages/JoinApplications";
+import PaymentCallbackPage from "../pages/payment/PaymentCallbackPage";
 
 export default function AppRoutes() {
     const location = useLocation();
@@ -56,9 +57,14 @@ export default function AppRoutes() {
                     </Route>
                 </Route>
                 {/* Payment */}
-                <Route path="checkout" element={<Checkout/>} />
-                <Route path="success" element={<PaymentSuccess/>} />
-                <Route path="failed" element={<PaymentFailed/>} />
+                <Route path="checkout" element={<Checkout />} />
+                <Route
+                    path="/payment-callback"
+                    element={<PaymentCallbackPage />}
+                />
+
+                <Route path="/success" element={<PaymentSuccess />} />
+                <Route path="/failed" element={<PaymentFailed />} />
 
                 {/* DashBoard */}
                 <Route
