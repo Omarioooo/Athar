@@ -2,11 +2,6 @@ import { motion } from "framer-motion";
 import { Clock, Bell } from "lucide-react";
 
 export default function NotificationCard({ item, readIds, setReadIds }) {
-    const markAsRead = (id) => {
-        if (!readIds.includes(id)) {
-            setReadIds((prev) => [...prev, id]);
-        }
-    };
 
     const formatTime = (dateString) => {
         if (!dateString) return "";
@@ -24,8 +19,6 @@ export default function NotificationCard({ item, readIds, setReadIds }) {
         if (diffDays < 7) return `منذ ${diffDays} أيام`;
         return date.toLocaleDateString("ar-EG");
     };
-
-    const isUnread = !readIds.includes(item.id);
 
     return (
         <motion.div
@@ -50,10 +43,9 @@ export default function NotificationCard({ item, readIds, setReadIds }) {
                     ease: "easeIn",
                 },
             }}
-            onClick={() => markAsRead(item.id)}
-            className={`notification-card ${isUnread ? "unread" : ""}`}
+            className={`notification-card`}
         >
-            <div className={`notification-bar ${isUnread ? "not-read" : ""}`} />
+            <div className={`notification-bar`} />
             <div className="notification-inner">
                 <div className="notification-icon-wrapper">
                     <Bell size={32} />

@@ -3,8 +3,8 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import { RequireAuth } from "../Auth/RequireAuth";
 import { DashboardWrapper } from "./DashboardWrapper";
-import '@fortawesome/fontawesome-free/css/all.min.css';
-import 'bootstrap/dist/css/bootstrap.rtl.min.css';
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import "bootstrap/dist/css/bootstrap.rtl.min.css";
 // Pages
 import Home from "../pages/Home";
 import Zakaa from "../pages/Zakaa";
@@ -21,6 +21,10 @@ import CharityProfile from "../pages/charity/CharityProfile";
 import NotFound from "../pages/callback/NotFound";
 import ProfilePageRoute from "./ProfilePageRoute";
 import AboutUs from "../pages/knowaboutus";
+import Checkout from "../pages/payment/Checkout";
+import PaymentSuccess from "../pages/payment/PaymentSuccess";
+import PaymentFailed from "../pages/payment/PaymentFailed";
+import JoinApplications from "../pages/JoinApplications";
 
 export default function AppRoutes() {
     const location = useLocation();
@@ -31,12 +35,13 @@ export default function AppRoutes() {
                 <Route element={<MainLayout />}>
                     <Route index element={<Home />} />
                     <Route path="zakaa" element={<Zakaa />} />
-                     <Route path="aboutus" element={<AboutUs />} />
+                    <Route path="aboutus" element={<AboutUs />} />
                     <Route path="content" element={<Content />} />
                     <Route path="campaigns" element={<Campaigns />} />
                     <Route path="charities" element={<Charities />} />
                     <Route path="campaign/:id" element={<CampaignDetails />} />
                     <Route path="charity/:id" element={<CharityProfile />} />
+                    <Route path="join" element={<JoinApplications />} />
 
                     {/* Protected Routes */}
                     <Route element={<RequireAuth />}>
@@ -50,6 +55,10 @@ export default function AppRoutes() {
                         />
                     </Route>
                 </Route>
+                {/* Payment */}
+                <Route path="checkout" element={<Checkout/>} />
+                <Route path="success" element={<PaymentSuccess/>} />
+                <Route path="failed" element={<PaymentFailed/>} />
 
                 {/* DashBoard */}
                 <Route

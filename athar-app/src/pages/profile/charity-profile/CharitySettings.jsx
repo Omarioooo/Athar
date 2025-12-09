@@ -1,19 +1,23 @@
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { IoCameraOutline } from "react-icons/io5";
 import ProfileImg from "../../../assets/images/profile.png";
 import {
+    deleteCharity,
     getCharityProfile,
     UpdateCharityData,
 } from "../../../services/charityService";
 import { UseAuth } from "../../../Auth/Auth";
+import { Navigate } from "react-router-dom";
 
 export default function CharitySettings() {
-    const { user } = UseAuth();
+    const { user, logout } = UseAuth();
     const [charity, setCharity] = useState(null);
     const [loading, setLoading] = useState(true);
     const [previewImage, setPreviewImage] = useState(ProfileImg);
     const [isEditing, setIsEditing] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
+
     const [formData, setFormData] = useState({
         name: "",
         description: "",
@@ -83,6 +87,22 @@ export default function CharitySettings() {
         }
     };
 
+    const handleDelete = async () => {
+        try {
+            setLoading(true);
+            await deleteCharity(user.id);
+
+            logout();
+            Navigate("/login", { replace: true });
+        } catch (err) {
+            console.error(err);
+            alert("فشل حذف الحساب");
+        } finally {
+            setShowConfirm(false);
+            setLoading(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="d-flex justify-content-center py-5">
@@ -95,133 +115,188 @@ export default function CharitySettings() {
     }
 
     return (
-        <motion.div
-            className="settings-wrapper"
-            animate={{ opacity: 1 }}
-            initial={{ opacity: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-        >
-            <div className="settings-card">
-                {/* HEADER */}
-                <div className="settings-header">
-                    <div className="profile">
-                        <div className="image">
-                            <img
-                                src={previewImage}
-                                alt="صورة الجمعية"
-                                className="avatar"
+        <>
+            <motion.div
+                className="settings-wrapper"
+                animate={{ opacity: 1 }}
+                initial={{ opacity: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+            >
+                <div className="settings-card">
+                    {/* HEADER */}
+                    <div className="settings-header">
+                        <div className="profile">
+                            <div className="image">
+                                <img
+                                    src={previewImage}
+                                    alt="صورة الجمعية"
+                                    className="avatar"
+                                />
+                                {isEditing && (
+                                    <label>
+                                        <IoCameraOutline />
+                                        <input
+                                            type="file"
+                                            name="profileImage"
+                                            onChange={handleChange}
+                                            style={{ display: "none" }}
+                                        />
+                                    </label>
+                                )}
+                            </div>
+                            <div className="profile-info">
+                                <h2 className="name">{formData.name}</h2>
+                            </div>
+                        </div>
+                        <div className="profile-btns">
+                            <button
+                                className="edit-btn profile-btn"
+                                onClick={() => setIsEditing(true)}
+                                disabled={isEditing}
+                            >
+                                تعديل
+                            </button>
+                            <button
+                                className="save-btn profile-btn"
+                                onClick={handleSave}
+                                disabled={!isEditing || loading}
+                            >
+                                {loading ? "جارٍ الحفظ..." : "حفظ"}
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* MAIN */}
+                    <div className="settings-main">
+                        <div className="form full-row">
+                            <label>اسم الجمعية</label>
+                            <input
+                                name="name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                placeholder="اكتب اسم الجمعية"
+                                disabled={!isEditing}
                             />
-                            {isEditing && (
-                                <label>
-                                    <IoCameraOutline />
-                                    <input
-                                        type="file"
-                                        name="profileImage"
-                                        onChange={handleChange}
-                                        style={{ display: "none" }}
-                                    />
-                                </label>
-                            )}
                         </div>
-                        <div className="profile-info">
-                            <h2 className="name">{formData.name}</h2>
+
+                        <div className="form full-row">
+                            <label>الوصف</label>
+                            <textarea
+                                className="description-textarea"
+                                name="description"
+                                value={formData.description}
+                                onChange={handleChange}
+                                placeholder="وصف الجمعية"
+                                disabled={!isEditing}
+                            />
                         </div>
-                    </div>
-                    <div className="profile-btns">
-                        <button
-                            className="edit-btn profile-btn"
-                            onClick={() => setIsEditing(true)}
-                            disabled={isEditing}
-                        >
-                            تعديل
-                        </button>
-                        <button
-                            className="save-btn profile-btn"
-                            onClick={handleSave}
-                            disabled={!isEditing || loading}
-                        >
-                            {loading ? "جارٍ الحفظ..." : "حفظ"}
-                        </button>
+
+                        <div className="form">
+                            <label>الدولة</label>
+                            <input
+                                name="country"
+                                value={formData.country}
+                                onChange={handleChange}
+                                disabled={!isEditing}
+                            />
+                        </div>
+
+                        <div className="form">
+                            <label>المدينة</label>
+                            <input
+                                name="city"
+                                value={formData.city}
+                                onChange={handleChange}
+                                disabled={!isEditing}
+                            />
+                        </div>
+
+                        <div className="form">
+                            <label>الرصيد</label>
+                            <input
+                                value={`${
+                                    charity.totalRaised?.toString() || 0
+                                } ج.م`}
+                                disabled
+                            />
+                        </div>
+
+                        <div className="form">
+                            <label>عدد المتابعين</label>
+                            <input
+                                value={charity.followersCount || 0}
+                                disabled
+                            />
+                        </div>
+
+                        <div className="form">
+                            <label>عدد الحملات</label>
+                            <input
+                                value={charity.campaignsCount || 0}
+                                disabled
+                            />
+                        </div>
+
+                        <div className="form">
+                            <label>الحالة</label>
+                            <input
+                                value={statusArabicById[charity.status]}
+                                disabled
+                            />
+                        </div>
                     </div>
                 </div>
+            </motion.div>
+            {/* DELETE BUTTON
+                    <button
+                        onClick={() => setShowConfirm(true)}
+                        className="rm-btn btn"
+                    >
+                        حذف الجمعية
+                    </button>
+            <AnimatePresence>
+                {showConfirm && (
+                    <motion.div
+                        className="confirm-overlay"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                    >
+                        <motion.div
+                            className="confirm-box"
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.8, opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            <h3>هل أنت متأكد؟</h3>
+                            <p>
+                                سيتم حذف الحساب نهائيًا ولا يمكن التراجع عن هذا
+                                الإجراء.
+                            </p>
 
-                {/* MAIN */}
-                <div className="settings-main">
-                    <div className="form full-row">
-                        <label>اسم الجمعية</label>
-                        <input
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            placeholder="اكتب اسم الجمعية"
-                            disabled={!isEditing}
-                        />
-                    </div>
+                            <div className="confirm-btns">
+                                <button
+                                    className="cancel-btn"
+                                    onClick={() => setShowConfirm(false)}
+                                >
+                                    إلغاء
+                                </button>
 
-                    <div className="form full-row">
-                        <label>الوصف</label>
-                        <textarea
-                            className="description-textarea"
-                            name="description"
-                            value={formData.description}
-                            onChange={handleChange}
-                            placeholder="وصف الجمعية"
-                            disabled={!isEditing}
-                        />
-                    </div>
-
-                    <div className="form">
-                        <label>الدولة</label>
-                        <input
-                            name="country"
-                            value={formData.country}
-                            onChange={handleChange}
-                            disabled={!isEditing}
-                        />
-                    </div>
-
-                    <div className="form">
-                        <label>المدينة</label>
-                        <input
-                            name="city"
-                            value={formData.city}
-                            onChange={handleChange}
-                            disabled={!isEditing}
-                        />
-                    </div>
-
-                    <div className="form">
-                        <label>الرصيد</label>
-                        <input
-                            value={`${
-                                charity.totalRaised?.toString() || 0
-                            } ج.م`}
-                            disabled
-                        />
-                    </div>
-
-                    <div className="form">
-                        <label>عدد المتابعين</label>
-                        <input value={charity.followersCount || 0} disabled />
-                    </div>
-
-                    <div className="form">
-                        <label>عدد الحملات</label>
-                        <input value={charity.campaignsCount || 0} disabled />
-                    </div>
-
-                    <div className="form">
-                        <label>الحالة</label>
-                        <input
-                            value={statusArabicById[charity.status]}
-                            disabled
-                        />
-                    </div>
-                </div>
-
-                <button className="rm-btn btn">حذف الجمعية</button>
-            </div>
-        </motion.div>
+                                <button
+                                    className="delete-btn"
+                                    onClick={handleDelete}
+                                    disabled={loading}
+                                >
+                                    {loading ? "جاري الحذف..." : "حذف"}
+                                </button>
+                            </div>
+                        </motion.div>
+                        )}
+                        </motion.div>
+                </AnimatePresence> 
+                        */}
+        </>
     );
 }

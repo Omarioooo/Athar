@@ -197,6 +197,10 @@ namespace AtharPlatform.Services
             {
                 var charity = await _unitOfWork.Charities.GetAsync(f.CharityId);
 
+                if (charity == null || !charity.IsActive)
+                    continue;
+                
+
                 resultFollows.Add(new FollowAtharHistoryDto
                 {
                     id = f.Id,

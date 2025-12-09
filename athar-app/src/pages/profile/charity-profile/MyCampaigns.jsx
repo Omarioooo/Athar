@@ -58,7 +58,7 @@ export default function MyCampaigns() {
         e.preventDefault();
 
         try {
-            setLoading(true);
+            // setLoading(true);
 
             const formData = new FormData();
             formData.append("Title", title);
@@ -67,6 +67,10 @@ export default function MyCampaigns() {
             formData.append("GoalAmount", goalAmount);
             formData.append("Category", category);
             formData.append("ImageFile", imageFile);
+
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ": ", pair[1]);
+            }
 
             await CreateCampaign(user.id, formData);
 

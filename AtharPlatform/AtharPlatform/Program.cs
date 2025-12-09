@@ -45,33 +45,33 @@ builder.Services.AddSwaggerGen(c =>
 
 /* Shared Db - ACTIVE */
 // Inject Database    
-builder.Services.AddDbContext<Context>(options =>
-    options.UseNpgsql(
-        builder.Configuration.GetConnectionString("connection"),
-        npgsql =>
-        {
-            // Add basic resiliency for transient connection errors
-            npgsql.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(5), errorCodesToAdd: null);
-        }
-    ));
+//builder.Services.AddDbContext<Context>(options =>
+//    options.UseNpgsql(
+//        builder.Configuration.GetConnectionString("connection"),
+//        npgsql =>
+//        {
+//            // Add basic resiliency for transient connection errors
+//            npgsql.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(5), errorCodesToAdd: null);
+//        }
+//    ));
 
 
 
 /*local Db - DISABLED */
-//builder.Services.AddDbContext<Context>(options =>
-//    options.UseSqlServer(
-//        builder.Configuration.GetConnectionString("MSSConnection"),
-//        sqlServerOptions =>
-//        {
-//           
-//            sqlServerOptions.EnableRetryOnFailure(
-//                maxRetryCount: 5,
-//                maxRetryDelay: TimeSpan.FromSeconds(5),
-//                errorNumbersToAdd: null
-//            );
-//        }
-//    )
-//);
+builder.Services.AddDbContext<Context>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("MSSConnection"),
+        sqlServerOptions =>
+        {
+
+            sqlServerOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(5),
+                errorNumbersToAdd: null
+            );
+        }
+    )
+);
 
 // Inject Repositories
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

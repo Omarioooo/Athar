@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { CiHeart } from "react-icons/ci";
 import { LiaCampgroundSolid } from "react-icons/lia";
 import { LuExternalLink } from "react-icons/lu";
@@ -11,7 +11,35 @@ export default function CharityCard({
     description,
     campaignsCount,
     img,
+    isFollowed: initialFollowState,
 }) {
+    const [isFollowed, setIsFollowed] = useState(initialFollowState);
+
+    const toggleFollow = () => {
+        setIsFollowed((prev) => !prev);
+    };
+
+    function truncateText(text, maxLength) {
+        if (!text) return "";
+        return text.length > maxLength
+            ? text.substring(0, maxLength) + "......."
+            : text;
+    }
+
+    const followStyle = {
+        backgroundColor: isFollowed ? "#ffc107" : "white",
+        color: isFollowed ? "black" : "#ffc107",
+        border: "2px solid #ffc107",
+        padding: "8px 16px",
+        borderRadius: "8px",
+        fontWeight: "bold",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+        transition: "0.3s",
+    };
+
     return (
         <>
             <div className="charity-card">
@@ -30,21 +58,23 @@ export default function CharityCard({
                         <LuExternalLink className="charity-link" />
                     </Link>
                 </div>
+
                 <div className="description">
-                    <p>{description}</p>
+                    <p>{truncateText(description, 110)}</p>
                 </div>
+
                 <div className="charity-card-btns">
                     <div>
                         <button className="donate">
-                            تبرع الأن
+                            تبرع الآن
                             <CiHeart className="icon" />
                         </button>
-                        <button className="follow">
-                            متابعه
+
+                        <button style={followStyle} onClick={toggleFollow}>
+                            {isFollowed ? "إلغاء المتابعة" : "متابعة"}
                             <SlUserFollow className="icon" />
                         </button>
                     </div>
-                    <button className="campaigns-btn">اعرض الحملات</button>
                 </div>
             </div>
         </>

@@ -34,6 +34,7 @@ namespace AtharPlatform.Controllers
             _charityService = charityService;
         }
 
+
         // Helper method to convert relative URLs to full URLs
         private string? ToFullUrl(string? imageUrl)
         {
@@ -51,6 +52,36 @@ namespace AtharPlatform.Controllers
             return $"{baseUrl}{imageUrl}";
         }
 
+        [HttpGet("status/{id}")]
+        public async Task<IActionResult> GetCharityStatus(int id)
+        {
+            try
+            {
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("join")]
+        public async Task<IActionResult> GetJoinApplications()
+        {
+            try
+            {
+                var result = await _charityService.GetCharityJoinApplicationsAsync();
+
+                if (result == null)
+                    return NotFound("Charities not found");
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
 
         [HttpGet("applications/{id}")]
@@ -330,7 +361,7 @@ namespace AtharPlatform.Controllers
             // Public endpoint; no authentication required
 
             var c = await _unitOfWork.Charities.GetWithCampaignsAsync(id);
-            if (c == null || c.IsActive==false) return NotFound("Charity not found.");
+            if (c == null || c.IsActive == false) return NotFound("Charity not found.");
 
             var dto = new CharityCardDto
             {
@@ -374,7 +405,7 @@ namespace AtharPlatform.Controllers
                     .FirstOrDefaultAsync();
             }
 
-            if (c == null || c.IsActive==false) return NotFound("Charity not found.");
+            if (c == null || c.IsActive == false) return NotFound("Charity not found.");
 
             var dto = new CharityCardDto
             {
@@ -487,7 +518,7 @@ namespace AtharPlatform.Controllers
 
                 return BadRequest("field to update");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest("cannot update");
             }
@@ -495,7 +526,7 @@ namespace AtharPlatform.Controllers
 
         // (DELETE) /api/charities/{id} - soft delete / deactivate
         [HttpDelete("{id:int}")]
-       // [Authorize(Roles = "SuperAdmin")]
+        // [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> SoftDelete(int id)
         {
             var charity = await _db.Charities.FirstOrDefaultAsync(c => c.Id == id);

@@ -86,12 +86,11 @@ export default function DonorSettings() {
 
             LogOut();
             navigate("/login", { replace: true });
-
         } catch (err) {
             console.error(err);
             alert("فشل حذف الحساب");
         } finally {
-            setShowConfirm(false)
+            setShowConfirm(false);
             setLoading(false);
         }
     };
@@ -119,7 +118,6 @@ export default function DonorSettings() {
                 transition={{ duration: 0.25 }}
             >
                 <div className="settings-card">
-
                     {/* HEADER */}
                     <div className="settings-header">
                         <div className="profile">
@@ -213,16 +211,15 @@ export default function DonorSettings() {
                             />
                         </div>
                     </div>
-
-                    {/* DELETE BUTTON */}
-                    <button
+                </div>
+            </motion.div>
+            {/* DELETE BUTTON */}
+            {/* <button
                         onClick={() => setShowConfirm(true)}
                         className="rm-btn btn"
                     >
                         حذف الحساب
                     </button>
-                </div>
-            </motion.div>
 
             <AnimatePresence>
                 {showConfirm && (
@@ -261,7 +258,7 @@ export default function DonorSettings() {
                         </motion.div>
                     </motion.div>
                 )}
-            </AnimatePresence>
+            </AnimatePresence> */}
         </>
     );
 }

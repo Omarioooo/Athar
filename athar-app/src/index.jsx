@@ -25,6 +25,8 @@ import "./styles/notFound.css";
 import "./styles/notAuth.css";
 import "./styles/volunteering.css";
 import "./styles/myCampaigns.css";
+import "./styles/payment.css";
+import "./styles/joinApplications.css";
 
 
 const root = ReactDOM.createRoot(document.getElementById("root"));

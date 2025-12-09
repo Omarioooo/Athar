@@ -7,6 +7,7 @@ import { useInView } from "react-intersection-observer";
 import SearchBar from "../../components/SearchBar";
 import Pagination from "../../components/Pagination";
 import { getTotalPages } from "../../utils/PaginationHelper";
+import { isCharityFollowed } from "../../services/followService";
 
 export default function Charities() {
     const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.2 });
@@ -15,21 +16,6 @@ export default function Charities() {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
-    useEffect(() => {
-        setLoading(true);
-        getAllCharities("", page)
-            .then((response) => {
-                setCharities(response.charities || []);
-                setTotalPages(getTotalPages(response.total, 9) || 1);
-            })
-            .catch((err) => {
-                console.error("Error fetching charities:", err);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    }, [page]);
-
     const handleSearch = (query) => {
         setPage(1);
         getAllCharities(query, 1).then((res) => {
@@ -37,6 +23,25 @@ export default function Charities() {
             setTotalPages(getTotalPages(res.total, 9) || 1);
         });
     };
+
+    useEffect(() => {
+        setLoading(true);
+        getAllCharities("", page)
+            .then(async (response) => {
+                const charitiesData = response.charities || [];
+
+                const withFollowState = await Promise.all(
+                    charitiesData.map(async (c) => {
+                        const followed = await isCharityFollowed(c.id);
+                        return { ...c, isFollowed: followed };
+                    })
+                );
+
+                setCharities(withFollowState);
+                setTotalPages(getTotalPages(response.total, 9) || 1);
+            })
+            .finally(() => setLoading(false));
+    }, [page]);
 
     if (loading) {
         return (
@@ -58,6 +63,7 @@ export default function Charities() {
         >
             <div className="charities-wrapper">
                 <SearchBar title={"أبحث عن أثرك..."} onSearch={handleSearch} />
+
                 <motion.div
                     className="charities-cards"
                     ref={ref}
@@ -65,25 +71,19 @@ export default function Charities() {
                     animate={inView ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 1, ease: "easeOut" }}
                 >
-                    {charities.map(
-                        ({
-                            id,
-                            name,
-                            description,
-                            campaignsCount,
-                            imageUrl,
-                        }) => (
-                            <CharityCard
-                                key={id}
-                                id={id}
-                                name={name}
-                                description={description}
-                                campaignsCount={campaignsCount}
-                                img={imageUrl}
-                            />
-                        )
-                    )}
+                    {charities.map((c) => (
+                        <CharityCard
+                            key={c.id}
+                            id={c.id}
+                            name={c.name}
+                            description={c.description}
+                            campaignsCount={c.campaignsCount}
+                            img={c.imageUrl}
+                            isFollowed={c.isFollowed}
+                        />
+                    ))}
                 </motion.div>
+
                 <Pagination
                     page={page}
                     totalPages={totalPages}

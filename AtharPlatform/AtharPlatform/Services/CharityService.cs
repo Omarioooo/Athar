@@ -17,9 +17,25 @@ namespace AtharPlatform.Services
             _unitOfWork = unitOfWork;
             _httpContextAccessor = httpContextAccessor;
             _context = context;
-           _fileService = fileService;
+            _fileService = fileService;
         }
 
+
+        public async Task<CharityStatusDto> GetCharityStatusAsync(int id)
+        {
+            var charity = await _unitOfWork.Charities.GetAsync(id);
+
+            return new CharityStatusDto
+            {
+                CampaignsCount = charity.Campaigns.Count,
+                DonationsCount = charity.Donations.Count,
+                FollowsCount = charity.Follows.Count,
+                ContentCount = 0,
+                TotalIncome = 0
+
+            };
+
+        }
 
         public async Task<List<CharityApplicationResponseDto>> GetAllApplicationsForCharityAsync(int charityId)
         {
@@ -132,7 +148,7 @@ namespace AtharPlatform.Services
 
             var charity = await _unitOfWork.Charities.GetCharityFullProfileAsync(id);
 
-            if (charity == null || charity.IsActive==false)//علشان ميرجعش المحذوف
+            if (charity == null || charity.IsActive == false)//علشان ميرجعش المحذوف
                 return null;
 
 
@@ -207,7 +223,7 @@ namespace AtharPlatform.Services
                     .Include(c => c.Follows)
                     .FirstOrDefaultAsync(c => c.Id == id);
 
-                if (charity == null || charity.IsActive==false)
+                if (charity == null || charity.IsActive == false)
                     return null;
 
                 var campaignIds = charity.Campaigns.Select(c => c.Id).ToList();
@@ -256,45 +272,6 @@ namespace AtharPlatform.Services
             }
         }
 
-        //public async Task<bool> UpdateAsync(int id, UpdateCharityDto model)
-        //{
-        //    try
-        //    {
-        //        // check the charity
-        //        var charity = await _unitOfWork.Charities.GetAsync(id);
-        //        if (charity == null)
-        //            throw new ArgumentNullException(nameof(model), "Charity not found");
-
-        //        // Handle image update
-        //        var imgFile = model.ProfileImage;
-        //        byte[] img = null;
-        //        if (imgFile != null && imgFile.Length > 0)
-        //        {
-        //            using (var ms = new MemoryStream())
-        //            {
-        //                await imgFile.CopyToAsync(ms);
-        //                img = ms.ToArray();
-        //            }
-        //        }
-
-        //        charity.Name = model.CharityName;
-        //        charity.Description = model.Description;
-        //        charity.Account.City = model.City;
-        //        charity.Account.Country = model.Country;
-        //        charity.Account.ProfileImage = img;
-
-        //        await _unitOfWork.Charities.UpdateAsync(charity);
-        //        await _unitOfWork.SaveAsync();
-
-        //        return true;
-        //    }
-        //    catch
-        //    {
-        //        return false;
-        //    }
-        //}
-
-
         public async Task<bool> UpdateAsync(int id, UpdateCharityDto model)
         {
             try
@@ -334,6 +311,61 @@ namespace AtharPlatform.Services
             }
         }
 
+        public async Task<List<CharityJoinDto>> GetCharityJoinApplicationsAsync()
+        {
+            var http = _httpContextAccessor.HttpContext;
+            var baseUrl = http != null
+                ? $"{http.Request.Scheme}://{http.Request.Host}"
+                : "";
+
+            var charities = await _unitOfWork.Charities.GetAllAsync();
+            if (charities == null)
+                throw new ArgumentNullException("Charities not found");
+
+            List<CharityJoinDto> apps = new List<CharityJoinDto>();
+
+            foreach (var charity in charities)
+            {
+                if (charity.Status != Models.Enums.CharityStatusEnum.Pending)
+                    continue;
+
+                string? imageUrl;
+
+                if (!string.IsNullOrEmpty(charity.ImageUrl))
+                {
+                    imageUrl = charity.ImageUrl;
+                }
+                else if (charity.Account?.ProfileImage != null)
+                {
+                    imageUrl = $"{baseUrl}/api/charities/profile-image/{charity.Id}";
+                }
+                else
+                {
+                    imageUrl = null;
+                }
+
+                apps.Add(new CharityJoinDto
+                {
+                    Id = charity.Id,
+                    Name = charity.Name,
+                    City = charity.Account.City,
+                    Country = charity.Account.Country,
+                    CreatedAt = charity.Account.CreatedAt,
+                    Description = charity.Description,
+                    email = charity.Account.Email,
+                    ImageUrl = imageUrl,
+                    VerificationDocument = charity.VerificationDocument != null
+                ? $"data:image/png;base64,{Convert.ToBase64String(charity.VerificationDocument)}"
+                : null,
+                });
+
+            }
+
+            return apps;
+
+        }
+
 
     }
+
 }

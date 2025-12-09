@@ -165,7 +165,7 @@ namespace AtharPlatform.Controllers
             }
         }
 
-      
+
 
         [HttpPost("import")]
         //[Authorize(Roles = "Admin,SuperAdmin")]
@@ -415,8 +415,8 @@ namespace AtharPlatform.Controllers
         public async Task<IActionResult> CreateCampaign(int id, [FromForm] CreateCampaignDto dto)
         {
 
-            var check = await _unitOfWork.Charities.GetAsync(dto.CharityId);
-            if (check.Status==Models.Enums.CharityStatusEnum.Pending)
+            var check = await _unitOfWork.Charities.GetAsync(id);
+            if (check.Status == Models.Enums.CharityStatusEnum.Pending)
             {
                 return BadRequest("Charity is under review.");
             }
@@ -447,12 +447,11 @@ namespace AtharPlatform.Controllers
             {
                 Title = dto.Title,
                 Description = dto.Description,
-                Category=dto.Category,
+                Category = dto.Category,
                 GoalAmount = dto.GoalAmount,
                 RaisedAmount = 0,
                 Duration = dto.Duration,
                 CharityID = id,
-                Category = dto.Category,
                 ImageUrl = imageUrl
             };
 
@@ -552,7 +551,7 @@ namespace AtharPlatform.Controllers
 
             // تحقق هل الجمعية موجودة
             var charityExists = await _unitOfWork.Charities.GetAll()
-                .AnyAsync(c => c.Id == charityId );
+                .AnyAsync(c => c.Id == charityId);
 
             if (!charityExists)
                 return NotFound("Charity Not Found");

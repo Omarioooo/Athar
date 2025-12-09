@@ -40,18 +40,108 @@ namespace AtharPlatform.Models
         public DbSet<VendorOffers> VendorForms { get; set; }
         public DbSet<CharityVendorOffer> CharityVendorOffers { get; set; }
 
+        // noen
+        //protected override void OnModelCreating(ModelBuilder builder)
+        //{
+        //    base.OnModelCreating(builder);
+
+        //    // Charity 1:1 external info
+        //    builder.Entity<Charity>()
+        //        .HasOne(c => c.ScrapedInfo)
+        //        .WithOne(e => e.Charity)
+        //        .HasForeignKey<CharityExternalInfo>(e => e.CharityId)
+        //        .OnDelete(DeleteBehavior.Cascade);
+
+        //    // Many-to-Many Relation with composite PK
+        //    builder.Entity<NotificationReceiver>()
+        //        .HasKey(nr => new { nr.NotificationId, nr.ReceiverId });
+
+        //    builder.Entity<Notification>()
+        //        .HasOne(n => n.Sender)
+        //        .WithOne(ns => ns.Notification)
+        //        .HasForeignKey<NotificationSender>(ns => ns.NotificationId)
+        //        .OnDelete(DeleteBehavior.Cascade);
+
+        //    // put unique index
+        //    builder.Entity<Follow>()
+        //       .HasIndex(f => new { f.DonorId, f.CharityId })
+        //       .IsUnique();
+
+        //    builder.Entity<Subscription>()
+        //      .HasIndex(s => new { s.DonorId, s.CharityId })
+        //      .IsUnique();
+
+        //    // Configure delete behaviors to avoid multiple cascade paths
+        //    builder.Entity<Follow>()
+        //        .HasOne(f => f.Donor)
+        //        .WithMany(d => d.Follows)
+        //        .HasForeignKey(f => f.DonorId)
+        //        .OnDelete(DeleteBehavior.Restrict);
+
+        //    builder.Entity<Follow>()
+        //        .HasOne(f => f.Charity)
+        //        .WithMany(c => c.Follows)
+        //        .HasForeignKey(f => f.CharityId)
+        //        .OnDelete(DeleteBehavior.Restrict);
+
+        //    builder.Entity<Subscription>()
+        //        .HasOne(s => s.Donor)
+        //        .WithMany(d => d.Subscriptions)
+        //        .HasForeignKey(s => s.DonorId)
+        //        .OnDelete(DeleteBehavior.Restrict);
+
+        //    builder.Entity<Subscription>()
+        //        .HasOne(s => s.Charity)
+        //        .WithMany(c => c.Subscriptions)
+        //        .HasForeignKey(s => s.CharityId)
+        //        .OnDelete(DeleteBehavior.Restrict);
+
+        //    // Configure Donation relationships to avoid multiple cascade paths
+        //    builder.Entity<Donation>()
+        //        .HasMany(d => d.CampaignDonations)
+        //        .WithOne(cd => cd.Donation)
+        //        .HasForeignKey(cd => cd.DonationId)
+        //        .OnDelete(DeleteBehavior.Restrict);
+
+        //    builder.Entity<Donation>()
+        //        .HasMany(d => d.CharityDonations)
+        //        .WithOne(cd => cd.Donation)
+        //        .HasForeignKey(cd => cd.DonationId)
+        //        .OnDelete(DeleteBehavior.Restrict);
+
+        //    builder.Entity<CampaignDonation>()
+        //        .HasOne(cd => cd.Campaign)
+        //        .WithMany(c => c.CampaignDonations)
+        //        .HasForeignKey(cd => cd.CampaignId)
+        //        .OnDelete(DeleteBehavior.Cascade);
+
+        //    // Reactions: prevent cascade from Donor + Content simultaneously
+        //    builder.Entity<Reaction>()
+        //        .HasOne(r => r.Donor)
+        //        .WithMany(d => d.Reactions)
+        //        .HasForeignKey(r => r.DonorID)
+        //        .OnDelete(DeleteBehavior.Restrict);
+
+        //    builder.Entity<Reaction>()
+        //        .HasOne(r => r.Content)
+        //        .WithMany(c => c.Reactions)
+        //        .HasForeignKey(r => r.ContentID)
+        //        .OnDelete(DeleteBehavior.Cascade); // only content cascade allowed
+
+        //    // Campaign validation: must have either Image or ImageUrl, but not both
+        //    //builder.Entity<Campaign>()
+        //    //    .ToTable(c => c.HasCheckConstraint(
+        //    //        "CK_Campaign_ImageSource",
+        //    //        "(\"Image\" IS NOT NULL AND \"ImageUrl\" IS NULL) OR (\"Image\" IS NULL AND \"ImageUrl\" IS NOT NULL)"
+        //    //    ));
+        //}
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
+
             base.OnModelCreating(builder);
 
-            // Charity 1:1 external info
-            builder.Entity<Charity>()
-                .HasOne(c => c.ScrapedInfo)
-                .WithOne(e => e.Charity)
-                .HasForeignKey<CharityExternalInfo>(e => e.CharityId)
-                .OnDelete(DeleteBehavior.Cascade);
 
-            // Many-to-Many Relation with composite PK
             builder.Entity<NotificationReceiver>()
                 .HasKey(nr => new { nr.NotificationId, nr.ReceiverId });
 
@@ -61,78 +151,39 @@ namespace AtharPlatform.Models
                 .HasForeignKey<NotificationSender>(ns => ns.NotificationId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // put unique index
-            builder.Entity<Follow>()
-               .HasIndex(f => new { f.DonorId, f.CharityId })
-               .IsUnique();
+            // IdentityUserLogin<int> composite key
+            builder.Entity<IdentityUserLogin<int>>(entity =>
+            {
+                entity.HasKey(l => new { l.LoginProvider, l.ProviderKey });
+            });
 
-            builder.Entity<Subscription>()
-              .HasIndex(s => new { s.DonorId, s.CharityId })
-              .IsUnique();
+            // IdentityUserRole<int> composite key
+            builder.Entity<IdentityUserRole<int>>(entity =>
+            {
+                entity.HasKey(r => new { r.UserId, r.RoleId });
+            });
 
-            // Configure delete behaviors to avoid multiple cascade paths
-            builder.Entity<Follow>()
-                .HasOne(f => f.Donor)
-                .WithMany(d => d.Follows)
-                .HasForeignKey(f => f.DonorId)
-                .OnDelete(DeleteBehavior.Restrict);
+            // IdentityUserToken<int> composite key
+            builder.Entity<IdentityUserToken<int>>(entity =>
+            {
+                entity.HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
+            });
 
-            builder.Entity<Follow>()
-                .HasOne(f => f.Charity)
-                .WithMany(c => c.Follows)
-                .HasForeignKey(f => f.CharityId)
-                .OnDelete(DeleteBehavior.Restrict);
+            // IdentityRoleClaim<int> primary key
+            builder.Entity<IdentityRoleClaim<int>>(entity =>
+            {
+                entity.HasKey(rc => rc.Id);
+            });
 
-            builder.Entity<Subscription>()
-                .HasOne(s => s.Donor)
-                .WithMany(d => d.Subscriptions)
-                .HasForeignKey(s => s.DonorId)
-                .OnDelete(DeleteBehavior.Restrict);
+            // IdentityUserClaim<int> primary key
+            builder.Entity<IdentityUserClaim<int>>(entity =>
+            {
+                entity.HasKey(uc => uc.Id);
+            });
 
-            builder.Entity<Subscription>()
-                .HasOne(s => s.Charity)
-                .WithMany(c => c.Subscriptions)
-                .HasForeignKey(s => s.CharityId)
-                .OnDelete(DeleteBehavior.Restrict);
 
-            // Configure Donation relationships to avoid multiple cascade paths
-            builder.Entity<Donation>()
-                .HasMany(d => d.CampaignDonations)
-                .WithOne(cd => cd.Donation)
-                .HasForeignKey(cd => cd.DonationId)
-                .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Entity<Donation>()
-                .HasMany(d => d.CharityDonations)
-                .WithOne(cd => cd.Donation)
-                .HasForeignKey(cd => cd.DonationId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<CampaignDonation>()
-                .HasOne(cd => cd.Campaign)
-                .WithMany(c => c.CampaignDonations)
-                .HasForeignKey(cd => cd.CampaignId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            // Reactions: prevent cascade from Donor + Content simultaneously
-            builder.Entity<Reaction>()
-                .HasOne(r => r.Donor)
-                .WithMany(d => d.Reactions)
-                .HasForeignKey(r => r.DonorID)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<Reaction>()
-                .HasOne(r => r.Content)
-                .WithMany(c => c.Reactions)
-                .HasForeignKey(r => r.ContentID)
-                .OnDelete(DeleteBehavior.Cascade); // only content cascade allowed
-
-            // Campaign validation: must have either Image or ImageUrl, but not both
-            builder.Entity<Campaign>()
-                .ToTable(c => c.HasCheckConstraint(
-                    "CK_Campaign_ImageSource",
-                    "(\"Image\" IS NOT NULL AND \"ImageUrl\" IS NULL) OR (\"Image\" IS NULL AND \"ImageUrl\" IS NOT NULL)"
-                ));
         }
+
     }
 }

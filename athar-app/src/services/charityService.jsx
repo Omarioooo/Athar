@@ -5,6 +5,8 @@ import {
     fetchCharityImageById,
     fetchCampaignsByCharityId,
     updateCharity,
+    deleteCharityApi,
+    fetchPendingCharities,
 } from "../Repository/charityRepository";
 import { validateEmail } from "../utils/validation/validateEmail";
 import {
@@ -141,8 +143,8 @@ export async function getCharityImage(id) {
 // get charity's campaign
 export async function getCharityCampaigns(id) {
     try {
-        const image = await fetchCampaignsByCharityId(id);
-        return image;
+        const campaigns = await fetchCampaignsByCharityId(id);
+        return campaigns;
     } catch (err) {
         console.error("Failed to load charity campaigns:", err);
         throw err;
@@ -151,12 +153,34 @@ export async function getCharityCampaigns(id) {
 
 export async function UpdateCharityData(id, data) {
     try {
-        console.log("data is ,", data);
-        
-        const image = await updateCharity(id, data);
-        return image;
+        const charity = await updateCharity(id, data);
+        return charity;
     } catch (err) {
         console.error("Failed to update charity:", err);
+        throw err;
+    }
+}
+
+
+// delete charity service
+export async function deleteCharity(id) {
+    try {
+        const image = await deleteCharityApi(id);
+        return image;
+    } catch (err) {
+        console.error("Failed to remove charity:", err);
+        throw err;
+    }
+}
+
+
+// get charity's campaign
+export async function getPendingCharity() {
+    try {
+        const charities = await fetchPendingCharities();
+        return charities;
+    } catch (err) {
+        console.error("Failed to load charities:", err);
         throw err;
     }
 }

@@ -107,3 +107,17 @@ export const updateCharity = async (id, data) => {
 
     return res.data;
 };
+
+
+// delete charity
+export const deleteCharityApi = async (id) => {
+    const res = await api.delete(`/charities/${id}`);
+    return res.data;
+};
+
+
+// get charities with status pending
+export const fetchPendingCharities = async (id) => {
+    const res = await api.get(`/charities/join`);
+    return res.data;
+};
