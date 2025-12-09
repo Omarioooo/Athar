@@ -23,100 +23,6 @@ namespace AtharPlatform.Services
 
         public async Task<CharityStatusDto> GetCharityStatisticsAsync(int charityId)
         {
-            //var charity = await _context.Charities
-            //   .FirstOrDefaultAsync(c => c.Id == charityId);
-
-            //if (charity == null)
-            //    throw new Exception("Charity not found");
-
-            ////int followsCount = await _context.Follows
-            ////   .Where(f => f.CharityId == charityId)
-            ////   .CountAsync();
-
-            //var follows = await _context.Follows
-            // .Where(f => f.CharityId == charityId)
-            // .Select(f => new FollowDto
-            // {
-            //     UserId = f.Id,
-            //     Date = f.StartDate
-            // })
-            // .ToListAsync();
-
-            //int followsCount = follows.Count;
-
-
-
-            //decimal totalDonations = await _context.Donations
-            //    .Where(d => d.CharityId == charityId && d.DonationStatus == TransactionStatusEnum.SUCCESSED)
-            //    .SumAsync(d => d.NetAmountToCharity);
-
-
-            //int donationsCount = await _context.Donations
-            //    .Where(d => d.CharityId == charityId)
-            //    .CountAsync();
-
-
-            //var campaignsList = await _context.Campaigns
-            //    .Where(c => c.CharityID == charityId)
-            //    .ToListAsync();
-
-
-            //int totalContent = 0;
-            //foreach (var c in campaignsList)
-            //{
-            //    var contentsCount = await _context.Contents
-            //        .Where(ct => !ct.IsDeleted && ct.CampaignId == c.Id)
-            //        .CountAsync();
-
-            //    totalContent += contentsCount;
-            //}
-
-            //// 7) Total reactions
-            //int totalReactions = await _context.Reactions
-            //    .CountAsync(r => r.Content.Campaign.CharityID == charityId);
-
-
-            //// 8) Campaigns by Category
-            //var campaignsByCategory = await _context.Campaigns
-            //    .Where(c => c.CharityID == charityId)
-            //    .GroupBy(c => c.Category)
-            //    .Select(g => new
-            //    {
-            //        Category = g.Key.ToString(),
-            //        Count = g.Count()
-            //    })
-            //    .ToDictionaryAsync(x => x.Category, x => x.Count);
-
-
-            //int campaignsCount = await _context.Campaigns
-            //  .Where(c => c.CharityID == charityId)
-            //  .CountAsync();
-
-
-            //// 9) Donations details (Amount + Date)
-            //var donationsList = await _context.Donations
-            //    .Where(d => d.CharityId == charityId)
-            //    .Select(d => new DonationSummaryDto
-            //    {
-            //        id = d.Id,
-            //        Amount = d.TotalAmount,
-            //        Date = d.CreatedAt
-            //    })
-            //    .ToListAsync();
-
-
-
-            //return new CharityStatusDto
-            //{
-            //    FollowsCount = followsCount,
-            //    CampaignsCount = campaignsCount,
-            //    TotalIncome = totalDonations,
-            //    DonationsCount = donationsCount,
-            //    ContentCount = totalContent,
-            //    TotalReactions = totalReactions,
-            //    CampaignsByCategory = campaignsByCategory,
-            //    Donations = donationsList
-            //};
 
             var charity = await _context.Charities
         .FirstOrDefaultAsync(c => c.Id == charityId);
@@ -205,9 +111,8 @@ namespace AtharPlatform.Services
 
             int totalReactions = reactionsList.Count;
 
-            // ================================
-            // Final Object
-            // ================================
+            
+            //Result
             return new CharityStatusDto
             {
                 FollowsCount = followsCount,
@@ -241,12 +146,9 @@ namespace AtharPlatform.Services
                     Type = "Volunteer",
                     Name = v.FirstName + " " + v.LastName,
                     Phone = v.PhoneNumber,
-                    // Country = v.Country,
-                    //City = v.City,
-                    ///Age = v.Age,
                     Description = $"ارغب في التطوع لجمعية {v.CharityVolunteer?.Charity?.Name}",
                     Date = v.CharityVolunteer.Date,
-                    //IsFirstTime = v.IsFirstTime
+                
                 })
                 .ToList();
 
@@ -263,13 +165,7 @@ namespace AtharPlatform.Services
                     Type = "VendorOffer",
                     Name = v.VendorName,
                     Phone = v.PhoneNumber,
-                    // Country = v.Country,
-                    // City = v.City,
-                    // ItemName = v.ItemName,
-                    // Quantity = v.Quantity,
                     Description = v.Description,
-                    // PriceBefore = v.PriceBeforDiscount,
-                    /// PriceAfter = v.PriceAfterDiscount,
                     Date = v.CharityVendorOffer.Date
                 })
                 .ToList();
