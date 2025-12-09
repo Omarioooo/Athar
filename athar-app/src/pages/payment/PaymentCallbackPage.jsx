@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { CreatePaymentCallBack } from "../services/paymentService";
 
 export default function PaymentCallbackPage() {
     const location = useLocation();
@@ -8,22 +7,27 @@ export default function PaymentCallbackPage() {
 
     useEffect(() => {
         const query = new URLSearchParams(location.search);
-        const formData = {
-            paymentId: query.get("paymentId"),
-            status: query.get("status"),
-        };
 
-        CreatePaymentCallBack(formData)
-            .then(() => navigate("/success"))
-            .catch(() => navigate("/failed"));
+        const success = query.get("success") === "true";
+        const pending = query.get("pending") === "true";
+
+        // لو الدفع نجح ومش معلق
+        if (success && !pending) {
+            navigate("/success");
+        } else {
+            navigate("/failed");
+        }
+
+        // اختياري: لو عايز تبعت للـ Backend عشان تتأكد
+        // fetch("https://burl-citylike-jalen.ngrok-free.dev/api/Payments/verify", { ... })
     }, [location, navigate]);
 
     return (
-        <div className="d-flex justify-content-center py-5">
-            <div
-                className="spinner-border text-warning"
-                style={{ width: "4rem", height: "4rem" }}
-            ></div>
+        <div className="d-flex justify-content-center align-items-center min-vh-100">
+            <div>
+                <div className="spinner-border text-warning mb-4" style={{width: "5rem", height: "5rem"}}></div>
+                <h3 className="text-center">جاري التحقق من عملية الدفع...</h3>
+            </div>
         </div>
     );
 }
