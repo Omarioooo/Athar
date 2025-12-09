@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Heart, Loader2 } from "lucide-react";
-import { CreatePaymentService } from "../../services/paymentService";
+import { Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const donationAmounts = [50, 100, 250, 500, 1000, 1200, 1500];
@@ -12,7 +11,6 @@ export default function DonationForms() {
         email: "",
         amount: "",
     });
-    const [isLoading, setIsLoading] = useState(false);
     const [selectedPreset, setSelectedPreset] = useState(null);
 
     const navigate = useNavigate();
@@ -28,42 +26,35 @@ export default function DonationForms() {
         setFormData((prev) => ({ ...prev, amount: amount.toString() }));
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Validation بسيطة
-        if (
-            !formData.firstName ||
-            !formData.lastName ||
-            !formData.email ||
-            !formData.amount
-        ) {
+        const { firstName, lastName, email, amount } = formData;
+
+        // Client-side validation للأسماء و الإيميل
+        if (!firstName.trim() || !lastName.trim() || !email.trim()) {
             alert("يرجى ملء جميع الحقول المطلوبة");
             return;
         }
 
-        if (isNaN(formData.amount) || Number(formData.amount) <= 0) {
+        // Validation البريد الإلكتروني بشكل بسيط
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            alert("يرجى إدخال بريد إلكتروني صالح");
+            return;
+        }
+
+        // Validation المبلغ
+        const numericAmount = Number(amount);
+        if (isNaN(numericAmount)) {
             alert("يرجى إدخال مبلغ صالح");
             return;
         }
 
-        setIsLoading(true);
-
-        try {
-            const response = await CreatePaymentService(formData);
-
-            // إذا استلمت رابط الدفع من الخدمة، حول المستخدم إليه
-            if (response.paymentUrl) {
-                window.location.href = response.paymentUrl;
-            } else {
-                // إذا تم الدفع مباشرة بدون رابط، نفترض النجاح
-                navigate("/success");
-            }
-        } catch (error) {
-            console.error(error);
+        if (numericAmount > 0) {
+            navigate("/success");
+        } else {
             navigate("/failed");
-        } finally {
-            setIsLoading(false);
         }
     };
 
@@ -136,24 +127,8 @@ export default function DonationForms() {
                     />
                 </div>
 
-                <button
-                    type="submit"
-                    className="donate-btn"
-                    disabled={isLoading}
-                >
-                    {isLoading ? (
-                        <>
-                            <Loader2 className="loader" /> جاري المعالجة...
-                        </>
-                    ) : (
-                        <>
-                            <Heart
-                                className="icon-heart-small"
-                                fill="currentColor"
-                            />
-                            تبرع الآن
-                        </>
-                    )}
+                <button type="submit" className="donate-btn">
+                    <Heart className="icon-heart-small" fill="currentColor" /> تبرع الآن
                 </button>
             </form>
         </div>
