@@ -120,15 +120,6 @@ namespace AtharPlatform.Services
 
 
 
-
-
-
-
-
-
-
-
-
         public async Task<Content> CreateContentAsync(CreateContentDTO dto)
         {
             var content = new Content
@@ -214,7 +205,6 @@ namespace AtharPlatform.Services
         }
 
 
-
         public async Task<List<Content>> GetPostsByCampaignAsync(int campaignId)
         {
             return await _unitOfWork.Contents.GetPostsByCampaignAsync(campaignId);
@@ -290,8 +280,6 @@ namespace AtharPlatform.Services
             await _unitOfWork.SaveAsync();
             return content;
         }
-
-
 
 
         public async Task<bool> DeleteContentAsync(int id)

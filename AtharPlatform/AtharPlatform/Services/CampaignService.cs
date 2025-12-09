@@ -316,7 +316,7 @@ namespace AtharPlatform.Services
             await _unitOfWork.Campaigns.AddAsync(campaign);
             await _unitOfWork.SaveAsync();
 
-            //شغل الnotiification
+       
             
             var followerIds = await _unitOfWork.Follows.GetAll()
                 .Where(f => f.CharityId == campaign.CharityID)
@@ -352,7 +352,7 @@ namespace AtharPlatform.Services
             if (campaign == null)
                 throw new ArgumentNullException(nameof(model), "Campaign not found");
 
-            // Handle image update: either uploaded file or external URL
+        
             string? newImageUrl = null;
             if (model.Image != null)
             {

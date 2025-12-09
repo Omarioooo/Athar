@@ -124,34 +124,7 @@ namespace AtharPlatform.Controllers
         }
 
 
-        //[HttpGet("campaign/{campaignId:int}/offers")]
-        //public async Task<IActionResult> GetOffersByCampaign(int campaignId)
-        //{
-        //    if (campaignId <= 0)
-        //        return BadRequest(new { Message = "Invalid campaign ID." });
 
-        //    var donations = await _unitOfWork.MaterialDonations
-        //        .GetByCharityAsync(d => d.MaterialDonationId == campaignId);
-
-        //    if (donations == null || !donations.Any())
-        //        return NotFound(new { Message = "لا توجد عروض تبرع لهذه الحملة بعد." });
-
-        //    var dtoList = donations.Select(d => new
-        //    {
-        //        d.Id,
-        //        DonorFullName = $"{d.DonorFirstName} {d.DonorLastName}",
-        //        d.PhoneNumber,
-        //        d.ItemName,
-        //        d.Quantity,
-        //        d.MeasurementUnit,
-        //        d.Description,
-        //        d.Country,
-        //        d.City,
-        //        d.CreatedAt
-        //    });
-
-        //    return Ok(dtoList);
-        //}
 
         private MaterialDonationDTO MapToDTO(MaterialDonation donation)
         {
