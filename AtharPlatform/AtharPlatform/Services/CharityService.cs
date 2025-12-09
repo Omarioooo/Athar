@@ -25,37 +25,37 @@ namespace AtharPlatform.Services
 
         public async Task<CharityStatusDto> GetCharityStatisticsAsync(int charityId)
         {
-             var charity = await _context.Charities
-                .FirstOrDefaultAsync(c => c.Id == charityId);
+            var charity = await _context.Charities
+               .FirstOrDefaultAsync(c => c.Id == charityId);
 
             if (charity == null)
                 throw new Exception("Charity not found");
 
-             int followsCount = await _context.Follows
-                .Where(f => f.CharityId == charityId)
-                .CountAsync();
+            int followsCount = await _context.Follows
+               .Where(f => f.CharityId == charityId)
+               .CountAsync();
 
-             
+
             int campaignsCount = await _context.Campaigns
                 .Where(c => c.CharityID == charityId)
                 .CountAsync();
 
-            
+
             decimal totalDonations = await _context.Donations
                 .Where(d => d.CharityId == charityId && d.DonationStatus == TransactionStatusEnum.SUCCESSED)
                 .SumAsync(d => d.NetAmountToCharity);
 
-             
+
             int donationsCount = await _context.Donations
                 .Where(d => d.CharityId == charityId)
                 .CountAsync();
 
-             
+
             var campaignsList = await _context.Campaigns
                 .Where(c => c.CharityID == charityId)
                 .ToListAsync();
 
-             
+
             int totalContent = 0;
             foreach (var c in campaignsList)
             {
@@ -66,7 +66,7 @@ namespace AtharPlatform.Services
                 totalContent += contentsCount;
             }
 
- 
+
             return new CharityStatusDto
             {
                 FollowsCount = followsCount,
@@ -385,6 +385,15 @@ namespace AtharPlatform.Services
                     imageUrl = null;
                 }
 
+                Console.WriteLine("doc is " + charity.VerificationDocument);
+                if (imageUrl == null || charity.VerificationDocument == null || charity.VerificationDocument.Length == 0)
+                    continue;
+
+                var doc = charity.VerificationDocument != null
+                ? $"data:image/png;base64,{Convert.ToBase64String(charity.VerificationDocument)}"
+                : null;
+
+
                 apps.Add(new CharityJoinDto
                 {
                     Id = charity.Id,
@@ -395,9 +404,7 @@ namespace AtharPlatform.Services
                     Description = charity.Description,
                     email = charity.Account.Email,
                     ImageUrl = imageUrl,
-                    VerificationDocument = charity.VerificationDocument != null
-                ? $"data:image/png;base64,{Convert.ToBase64String(charity.VerificationDocument)}"
-                : null,
+                    VerificationDocument = doc
                 });
 
             }

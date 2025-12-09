@@ -7,6 +7,9 @@ import {
     updateCharity,
     deleteCharityApi,
     fetchPendingCharities,
+    fetchCharityStatsById,
+    approveCharityById,
+    rejectCharityById,
 } from "../Repository/charityRepository";
 import { validateEmail } from "../utils/validation/validateEmail";
 import {
@@ -184,3 +187,34 @@ export async function getPendingCharity() {
         throw err;
     }
 }
+
+// get the charity view for donor
+export const getCharityStats = async (id) => {
+    try {
+        const fetchedData = await fetchCharityStatsById(id);
+        return fetchedData;
+    } catch (error) {
+        console.error("Failed to load charity stats:", error);
+        throw error;
+    }
+};
+
+export const approveCharity = async (id) => {
+    try {
+        const result = await approveCharityById(id);
+        return result;
+    } catch (error) {
+        console.error("Failed to approve charity:", error);
+        throw error;
+    }
+};
+
+export const rejectCharity = async (id) => {
+    try {
+        const result = await rejectCharityById(id);
+        return result;
+    } catch (error) {
+        console.error("Failed to reject charity:", error);
+        throw error;
+    }
+};

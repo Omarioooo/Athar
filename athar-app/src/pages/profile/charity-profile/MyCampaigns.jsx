@@ -7,6 +7,7 @@ import { getCharityCampaigns } from "../../../services/charityService";
 import { FaPlus } from "react-icons/fa";
 import { CreateCampaign } from "../../../services/campaignService";
 import { AnimatePresence, motion } from "framer-motion";
+import { Navigate } from "react-router-dom";
 
 export default function MyCampaigns() {
     const { user } = UseAuth();
@@ -109,6 +110,42 @@ export default function MyCampaigns() {
 
     return (
         <>
+            {/* {charity.status === 1 && (
+                <div className="pending-overlay">
+                    <div className="overlay-box">
+                        <h2>🚧 الجمعية قيد المراجعة</h2>
+                        <p>
+                            طلب انضمامك تحت المراجعة الآن. سيتم التواصل معك عند
+                            الانتهاء.
+                        </p>
+                        <button
+                            className="overlay-button"
+                            onClick={() => Navigate("/")}
+                        >
+                            الذهاب للصفحة الرئيسية
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {charity.status === 3 && (
+                <div className="rejected-overlay">
+                    <div className="overlay-box">
+                        <h2>❌ تم رفض الطلب</h2>
+                        <p>
+                            نأسف، تم رفض طلب تسجيل الجمعية. يمكنك التواصل معنا
+                            لمزيد من التفاصيل.
+                        </p>
+                        <button
+                            className="overlay-button"
+                            onClick={() => Navigate("/")}
+                        >
+                            الذهاب للصفحة الرئيسية
+                        </button>
+                    </div>
+                </div>
+            )} */}
+
             <div className="campaigns-wrapper">
                 {/* Filter buttons */}
                 <div className="campaigns-filter">

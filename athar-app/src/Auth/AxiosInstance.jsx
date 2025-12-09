@@ -3,8 +3,8 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 const api = axios.create({
-    baseURL: "https://burl-citylike-jalen.ngrok-free.dev/api",
-    // baseURL: "https://localhost:5192/api",
+    // baseURL: "https://burl-citylike-jalen.ngrok-free.dev/api",
+    baseURL: "https://localhost:5192/api",
     withCredentials: true, 
     headers: {
         "Content-Type": "application/json",
