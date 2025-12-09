@@ -52,12 +52,18 @@ namespace AtharPlatform.Controllers
             return $"{baseUrl}{imageUrl}";
         }
 
+
         [HttpGet("status/{id}")]
         public async Task<IActionResult> GetCharityStatus(int id)
         {
             try
             {
-                return Ok();
+                var results = _charityService.GetCharityStatusAsync(id);
+
+                if (results == null)
+                    return BadRequest("Status not found");
+
+                return Ok(results);
             }
             catch (Exception ex)
             {

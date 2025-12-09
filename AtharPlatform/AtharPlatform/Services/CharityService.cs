@@ -2,6 +2,7 @@
 using AtharPlatform.DTOs;
 using AtharPlatform.Models;
 using AtharPlatform.Repositories;
+using System;
 
 namespace AtharPlatform.Services
 {
@@ -24,14 +25,40 @@ namespace AtharPlatform.Services
         public async Task<CharityStatusDto> GetCharityStatusAsync(int id)
         {
             var charity = await _unitOfWork.Charities.GetAsync(id);
+            if (charity == null)
+                throw new Exception("charity not found");
+
+
+            var campaigns = charity.Campaigns.ToList();
+            if (campaigns == null)
+                throw new Exception("campaigns not found");
+
+            int totalContent = 0;
+            foreach(var c in campaigns)
+            {
+                var contents = await _unitOfWork.Contents.GetByCampaignIdAsync(c.Id);
+                totalContent += contents.Count;
+            }
+
+            decimal totalDonations = 0;
+            foreach (var c in campaigns)
+            {
+             foreach(var d in c.CampaignDonations)
+                {
+                    var don = await _unitOfWork.Donations.FindAsync(d.DonationId);
+                    if (don == null)
+                        continue;
+                    totalDonations += don.TotalAmount;
+                }   
+            }
 
             return new CharityStatusDto
             {
-                CampaignsCount = charity.Campaigns.Count,
+                CampaignsCount = campaigns.Count,
                 DonationsCount = charity.Donations.Count,
                 FollowsCount = charity.Follows.Count,
-                ContentCount = 0,
-                TotalIncome = 0
+                ContentCount = totalContent,
+                TotalIncome = totalDonations
 
             };
 
