@@ -65,10 +65,12 @@ export default function CharityCard({
 
                 <div className="charity-card-btns">
                     <div>
-                        <button className="donate">
-                            تبرع الآن
-                            <CiHeart className="icon" />
-                        </button>
+                        <Link to={`/checkout`}>
+                            <button className="donate">
+                                تبرع الآن
+                                <CiHeart className="icon" />
+                            </button>
+                        </Link>
 
                         <button style={followStyle} onClick={toggleFollow}>
                             {isFollowed ? "إلغاء المتابعة" : "متابعة"}

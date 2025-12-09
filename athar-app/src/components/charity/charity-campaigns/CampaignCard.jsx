@@ -4,6 +4,7 @@ import {
     computeDaysLeftForCampaigns,
     computeProgressPercentageForCampaigns,
 } from "../../../utils/HelpersUtils";
+import { Link } from "react-router-dom";
 
 export default function CampaignCard({
     id,
@@ -21,13 +22,13 @@ export default function CampaignCard({
 }) {
     // progress لو جاية من الـ API استخدمها، لو مش موجودة احسبها
     const computedProgress =
-        progress ?? computeProgressPercentageForCampaigns(raisedAmount, goalAmount);
+        progress ??
+        computeProgressPercentageForCampaigns(raisedAmount, goalAmount);
 
     const daysLeft = computeDaysLeftForCampaigns(startDate, endDate);
 
     return (
         <div className="card campaign-card">
-
             {/* IMAGE */}
             <div className="img-campaign">
                 <img
@@ -70,9 +71,11 @@ export default function CampaignCard({
                     </span>
                 </div>
 
-                <button className="cmp-donate-btn">
-                    <p className="p-btn">تبرع الآن</p>
-                </button>
+                <Link to={`/checkout`}>
+                    <button className="cmp-donate-btn">
+                        <p className="p-btn">تبرع الآن</p>
+                    </button>
+                </Link>
             </div>
         </div>
     );

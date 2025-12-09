@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Heart, Loader2 } from "lucide-react";
 import { CreatePaymentService } from "../../services/paymentService";
+import { useNavigate } from "react-router-dom";
 
 const donationAmounts = [50, 100, 250, 500, 1000, 1200, 1500];
 
@@ -13,6 +14,8 @@ export default function DonationForms() {
     });
     const [isLoading, setIsLoading] = useState(false);
     const [selectedPreset, setSelectedPreset] = useState(null);
+
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -28,28 +31,42 @@ export default function DonationForms() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!formData.firstName || !formData.lastName || !formData.email || !formData.amount) {
+        // Validation بسيطة
+        if (
+            !formData.firstName ||
+            !formData.lastName ||
+            !formData.email ||
+            !formData.amount
+        ) {
             alert("يرجى ملء جميع الحقول المطلوبة");
             return;
         }
 
+        if (isNaN(formData.amount) || Number(formData.amount) <= 0) {
+            alert("يرجى إدخال مبلغ صالح");
+            return;
+        }
+
         setIsLoading(true);
+
         try {
             const response = await CreatePaymentService(formData);
+
+            // إذا استلمت رابط الدفع من الخدمة، حول المستخدم إليه
             if (response.paymentUrl) {
                 window.location.href = response.paymentUrl;
             } else {
-                window.location.href = "/success";
+                // إذا تم الدفع مباشرة بدون رابط، نفترض النجاح
+                navigate("/success");
             }
         } catch (error) {
             console.error(error);
-            window.location.href = "/failed";
+            navigate("/failed");
         } finally {
             setIsLoading(false);
         }
     };
 
-    // JSX يكون هنا في return الرئيسي
     return (
         <div className="payment-donation-card">
             <div className="payment-donation-card-header">
@@ -97,10 +114,14 @@ export default function DonationForms() {
                             <button
                                 key={amount}
                                 type="button"
-                                className={`preset-btn ${selectedPreset === amount ? "active" : ""}`}
+                                className={`preset-btn ${
+                                    selectedPreset === amount ? "active" : ""
+                                }`}
                                 onClick={() => handlePresetAmount(amount)}
                             >
-                                {index === donationAmounts.length - 1 ? "أدخل مبلغًا آخر" : `${amount} جنيه`}
+                                {index === donationAmounts.length - 1
+                                    ? "أدخل مبلغًا آخر"
+                                    : `${amount} جنيه`}
                             </button>
                         ))}
                     </div>
@@ -115,14 +136,21 @@ export default function DonationForms() {
                     />
                 </div>
 
-                <button type="submit" className="donate-btn" disabled={isLoading}>
+                <button
+                    type="submit"
+                    className="donate-btn"
+                    disabled={isLoading}
+                >
                     {isLoading ? (
                         <>
                             <Loader2 className="loader" /> جاري المعالجة...
                         </>
                     ) : (
                         <>
-                            <Heart className="icon-heart-small" fill="currentColor" />
+                            <Heart
+                                className="icon-heart-small"
+                                fill="currentColor"
+                            />
                             تبرع الآن
                         </>
                     )}
