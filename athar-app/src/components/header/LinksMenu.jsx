@@ -42,14 +42,26 @@ export default function LinksMenu({ open, setOpen, user }) {
                         </div>
                     </NavLink>
 
-                    {["Admin", "Donor", "CharityAdmin"].includes(
-                        user.role
-                    ) && (
+                    {["Admin", "Donor", "CharityAdmin"].includes(user.role) && (
                         <NavLink to="/media" onClick={() => setOpen(false)}>
                             <div className="link">
                                 <MdOutlinePermMedia />
                                 الميديا
                             </div>
+                        </NavLink>
+                    )}
+
+                    {["Admin", "Donor", "CharityAdmin"].includes(user.role) && (
+                        <NavLink to="/media" onClick={() => setOpen(false)}>
+                            <NavLink
+                                to="/charities"
+                                onClick={() => setOpen(false)}
+                            >
+                                <div className="link">
+                                    <HiOutlineBuildingOffice2 />
+                                    جمعياتنا
+                                </div>
+                            </NavLink>
                         </NavLink>
                     )}
 
@@ -72,20 +84,13 @@ export default function LinksMenu({ open, setOpen, user }) {
                 </div>
             </NavLink>
 
-            <NavLink to="/charities" onClick={() => setOpen(false)}>
-                <div className="link">
-                    <HiOutlineBuildingOffice2 />
-                    جمعياتنا
-                </div>
-            </NavLink>
-
-            {["Admin"].includes(user.role) && (
+            {user?.role === "Admin" && (
                 <NavLink to="/join" onClick={() => setOpen(false)}>
-                <div className="link">
-                    <FaUserLock />
-                   طلبات الأنضمام
-                </div>
-            </NavLink>
+                    <div className="link">
+                        <FaUserLock />
+                        طلبات الأنضمام
+                    </div>
+                </NavLink>
             )}
 
             <NavLink to="/zakaa" onClick={() => setOpen(false)}>

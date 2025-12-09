@@ -66,7 +66,7 @@ namespace AtharPlatform.Services
                 .Where(d => d.CharityId == charityId)
                 .Select(d => new DonationInfoDto
                 {
-                    Id=d.Id,
+                    Id = d.Id,
                     Amount = d.NetAmountToCharity,
                     Date = d.CreatedAt,
                     Status = d.DonationStatus
@@ -111,7 +111,7 @@ namespace AtharPlatform.Services
 
             int totalReactions = reactionsList.Count;
 
-            
+
             //Result
             return new CharityStatusDto
             {
@@ -187,10 +187,6 @@ namespace AtharPlatform.Services
 
 
 
-
-
-
-
         public async Task<List<CharityApplicationResponseDto>> GetAllApplicationsForCharityAsync(int charityId)
         {
             // 1) Get volunteer  to charity
@@ -206,7 +202,7 @@ namespace AtharPlatform.Services
                     Phone = v.PhoneNumber,
                     Description = $"ارغب في التطوع لجمعية {v.CharityVolunteer?.Charity?.Name}",
                     Date = v.CharityVolunteer.Date,
-                
+
                 })
                 .ToList();
 
@@ -517,7 +513,10 @@ namespace AtharPlatform.Services
 
         }
 
-
+        Task<string?> ICharityService.GetCharityStatusAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }

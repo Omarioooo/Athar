@@ -37,14 +37,14 @@ export default function AppRoutes() {
                     <Route index element={<Home />} />
                     <Route path="zakaa" element={<Zakaa />} />
                     <Route path="aboutus" element={<AboutUs />} />
-                    <Route path="content" element={<Content />} />
-                    <Route path="campaigns" element={<Campaigns />} />
-                    <Route path="charities" element={<Charities />} />
                     <Route path="campaign/:id" element={<CampaignDetails />} />
                     <Route path="charity/:id" element={<CharityProfile />} />
+                    <Route path="campaigns" element={<Campaigns />} />
 
                     {/* Protected Routes */}
                     <Route element={<RequireAuth />}>
+                        <Route path="content" element={<Content />} />
+                        <Route path="charities" element={<Charities />} />
                         <Route
                             path="notifications"
                             element={<Notifications />}
