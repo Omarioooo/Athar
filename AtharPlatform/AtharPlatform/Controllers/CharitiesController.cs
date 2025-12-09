@@ -53,12 +53,12 @@ namespace AtharPlatform.Controllers
         }
 
 
-        [HttpGet("status/{id}")]
-        public async Task<IActionResult> GetCharityStatus(int id)
+        [HttpGet("Statistics/{id}")]
+        public async Task<IActionResult> GetCharityStatistics(int id)
         {
             try
             {
-                var results = _charityService.GetCharityStatusAsync(id);
+                var results = await _charityService.GetCharityStatisticsAsync(id);
 
                 if (results == null)
                     return BadRequest("Status not found");

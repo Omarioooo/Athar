@@ -22,44 +22,50 @@ namespace AtharPlatform.Services
         }
 
 
-        public async Task<CharityStatusDto> GetCharityStatusAsync(int id)
+        public async Task<CharityStatusDto> GetCharityStatisticsAsync(int id)
         {
-            var charity = await _unitOfWork.Charities.GetAsync(id);
+           
+            var charity = await _unitOfWork.Charities.GetByIdAsync(id);
             if (charity == null)
-                throw new Exception("charity not found");
+                throw new Exception("Charity not found");
 
-
-            var campaigns = charity.Campaigns.ToList();
-            if (campaigns == null)
-                throw new Exception("campaigns not found");
+        
+            var campaigns = await _unitOfWork.Campaigns.GetByCharityIdAsync(id);
+           
+            var campaignsList = charity.Campaigns.ToList();
 
             int totalContent = 0;
-            foreach(var c in campaigns)
+            foreach (var c in campaignsList)
             {
                 var contents = await _unitOfWork.Contents.GetByCampaignIdAsync(c.Id);
-                totalContent += contents.Count;
+                totalContent += contents.Count ;
             }
 
+          
             decimal totalDonations = 0;
-            foreach (var c in campaigns)
+            foreach (var c in campaignsList)
             {
-             foreach(var d in c.CampaignDonations)
+                if (c.CampaignDonations == null) continue;
+
+                foreach (var cd in c.CampaignDonations)
                 {
-                    var don = await _unitOfWork.Donations.FindAsync(d.DonationId);
-                    if (don == null)
-                        continue;
-                    totalDonations += don.TotalAmount;
-                }   
+                    var donation = await _unitOfWork.Donations.FindAsync(cd.DonationId);
+                    if (donation != null)
+                        totalDonations += donation.TotalAmount;
+                }
             }
+
+         
+            int followsCount = charity.Follows?.Count ?? 0;
+            int donationsCount = charity.Donations?.Count ?? 0;
 
             return new CharityStatusDto
             {
-                CampaignsCount = campaigns.Count,
-                DonationsCount = charity.Donations.Count,
-                FollowsCount = charity.Follows.Count,
+                CampaignsCount = campaignsList.Count,
                 ContentCount = totalContent,
-                TotalIncome = totalDonations
-
+                TotalIncome = totalDonations,
+                DonationsCount = donationsCount,
+                FollowsCount = followsCount
             };
 
         }
