@@ -1,8 +1,9 @@
-﻿using AtharPlatform.Dtos;
+﻿using System;
+using AtharPlatform.Dtos;
 using AtharPlatform.DTOs;
 using AtharPlatform.Models;
+using AtharPlatform.Models.Enums;
 using AtharPlatform.Repositories;
-using System;
 
 namespace AtharPlatform.Services
 {
@@ -22,53 +23,60 @@ namespace AtharPlatform.Services
         }
 
 
-        public async Task<CharityStatusDto> GetCharityStatisticsAsync(int id)
+        public async Task<CharityStatusDto> GetCharityStatisticsAsync(int charityId)
         {
-           
-            var charity = await _unitOfWork.Charities.GetByIdAsync(id);
+             var charity = await _context.Charities
+                .FirstOrDefaultAsync(c => c.Id == charityId);
+
             if (charity == null)
                 throw new Exception("Charity not found");
 
-        
-            var campaigns = await _unitOfWork.Campaigns.GetByCharityIdAsync(id);
-           
-            var campaignsList = charity.Campaigns.ToList();
+             int followsCount = await _context.Follows
+                .Where(f => f.CharityId == charityId)
+                .CountAsync();
 
+             
+            int campaignsCount = await _context.Campaigns
+                .Where(c => c.CharityID == charityId)
+                .CountAsync();
+
+            
+            decimal totalDonations = await _context.Donations
+                .Where(d => d.CharityId == charityId && d.DonationStatus == TransactionStatusEnum.SUCCESSED)
+                .SumAsync(d => d.NetAmountToCharity);
+
+             
+            int donationsCount = await _context.Donations
+                .Where(d => d.CharityId == charityId)
+                .CountAsync();
+
+             
+            var campaignsList = await _context.Campaigns
+                .Where(c => c.CharityID == charityId)
+                .ToListAsync();
+
+             
             int totalContent = 0;
             foreach (var c in campaignsList)
             {
-                var contents = await _unitOfWork.Contents.GetByCampaignIdAsync(c.Id);
-                totalContent += contents.Count ;
+                var contentsCount = await _context.Contents
+                    .Where(ct => !ct.IsDeleted && ct.CampaignId == c.Id)
+                    .CountAsync();
+
+                totalContent += contentsCount;
             }
 
-          
-            decimal totalDonations = 0;
-            foreach (var c in campaignsList)
-            {
-                if (c.CampaignDonations == null) continue;
-
-                foreach (var cd in c.CampaignDonations)
-                {
-                    var donation = await _unitOfWork.Donations.FindAsync(cd.DonationId);
-                    if (donation != null)
-                        totalDonations += donation.TotalAmount;
-                }
-            }
-
-         
-            int followsCount = charity.Follows?.Count ?? 0;
-            int donationsCount = charity.Donations?.Count ?? 0;
-
+ 
             return new CharityStatusDto
             {
-                CampaignsCount = campaignsList.Count,
-                ContentCount = totalContent,
+                FollowsCount = followsCount,
+                CampaignsCount = campaignsCount,
                 TotalIncome = totalDonations,
                 DonationsCount = donationsCount,
-                FollowsCount = followsCount
+                ContentCount = totalContent
             };
-
         }
+
 
         public async Task<List<CharityApplicationResponseDto>> GetAllApplicationsForCharityAsync(int charityId)
         {
