@@ -20,49 +20,57 @@ namespace AtharPlatform.Services
 
         public async Task<string> DonateToCampaignAsync(DonationDto model)
         {
-         
+
             var donor = await _unitOfWork.Donors.GetAsync(model.DonorId)
                         ?? throw new Exception($"Donor with id {model.DonorId} not found");
 
-            
+
             var campaign = await _unitOfWork.Campaigns.GetAsync(model.CharityOrCampaignId)
                           ?? throw new Exception($"Charity with id {model.CharityOrCampaignId} not found");
 
-            
+            int charityId = campaign.CharityID;
+
             var donation = new Donation
             {
                 DonorId = model.DonorId,
-                TotalAmount =(decimal)model.TotalAmount,
+                TotalAmount = (decimal)model.TotalAmount,
                 NetAmountToCharity = model.TotalAmount - (model.TotalAmount * 0.02m),
                 Currency = "EGP",
                 MerchantOrderId = Guid.NewGuid().ToString(),
-                DonationStatus = TransactionStatusEnum.PENDING
+                DonationStatus = TransactionStatusEnum.PENDING,
+
+                CampaignId = campaign.Id,
+                CharityId = charityId
             };
 
             await _unitOfWork.Donations.AddAsync(donation);
             await _unitOfWork.SaveAsync();
 
-          
+
             var campaingDonation = new CampaignDonation
             {
                 DonationId = donation.Id,
-                CampaignId = model.CharityOrCampaignId
+                CampaignId = campaign.Id,
+                DonorId = model.DonorId
             };
 
             await _unitOfWork.CampaignDonations.AddAsync(campaingDonation);
             await _unitOfWork.SaveAsync();
 
-           
+
             var paymentOutPut = await _paymobService.CreatePaymentAsync(new CreatePaymentDto
             {
-                DonorId=model.DonorId,
-                CharityId=model.CharityOrCampaignId,
-                CampaignId = model.CharityOrCampaignId,
+                DonorId = model.DonorId,
                 DonorFirstName = donor.FirstName,
                 DonorLastName = donor.LastName,
                 DonorEmail = donor.Account.Email,
                 Amount = model.TotalAmount,
-                MerchantOrderId = donation.MerchantOrderId
+                MerchantOrderId = donation.MerchantOrderId,
+
+                 
+                CharityId = charityId,
+                CampaignId = campaign.Id
+
             });
 
             donation.PaymentID = paymentOutPut.PaymentId;
@@ -72,6 +80,9 @@ namespace AtharPlatform.Services
             return paymentOutPut.PaymentUrl ?? "";
         }
 
+
+
+        //علشان فيما بعد لما نعمل ان ينفع تبرع للجمعية علطول مش لازم يبقي في حملة
         public async Task<string> DonateToCharityAsync(DonationDto model)
         {
             // Check the donor

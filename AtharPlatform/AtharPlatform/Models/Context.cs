@@ -181,7 +181,30 @@ namespace AtharPlatform.Models
                 entity.HasKey(uc => uc.Id);
             });
 
+            builder.Entity<Donation>()
+                .HasMany(d => d.CharityDonations)
+                .WithOne(cd => cd.Donation)
+                .HasForeignKey(cd => cd.DonationId)
+                .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<CampaignDonation>()
+                .HasOne(cd => cd.Campaign)
+                .WithMany(c => c.CampaignDonations)
+                .HasForeignKey(cd => cd.CampaignId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Reactions: prevent cascade from Donor + Content simultaneously
+            builder.Entity<Reaction>()
+                .HasOne(r => r.Donor)
+                .WithMany(d => d.Reactions)
+                .HasForeignKey(r => r.DonorID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Reaction>()
+                .HasOne(r => r.Content)
+                .WithMany(c => c.Reactions)
+                .HasForeignKey(r => r.ContentID)
+                .OnDelete(DeleteBehavior.Cascade);
 
         }
 

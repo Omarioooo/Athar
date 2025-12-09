@@ -416,7 +416,9 @@ namespace AtharPlatform.Controllers
         {
 
             var check = await _unitOfWork.Charities.GetAsync(id);
+
             if (check.Status == Models.Enums.CharityStatusEnum.Pending)
+
             {
                 return BadRequest("Charity is under review.");
             }

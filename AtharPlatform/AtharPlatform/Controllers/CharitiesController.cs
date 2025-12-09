@@ -439,7 +439,7 @@ namespace AtharPlatform.Controllers
 
         // (POST) /api/charities/import - bulk import scraped data
         [HttpPost("import")]
-        [Authorize(Roles = "Admin,SuperAdmin")]
+        //[Authorize(Roles = "Admin,SuperAdmin")]
         public async Task<IActionResult> Import([FromBody] IEnumerable<CharityImportItemDto> items)
         {
             if (items == null) return BadRequest("No data provided");
