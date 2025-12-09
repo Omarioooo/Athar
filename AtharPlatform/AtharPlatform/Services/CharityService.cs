@@ -37,7 +37,7 @@ namespace AtharPlatform.Services
                 .Where(f => f.CharityId == charityId)
                 .Select(f => new StatsFollowDto
                 {
-                    UserId = f.Id,
+                    UserId = f.DonorId,
                     Date = f.StartDate
                 })
                 .ToListAsync();
