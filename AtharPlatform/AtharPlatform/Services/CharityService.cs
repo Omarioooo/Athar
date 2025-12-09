@@ -1,7 +1,5 @@
-﻿using System;
-using AtharPlatform.Dtos;
+﻿using AtharPlatform.Dtos;
 using AtharPlatform.DTOs;
-using AtharPlatform.Models;
 using AtharPlatform.Models.Enums;
 using AtharPlatform.Repositories;
 
@@ -25,55 +23,207 @@ namespace AtharPlatform.Services
 
         public async Task<CharityStatusDto> GetCharityStatisticsAsync(int charityId)
         {
-             var charity = await _context.Charities
-                .FirstOrDefaultAsync(c => c.Id == charityId);
+            //var charity = await _context.Charities
+            //   .FirstOrDefaultAsync(c => c.Id == charityId);
+
+            //if (charity == null)
+            //    throw new Exception("Charity not found");
+
+            ////int followsCount = await _context.Follows
+            ////   .Where(f => f.CharityId == charityId)
+            ////   .CountAsync();
+
+            //var follows = await _context.Follows
+            // .Where(f => f.CharityId == charityId)
+            // .Select(f => new FollowDto
+            // {
+            //     UserId = f.Id,
+            //     Date = f.StartDate
+            // })
+            // .ToListAsync();
+
+            //int followsCount = follows.Count;
+
+
+
+            //decimal totalDonations = await _context.Donations
+            //    .Where(d => d.CharityId == charityId && d.DonationStatus == TransactionStatusEnum.SUCCESSED)
+            //    .SumAsync(d => d.NetAmountToCharity);
+
+
+            //int donationsCount = await _context.Donations
+            //    .Where(d => d.CharityId == charityId)
+            //    .CountAsync();
+
+
+            //var campaignsList = await _context.Campaigns
+            //    .Where(c => c.CharityID == charityId)
+            //    .ToListAsync();
+
+
+            //int totalContent = 0;
+            //foreach (var c in campaignsList)
+            //{
+            //    var contentsCount = await _context.Contents
+            //        .Where(ct => !ct.IsDeleted && ct.CampaignId == c.Id)
+            //        .CountAsync();
+
+            //    totalContent += contentsCount;
+            //}
+
+            //// 7) Total reactions
+            //int totalReactions = await _context.Reactions
+            //    .CountAsync(r => r.Content.Campaign.CharityID == charityId);
+
+
+            //// 8) Campaigns by Category
+            //var campaignsByCategory = await _context.Campaigns
+            //    .Where(c => c.CharityID == charityId)
+            //    .GroupBy(c => c.Category)
+            //    .Select(g => new
+            //    {
+            //        Category = g.Key.ToString(),
+            //        Count = g.Count()
+            //    })
+            //    .ToDictionaryAsync(x => x.Category, x => x.Count);
+
+
+            //int campaignsCount = await _context.Campaigns
+            //  .Where(c => c.CharityID == charityId)
+            //  .CountAsync();
+
+
+            //// 9) Donations details (Amount + Date)
+            //var donationsList = await _context.Donations
+            //    .Where(d => d.CharityId == charityId)
+            //    .Select(d => new DonationSummaryDto
+            //    {
+            //        id = d.Id,
+            //        Amount = d.TotalAmount,
+            //        Date = d.CreatedAt
+            //    })
+            //    .ToListAsync();
+
+
+
+            //return new CharityStatusDto
+            //{
+            //    FollowsCount = followsCount,
+            //    CampaignsCount = campaignsCount,
+            //    TotalIncome = totalDonations,
+            //    DonationsCount = donationsCount,
+            //    ContentCount = totalContent,
+            //    TotalReactions = totalReactions,
+            //    CampaignsByCategory = campaignsByCategory,
+            //    Donations = donationsList
+            //};
+
+            var charity = await _context.Charities
+        .FirstOrDefaultAsync(c => c.Id == charityId);
 
             if (charity == null)
                 throw new Exception("Charity not found");
 
-             int followsCount = await _context.Follows
+            // ================================
+            // 1) Follows + Dates
+            // ================================
+            var follows = await _context.Follows
                 .Where(f => f.CharityId == charityId)
-                .CountAsync();
+                .Select(f => new StatsFollowDto
+                {
+                    UserId = f.Id,
+                    Date = f.StartDate
+                })
+                .ToListAsync();
 
-             
-            int campaignsCount = await _context.Campaigns
+            int followsCount = follows.Count;
+
+            // ================================
+            // 2) Campaign Counts by Category
+            // ================================
+            var campaignsByCategory = await _context.Campaigns
                 .Where(c => c.CharityID == charityId)
-                .CountAsync();
+                .GroupBy(c => c.Category)
+                .Select(g => new CampaignCategoryCountDto
+                {
+                    Category = g.Key,
+                    Count = g.Count()
+                })
+                .ToListAsync();
 
-            
-            decimal totalDonations = await _context.Donations
-                .Where(d => d.CharityId == charityId && d.DonationStatus == TransactionStatusEnum.SUCCESSED)
-                .SumAsync(d => d.NetAmountToCharity);
+            int campaignsCount = campaignsByCategory.Sum(x => x.Count);
 
-             
-            int donationsCount = await _context.Donations
+            // ================================
+            // 3) Total Donations + donation list
+            // ================================
+            var donationsList = await _context.Donations
                 .Where(d => d.CharityId == charityId)
-                .CountAsync();
+                .Select(d => new DonationInfoDto
+                {
+                    Id=d.Id,
+                    Amount = d.NetAmountToCharity,
+                    Date = d.CreatedAt,
+                    Status = d.DonationStatus
+                })
+                .ToListAsync();
 
-             
+            var totalDonations = donationsList
+                .Where(d => d.Status == TransactionStatusEnum.SUCCESSED)
+                .Sum(d => d.Amount);
+
+            int donationsCount = donationsList.Count;
+
+            // ================================
+            // 4) Total Content in campaigns
+            // ================================
             var campaignsList = await _context.Campaigns
                 .Where(c => c.CharityID == charityId)
                 .ToListAsync();
 
-             
             int totalContent = 0;
+
             foreach (var c in campaignsList)
             {
-                var contentsCount = await _context.Contents
+                int contentsCount = await _context.Contents
                     .Where(ct => !ct.IsDeleted && ct.CampaignId == c.Id)
                     .CountAsync();
 
                 totalContent += contentsCount;
             }
 
- 
+            // ================================
+            // 5) Total Reactions + reaction list
+            // ================================
+            var reactionsList = await _context.Reactions
+                .Where(r => r.Content.Campaign.CharityID == charityId)
+                .Select(r => new ReactionDto
+                {
+                    ReactionId = r.Id,
+                    Date = r.ReactionDate
+                })
+                .ToListAsync();
+
+            int totalReactions = reactionsList.Count;
+
+            // ================================
+            // Final Object
+            // ================================
             return new CharityStatusDto
             {
                 FollowsCount = followsCount,
+                Follows = follows,
+
                 CampaignsCount = campaignsCount,
+                CampaignsByCategory = campaignsByCategory,
+
                 TotalIncome = totalDonations,
                 DonationsCount = donationsCount,
-                ContentCount = totalContent
+                Donations = donationsList,
+
+                ContentCount = totalContent,
+
+                ReactionsCount = totalReactions,
+                Reactions = reactionsList
             };
         }
 
