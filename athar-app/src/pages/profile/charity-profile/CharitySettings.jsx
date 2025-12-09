@@ -9,7 +9,7 @@ import {
     UpdateCharityData,
 } from "../../../services/charityService";
 import { UseAuth } from "../../../Auth/Auth";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export default function CharitySettings() {
     const { user, logout } = UseAuth();
@@ -18,6 +18,7 @@ export default function CharitySettings() {
     const [previewImage, setPreviewImage] = useState(ProfileImg);
     const [isEditing, setIsEditing] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
+     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         name: "",
@@ -128,7 +129,7 @@ export default function CharitySettings() {
                         </p>
                         <button
                             className="overlay-button"
-                            onClick={() => Navigate("/")}
+                            onClick={() => navigate("/")}
                         >
                             الذهاب للصفحة الرئيسية
                         </button>
@@ -146,7 +147,7 @@ export default function CharitySettings() {
                         </p>
                         <button
                             className="overlay-button"
-                            onClick={() => Navigate("/")}
+                           onClick={() => navigate("/")}
                         >
                             الذهاب للصفحة الرئيسية
                         </button>

@@ -3,11 +3,14 @@ import CampaignCard from "../../../components/charity/charity-campaigns/Campaign
 import Pagination from "../../../components/Pagination";
 import { getTotalPages, paginate } from "../../../utils/PaginationHelper";
 import { UseAuth } from "../../../Auth/Auth";
-import { CharityStatus, getCharityCampaigns } from "../../../services/charityService";
+import {
+    CharityStatus,
+    getCharityCampaigns,
+} from "../../../services/charityService";
 import { FaPlus } from "react-icons/fa";
 import { CreateCampaign } from "../../../services/campaignService";
 import { AnimatePresence, motion } from "framer-motion";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export default function MyCampaigns() {
     const { user } = UseAuth();
@@ -23,8 +26,8 @@ export default function MyCampaigns() {
     const [goalAmount, setGoalAmount] = useState("");
     const [category, setCategory] = useState("");
     const [imageFile, setImageFile] = useState(null);
-        const [status, setStatus] = useState(1)
-
+    const [status, setStatus] = useState(1);
+    const navigate = useNavigate();
 
     const [page, setPage] = useState(1);
     const [filter, setFilter] = useState("all");
@@ -48,7 +51,6 @@ export default function MyCampaigns() {
         if (user?.id) loadCampaigns();
     }, [user?.id]);
 
-
     useEffect(() => {
         if (!user) return;
 
@@ -57,7 +59,6 @@ export default function MyCampaigns() {
                 setLoading(true);
                 const data = await CharityStatus(user.id);
                 setStatus(data);
-
             } catch (err) {
                 console.error("Failed to fetch charity status", err);
             } finally {
@@ -142,7 +143,7 @@ export default function MyCampaigns() {
                         </p>
                         <button
                             className="overlay-button"
-                            onClick={() => Navigate("/")}
+                            onClick={() => navigate("/")}
                         >
                             الذهاب للصفحة الرئيسية
                         </button>
@@ -160,7 +161,7 @@ export default function MyCampaigns() {
                         </p>
                         <button
                             className="overlay-button"
-                            onClick={() => Navigate("/")}
+                            onClick={() => navigate("/")}
                         >
                             الذهاب للصفحة الرئيسية
                         </button>

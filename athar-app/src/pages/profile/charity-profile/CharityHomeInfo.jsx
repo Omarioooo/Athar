@@ -4,11 +4,11 @@ import defaultImg from "../../../assets/images/athar5.png";
 import { UseAuth } from "../../../Auth/Auth";
 import { useEffect, useState } from "react";
 import { getCharityProfile } from "../../../services/charityService";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export default function CharityHomeInfo() {
     const { user } = UseAuth();
-
+ const navigate = useNavigate();
     const [charity, setCharity] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -67,7 +67,7 @@ export default function CharityHomeInfo() {
                         </p>
                         <button
                             className="overlay-button"
-                            onClick={() => Navigate("/")}
+                            onClick={() => navigate("/")}
                         >
                             الذهاب للصفحة الرئيسية
                         </button>
@@ -85,7 +85,7 @@ export default function CharityHomeInfo() {
                         </p>
                         <button
                             className="overlay-button"
-                            onClick={() => Navigate("/")}
+                            onClick={() => navigate("/")}
                         >
                             الذهاب للصفحة الرئيسية
                         </button>
