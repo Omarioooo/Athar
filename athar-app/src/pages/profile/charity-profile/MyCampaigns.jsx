@@ -3,7 +3,7 @@ import CampaignCard from "../../../components/charity/charity-campaigns/Campaign
 import Pagination from "../../../components/Pagination";
 import { getTotalPages, paginate } from "../../../utils/PaginationHelper";
 import { UseAuth } from "../../../Auth/Auth";
-import { getCharityCampaigns } from "../../../services/charityService";
+import { CharityStatus, getCharityCampaigns } from "../../../services/charityService";
 import { FaPlus } from "react-icons/fa";
 import { CreateCampaign } from "../../../services/campaignService";
 import { AnimatePresence, motion } from "framer-motion";
