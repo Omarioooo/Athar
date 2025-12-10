@@ -8,12 +8,12 @@ export function DashboardWrapper() {
     const { user } = UseAuth();
     const role = user?.role;
 
-    if (role == null || (role !== "Admin" && role !== "CharityAdmin")) {
+    if (role == null || (role !== "SuperAdmin" && role !== "CharityAdmin")) {
         return <NotAuth />;
     }
 
     switch (role) {
-        case "Admin":
+        case "SuperAdmin":
             return (
                 <>
                     <MainLayout /> <AdminDashboard />

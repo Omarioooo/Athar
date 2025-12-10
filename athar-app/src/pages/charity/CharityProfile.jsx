@@ -34,7 +34,6 @@ export default function CharityProfile() {
                 setLoading(false);
             }
         };
-
         loadProfile();
     }, [id]);
 

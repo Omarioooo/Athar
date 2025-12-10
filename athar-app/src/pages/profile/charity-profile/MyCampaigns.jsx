@@ -58,6 +58,8 @@ export default function MyCampaigns() {
             try {
                 setLoading(true);
                 const data = await CharityStatus(user.id);
+                console.log(data);
+                
                 setStatus(data);
             } catch (err) {
                 console.error("Failed to fetch charity status", err);
@@ -133,7 +135,7 @@ export default function MyCampaigns() {
 
     return (
         <>
-            {status === 1 && (
+            {/* {status === 1 && (
                 <div className="pending-overlay">
                     <div className="overlay-box">
                         <h2>🚧 الجمعية قيد المراجعة</h2>
@@ -167,7 +169,7 @@ export default function MyCampaigns() {
                         </button>
                     </div>
                 </div>
-            )}
+            )} */}
 
             <div className="campaigns-wrapper">
                 {/* Filter buttons */}

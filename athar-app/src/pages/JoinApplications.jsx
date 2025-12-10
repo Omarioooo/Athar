@@ -62,10 +62,10 @@ export default function JoinApplications() {
                 setLoading(false);
             }
         }
-
         loadCharities();
     }, []);
 
+    
     if (loading) {
         return (
             <div className="d-flex justify-content-center py-5">
