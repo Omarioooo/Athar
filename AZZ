@@ -1,0 +1,245 @@
+[33m40ea975[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mY-After_Media[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m fixes
+[33m2b29cd5[m fixes
+[33m37abe0d[m fixes
+[33m8d7b665[m fixes
+[33m5beaea9[m fixes
+[33m7f12c09[m[33m ([m[1;31morigin/Y-After_Media[m[33m)[m Merge branch 'main' of https://github.com/Omarioooo/Athar into Y-After_Media
+[33mde4ac7f[m  check
+[33m2f5267f[m fixes
+[33md645856[m charity status fix
+[33m1279a85[m Merge branch 'main' of https://github.com/Omarioooo/Athar
+[33m6d9093a[m charity status fix
+[33m0f4bf43[m :((((
+[33mc2d214a[m charity status fix
+[33m2c1a2eb[m Status For Charity
+[33m80ca382[m Last Dance
+[33m0987977[m Merge branch 'main' of https://github.com/Omarioooo/Athar into Y-After_Media
+[33m21b9b9c[m Make more stats for Endpoint  Charitystats
+[33m079a757[m Merge branch 'main' of https://github.com/Omarioooo/Athar
+[33m6bfcd3d[m some payment fix
+[33m29dee9b[m Make stats Endpoint For Charity_2
+[33m244302d[m Make stats Endpoint For Charity
+[33m89ff89d[m Merge branch 'main' of https://github.com/Omarioooo/Athar
+[33m3887be3[m charity status
+[33mcdb47da[m upload some Photos
+[33m982858a[m db updates
+[33mca43ab0[m front updates
+[33m7a83b9a[m  t
+[33m8e984a2[m  t
+[33m6a5359c[m Merge pull request #42 from Omarioooo/R-final
+[33m3c7b63b[m new neon connection string + migration error fix
+[33mbe9b91b[m Upate Paymob_Service_2+ solve Conflict
+[33m1d78816[m Upate Paymob_Service_2
+[33mfd3eccc[m Merge branch 'main' of https://github.com/Omarioooo/Athar into Y-After_Media
+[33m5796d41[m Upate Paymob_Service
+[33m94915db[m Merge branch 'main' of https://github.com/Omarioooo/Athar
+[33md73f65d[m pull updates
+[33md51aa31[m upload Photos_2
+[33m8c9e5ac[m Merge branch 'main' of https://github.com/Omarioooo/Athar
+[33md58fb7f[m Merge pull request #41 from Omarioooo/Y-After_Media
+[33mbf7d76a[m upload Photos
+[33me319801[m Merge pull request #40 from Omarioooo/Y-After_Media
+[33m4104e7a[m Add Type to Create Campaign
+[33ma9f1fc0[m pull updates
+[33m8223d21[m updates
+[33m1be2479[m Merge pull request #39 from Omarioooo/Y-After_Media
+[33m48ca580[m Revision Update delete Charity
+[33m7b3c678[m Merge pull request #38 from Omarioooo/Y-After_Media
+[33m1504b5c[m delete donor with his data
+[33m6183a4e[m Merge pull request #37 from Omarioooo/Y-After_Media
+[33m26f8be9[m Add Counters To Make The Dashboard
+[33m4b10eee[m حفظ التغييرات المحلية
+[33mc8ee921[m Merge pull request #36 from Omarioooo/Y-After_Media
+[33m3ec0704[m Add More data for notification response
+[33md7e8b19[m updates
+[33md94f317[m Merge pull request #35 from Omarioooo/Y-After_Media
+[33m9dacb90[m Donor Athar Endpoint
+[33mfac9653[m updates
+[33m0fce21e[m updates
+[33m72b15dd[m end points updates
+[33mdd06b2c[m Merge branch 'main' of https://github.com/Omarioooo/Athar into Y-After_Media
+[33m520f180[m Edit GetAll_Applications(Forms)
+[33m8602bd4[m forms volunteer update
+[33m9684cc9[m Merge pull request #34 from Omarioooo/Y-After_Media
+[33m29cb25c[m Edit logic in Forms_3:(
+[33m0ccf10c[m forms updates
+[33md26c38c[m Edit logic in Forms_2
+[33m89bc460[m forms updates
+[33m3d878fa[m Merge pull request #33 from Omarioooo/Y-After_Media
+[33m2f3d090[m Merge branch 'main' of https://github.com/Omarioooo/Athar into Y-After_Media
+[33mc952d78[m Edit logic in Forms
+[33m9cf780d[m forms fixed
+[33mdd66d74[m Merge pull request #32 from Omarioooo/Y-After_Media
+[33mb39903c[m Merge branch 'main' of https://github.com/Omarioooo/Athar into Y-After_Media
+[33m2ecc0c1[m Edit logic in Content
+[33m188e097[m like
+[33m149cc5f[m no thing
+[33m94d7128[m no thing
+[33m35a3753[m yoo
+[33m0290bc4[m Fix ordering of concatenated volunteer and vendor offers
+[33m4cf7a2c[m Use Guid to make it Random
+[33m5434f3d[m Merge pull request #31 from Omarioooo/Y-After_Media
+[33md09f915[m Update Forms To be All_For_Charity_EndPoint
+[33ma754783[m last updates
+[33m9e516b2[m Modals forms are done
+[33m45719df[m Temp commit for pull
+[33mcccfc1c[m Add new updates to athar-app
+[33mea14b5f[m giiihad
+[33m5e12d5e[m sorry ya gihad :)
+[33mced8ed9[m Merge branch 'main' of https://github.com/Omarioooo/Athar
+[33ma56c888[m fix some profile route issues
+[33m592f7db[m Merge pull request #30 from Omarioooo/Y-After_Media
+[33m0d58b06[m After Fixing the unlimited photos problems :)
+[33m15b2f80[m befor Pull to Fix Donor Routing_2
+[33m26e05e7[m befor Pull to Fix Donor Routing
+[33mfd68f6a[m fix profile route in react
+[33mf437812[m new charity profile endpoint
+[33m9f55f15[m fixing auth in react
+[33m13bf785[m Merge pull request #29 from Omarioooo/Y-After_Media
+[33mfb89d4c[m Edit Charity Photos :(
+[33me143f77[m fetching donor service updates
+[33me4d4e96[m Merge pull request #28 from Omarioooo/Y-After_Media
+[33mff79051[m Resolved merge conflict with main
+[33m6c630e0[m Add EndPoint to Get Donor Profile
+[33ma27e0d3[m add new front-folders
+[33m713d31b[m add new front-folders
+[33m5d7fa0f[m README for detailed project overview
+[33md9d7ef2[m Merge pull request #27 from Omarioooo/O-Merge
+[33m3ae5cf0[m[33m ([m[1;31morigin/O-Merge[m[33m)[m new front file
+[33m415f4c1[m Merge branch 'O-Merge'
+[33m8c7baf4[m update O-merge
+[33m701655c[m Merge branch 'gihad-front' of https://github.com/Omarioooo/Athar into O-Merge
+[33mad9d540[m Add notification To Approve and reject_2
+[33m347cf7d[m Add notification To Approve and reject
+[33ma9b1bcb[m make front
+[33mc681b56[m Add notification To Create Campaign to Followers
+[33mc63105a[m Optimize Campaigns GetAll+Create
+[33m80cf351[m Optimize Campaigns GetAll
+[33m1f3f776[m Edit Search in Media_4 (Notification for Followers) Remove All Auth till finish FrontEnd
+[33m25daf8e[m Edit Search in Media_4 (Notification for Followers) Remove All Auth till finish Front
+[33m854f6aa[m Edit Search in Media_4 (Notification for Followers) Remove Auth till finish Front
+[33mb9eecf2[m Edit Search in Media_4 (Notification for Followers)
+[33m769409c[m Edit Search in Media_3
+[33mb8a8cd7[m Edit Search in Media_2
+[33m40cf71b[m Edit Search in Media
+[33m855a4df[m Edit Auth in MediaEndPoint2
+[33m4993af2[m Edit Auth in MediaEndPoint
+[33m9395093[m Add more Media EndPoints
+[33mb8d87bb[m Finish Media EndPoints
+[33md44b455[m Merge branch 'O-Merge' of https://github.com/Omarioooo/Athar into Y-ReadyForMedia
+[33m60ad1da[m remove some old fixes not needed
+[33mb467099[m remove trash
+[33m05170d2[m Merge branch 'O-Merge' of https://github.com/Omarioooo/Athar into O-Merge
+[33m6b373fb[m create one more charity and campagin ensure cros https
+[33maafaac1[m Merge remote-tracking branch 'origin/front-branch' into O-Merge
+[33m5601281[m add ToFullUrl helper method to convert relative image URLs to full URLs
+[33mbac62d7[m feat(migrations): remove initial migration and add new migrations for charity image URLs and volunteer/vendor status
+[33m5ecbf1e[m Merge branch 'O-Merge' of https://github.com/Omarioooo/Athar
+[33m200bd2e[m -Reset to SharedDB: Switched from local SQL Server to Neon PostgreSQL ,Updated Program.cs - Enabled PostgreSQL (UseNpgsql) and disabled SQL Server (UseSqlServer)
+[33m3e4fe9f[m Forget to put Auth
+[33mda89423[m Merge pull request #19 from Omarioooo/O-Merge
+[33mbb738ee[m Edit Volunteer and Venddor Forms + Charity Open and close the Forms
+[33m4ddc69c[m Edit Volunteer and Venddor Forms + Charity Open and close the Forms
+[33mb49092f[m add frontend project to front-branch
+[33md9d1211[m Add hard delete endpoint for charities with related data removal (the one we had was soft delete ---> inactive charity)
+[33m2eb4c24[m convert image byte to imagurl no image byte anymore
+[33ma7a2261[m Add JWT Bearer authentication to Swagger configuration
+[33m5fe9f9c[m Merge pull request #18 from Omarioooo/R-SharedDB
+[33m7903b9f[m remove post/api/charities creation endpoint
+[33m5a19554[m the script if needed but local images files
+[33m6d90b14[m inserted a  manual account charity then approve it then create campagin +handle some roles and imgprofile from account form  convert to image in charity get+ script to add the data in case the shared db failed"it's a test"
+[33m28ced9a[m Add initial PostgreSQL migration Neon.Tech host DB
+[33m0e1dd4b[m imageURL for campagins
+[33mf678021[m campaign and charity retrieval with additional filters and query capabilities
+[33m075b329[m Merge pull request #17 from Omarioooo/O-Merge
+[33mf0ea95c[m Applying The Payment After Editing Payment2 18/11
+[33m41fc8ca[m Applying The Payment final one
+[33mbdeef3b[m refactor: improve username generation for charity accounts to use sanitized GUIDs
+[33mf737039[m run synchronously during startup
+[33m37fa47f[m data seeding process add background seeding for scraped data
+[33m6d6a18a[m scripts: update import.ps1 to use AdminRegister form endpoint and default to https://localhost:7032
+[33m3d65f41[m Remove outdated migration files from project configuration
+[33m926403f[m Merge Y-Payment into O-Merge: resolve conflicts (Program, PaginatedResultDto, snapshot); preserve existing schema, add CampaignId to Donation
+[33mce007fd[m Merge pull request #16 from Omarioooo/Y-Payment
+[33m7b8de26[m Applying The Payment ||
+[33m1055e7f[m Remove AdminRegisterJson endpoint and data seeding logic from Program.cs after import json "if needed again we can do it again"
+[33m7f00505[m  script for importing charities and campaigns :Implemented a script to register an admin user and log in to the API
+[33m3b3ac6b[m final updates on campaigns (Yarab ya3ny)...
+[33mda05b63[m Fix arch of campaign service and repo...
+[33m07307e7[m Merge 'origin/main' into O-Merge to check the updates
+[33m45f19f1[m Fixed conflicts errors...
+[33m22fb882[m Merge pull request #15 from Omarioooo/O-Test
+[33m8af8194[m Fixed the notification errors...
+[33mc054527[m Schema updated...
+[33md93cf1f[m follow service completed
+[33m486a206[m Refactor CampaignController
+[33mb13392e[m Merge pull request #14 from Omarioooo/g-campaign
+[33mc88f17a[m Merge branch 'Master' into g-campaign
+[33mc0c7ce0[m Merge pull request #13 from Omarioooo/R-importScrapedData
+[33m9ecccf4[m Refactor CampaignDto and CampaignController to include supporting_charities (array) for scrapped charities and charity_name (single string) for manual ones & improve data handling
+[33m9ae22b8[m Resolved conflict fully
+[33m9b2712b[m Enhance campaign import functionality
+[33mad00e06[m Add migration for campaign scraped fields and update import script
+[33mc157e53[m Resolved merge conflicts and updated campaign files
+[33m1183267[m Resolved all merge conflicts
+[33m22f5644[m update ex-handling in account controller (auth)...
+[33mb37cc87[m Resolved all merge conflicts
+[33md29e22d[m save all campaigns
+[33m027b404[m Complete and Test Account Services (auth)...
+[33m97351ee[m Add fix_campaign_images script
+[33m06094fa[m Add scrapers and  for MegaKheir campaigns
+[33mf1a0fea[m Add FrontEnd project
+[33m25edc28[m Merge pull request #12 from Omarioooo/R-importScrapedData
+[33m72a9c6d[m Improve charity name search logic with exact and partial matching
+[33m0974721[m Merge pull request #11 from Omarioooo/R-importScrapedData
+[33mc9498b3[m Merge pull request #10 from Omarioooo/Y-Forms
+[33m42ca96b[m Remove MegaKheirUrl from Charity DTOs and CharitiesController update filter script to exclude it from output
+[33m1293f4f[m Making Forms For Vendor and Volunteer
+[33m3a0cc47[m import scrapped charities
+[33m2fd4271[m some details
+[33m65aaac9[m Merge pull request #9 from Omarioooo/R-Charites
+[33m8f0ba8f[m impl 8 endpoints: charity edit :CharityAdmin: only their own charity SuperAdmin: any charity expand charity dashboard stats
+[33mcdf520f[m Add endpoint to serve charity images as browser-friendly URLs
+[33mb324826[m Fix async login method in AccountController and update obsolete DTO class
+[33m93d3f03[m Removed duplicate pagination DTO Reverted Campaign images to URL  better for frontend ByName endpoint returns CharityCardDto and matches case-insensitive
+[33mbd00baa[m Revision to Charities
+[33m2378692[m Merge branch 'R-Charites' of github.com:Omarioooo/Athar into Y-Revision-R-Charities
+[33m66f018f[m Merge branch 'Master' of github.com:Omarioooo/Athar
+[33m3eb59b3[m Merge branch 'master' into compain-update
+[33m734db42[m impl 5 endpoints for charities:
+[33m9b3f8e7[m add Entity Framework Core Design package and implement GetByType method in CampaignRepository "error in runtime" and connecttion in appsettings faild for me so updated it
+[33mdc5e026[m making campaign repository
+[33md895413[m Merge pull request #7 from Omarioooo/compain-update
+[33md41de90[m Merge pull request #6 from Omarioooo/R-Ai
+[33m8037bb7[m chore: add .gitignore for venv, .env, and scraper data outputs
+[33m7ae784d[m make campaincontroller
+[33m6e0f564[m Connect to SqlServer...
+[33m1a3039a[m Fix Notification Service...
+[33mee9b35b[m Fix Account Service and Auth...
+[33med0347f[m Add scraper for MegaKheir NGOs using Crawl4AI
+[33md69d290[m fixed the missing of IdonorRepository
+[33md365c57[m Merge branch 'Master' into Master
+[33mb6fcab6[m fixed the missing of IdonorRepository
+[33m39075c7[m Merge pull request #4 from Omarioooo/Master
+[33m7c88d6f[m Merge branch 'main' into Master
+[33m8ed06b4[m some fixes
+[33meca688f[m final db updates added
+[33m7bf7a28[m Add campaign and donation models with new properties and enums, implement beneficiary upload entity ,some edits
+[33md2bb824[m Refactor Identity service registration to include EF stores and default token providers
+[33m7ea37e6[m fix ather the code-first problems
+[33m99cee07[m fix the code-first problems
+[33m27f4120[m Fix ForeignKey attribute for SubscriptionID property
+[33m9d36c0f[m Update CampaignDonation.cs
+[33me204764[m Merge pull request #3 from Omarioooo/feature/code-first-entities
+[33m98bebfa[m Delete some folders in Model
+[33me8ac177[m Rename MediaUrl to PostImage in Content model
+[33m8787575[m Merge pull request #2 from Omarioooo/feature/code-first-entities
+[33m025a6f5[m Update Code-first for the Entities
+[33m8caa97c[m Merge pull request #1 from Omarioooo/feature/code-first-entities
+[33ma4d57ab[m make Code-first for the Entities
+[33m03bb130[m Fix URL in README for local server access
+[33ma28cf8f[m Correct README instructions for cloning and running
+[33mf1ab48d[m Fix clone command in README
+[33m8dc45b9[m create the initial folders and identity
+[33m1166d76[m Create README.md with project details
+[33mff3fb7b[m Initial commit
