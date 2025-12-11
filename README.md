@@ -168,6 +168,10 @@ Data files included and tracked:
 - Repository Pattern & Unit of Work for data access
 - DTOs and AutoMapper for mapping between layers
 - FluentValidation for request validation
+ ---
+🎥 Website Explanation Video
+
+watch a full explanation of the website : https://drive.google.com/file/d/1vk_ztuCkso5OSW4xnMTEzrNFhMJTQ14J/view?usp=sharing
 
  ---
  👥 Authors
