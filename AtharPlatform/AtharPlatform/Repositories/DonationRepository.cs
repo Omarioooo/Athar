@@ -40,17 +40,33 @@ namespace AtharPlatform.Repositories
 
         public Task<List<Donation>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return _context.Set<Donation>()
+                .Include(d => d.CampaignDonations)
+                .ThenInclude(cd => cd.Campaign)
+                .ToListAsync();
         }
 
         public Task<Donation> GetAsync(int id)
         {
-            throw new NotImplementedException();
+            return _context.Set<Donation>()
+                .Include(d => d.CampaignDonations)
+                .FirstOrDefaultAsync(d => d.Id == id);
         }
 
         public Task<bool> DeleteAsync(int id)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<List<Donation>> GetDonationsByDonorIdAsync(int donorId)
+        {
+            return await _context.Set<Donation>()
+                .Where(d => d.DonorId == donorId)
+                .Include(d => d.CampaignDonations)
+                .ThenInclude(cd => cd.Campaign)
+                .Include(d => d.CharityDonations)
+                .OrderByDescending(d => d.CreatedAt)
+                .ToListAsync();
         }
     }
 }

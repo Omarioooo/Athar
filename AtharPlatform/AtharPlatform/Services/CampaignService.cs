@@ -5,6 +5,7 @@ using AtharPlatform.DTOs;
 using AtharPlatform.Models;
 using AtharPlatform.Models.Enum;
 using AtharPlatform.Repositories;
+using AtharPlatform.Services.MachineLearning;
 
 namespace AtharPlatform.Services
 {
@@ -14,12 +15,18 @@ namespace AtharPlatform.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFileService _fileService;
         private readonly INotificationService _notificationService;
+        private readonly ICampaignRecommendationService _recommendationService;
 
-        public CampaignService(IUnitOfWork unitOfWork, IFileService fileService, INotificationService notificationService)
+        public CampaignService(
+            IUnitOfWork unitOfWork, 
+            IFileService fileService, 
+            INotificationService notificationService,
+            ICampaignRecommendationService recommendationService)
         {
             _unitOfWork = unitOfWork;
             _fileService = fileService;
             _notificationService = notificationService;
+            _recommendationService = recommendationService;
         }
 
         public async Task<List<CampaignDto>> GetCampaignsByCharityIdAsync(int charityId)
@@ -496,5 +503,54 @@ namespace AtharPlatform.Services
                  .Where(c => c.CharityID == CharityId)
                  .CountAsync();
         }
+
+        #region AI-Powered Recommendations
+
+        /// <summary>
+        /// Get hybrid AI-powered recommendations combining content-based and collaborative filtering
+        /// with boosting for new charities and low-donation campaigns
+        /// </summary>
+        public async Task<List<CampaignDto>> GetHybridRecommendationsAsync(int? donorId = null, int topN = 10)
+        {
+            var recommendations = await _recommendationService.GetHybridRecommendationsAsync(donorId, topN);
+            
+            var campaignIds = recommendations.Select(r => r.CampaignId).ToList();
+            
+            if (!campaignIds.Any())
+            {
+                return new List<CampaignDto>();
+            }
+
+            var campaigns = await _unitOfWork.Campaigns.GetAll()
+                .Where(c => campaignIds.Contains(c.Id))
+                .Include(c => c.Charity)
+                .ToListAsync();
+
+            // Maintain the order from ML recommendations (sorted by hybrid score)
+            var orderedCampaigns = campaignIds
+                .Select(id => campaigns.FirstOrDefault(c => c.Id == id))
+                .Where(c => c != null)
+                .Select(c => new CampaignDto
+                {
+                    Id = c!.Id,
+                    Title = c.Title,
+                    Description = c.Description,
+                    ImageUrl = c.ImageUrl,
+                    GoalAmount = c.GoalAmount,
+                    RaisedAmount = c.RaisedAmount,
+                    StartDate = c.StartDate,
+                    EndDate = c.EndDate,
+                    Category = c.Category,
+                    Status = c.Status,
+                    CharityID = c.CharityID,
+                    CharityName = c.Charity?.Name ?? "",
+                    IsCritical = c.isCritical
+                })
+                .ToList();
+
+            return orderedCampaigns;
+        }
+
+        #endregion
     }
 }
