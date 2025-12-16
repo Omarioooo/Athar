@@ -1,6 +1,7 @@
 ﻿using AtharPlatform.Hubs;
 using AtharPlatform.Repositories;
 using AtharPlatform.Services;
+using AtharPlatform.Services.MachineLearning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -105,6 +106,9 @@ builder.Services.AddScoped<IContentService, ContentService>();
 builder.Services.AddScoped<ICharityService, CharityService>();
 builder.Services.AddScoped<IVolunteerApplicationService, VolunteerApplicationService>();
 
+// ML.NET AI Services for Campaign Recommendations
+builder.Services.AddSingleton<ICampaignRecommendationService, CampaignRecommendationService>();
+builder.Services.AddHostedService<MLModelTrainingBackgroundService>();
 
 builder.Services.AddHttpContextAccessor();
 

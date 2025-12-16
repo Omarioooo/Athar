@@ -96,5 +96,11 @@ namespace AtharPlatform.Services
         Task<List<CampaignDto>> GetCampaignsByCharityIdAsync(int charityId);
 
         Task<int> GetCountOfCampaignsByCharityIdAsync(int CharityId);
+
+        /// <summary>
+        /// Get hybrid AI-powered recommendations combining content-based and collaborative filtering
+        /// with boosting for new charities and low-donation campaigns
+        /// </summary>
+        Task<List<CampaignDto>> GetHybridRecommendationsAsync(int? donorId = null, int topN = 10);
     }
 }

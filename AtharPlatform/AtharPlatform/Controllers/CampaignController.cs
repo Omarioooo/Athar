@@ -560,5 +560,66 @@ namespace AtharPlatform.Controllers
             return Ok(result);
         }
 
+        #region AI-Powered Hybrid Recommendations
+
+        /// <summary>
+        /// Get hybrid AI-powered campaign recommendations combining Content-Based and Collaborative Filtering
+        /// Includes boosting for new charities and campaigns with low donations
+        /// Results are ordered by hybrid ML score from highest to lowest
+        /// </summary>
+        /// <param name="donorId">Optional Donor ID for personalized recommendations (omit for anonymous users)</param>
+        /// <param name="count">Number of recommendations: Top5, Top10, Top15, or All. Default: Top10</param>
+        /// <returns>Sorted list of campaign recommendations with scores</returns>
+        [HttpGet("[action]")]
+        [ProducesResponseType(typeof(List<CampaignDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetRecommendations(
+            [FromQuery] int? donorId = null, 
+            [FromQuery] RecommendationCount count = RecommendationCount.Top10)
+        {
+            try
+            {
+                // Convert enum to topN value (maximum 15 recommendations, 0 for all)
+                int topN = (int)count;
+                
+                // Enforce 15 as maximum unless requesting ALL (0)
+                if (topN > 15 && topN != 0)
+                    topN = 15;
+
+                var recommendations = await _campaignService.GetHybridRecommendationsAsync(donorId, topN);
+
+                // Convert relative ImageUrls to full URLs
+                foreach (var campaign in recommendations)
+                {
+                    campaign.ImageUrl = ToFullUrl(campaign.ImageUrl);
+                }
+
+                var response = new 
+                { 
+                    recommendations = recommendations,
+                    count = recommendations.Count,
+                    isPersonalized = donorId.HasValue,
+                    message = donorId.HasValue 
+                        ? "Personalized hybrid recommendations based on your history and preferences" 
+                        : "Popular campaigns recommended for you",
+                    algorithm = "Hybrid ML (Content-Based 40% + Collaborative Filtering 30% + Health Score 20% + Diversity 10%)",
+                    boosting = new 
+                    {
+                        newCharities = "+15% (charities < 6 months old or < 3 campaigns)",
+                        lowDonations = "+20% (< 20% funded), +10% (< 50% funded)",
+                        smallCharities = "+10% (< 10 campaigns)",
+                        maxBoost = "1.5x (capped)"
+                    }
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error generating recommendations", error = ex.Message });
+            }
+        }
+
+        #endregion
+
     }
 }
