@@ -409,35 +409,3 @@ public async Task<IActionResult> TrainModels()
 7. **Context-Aware**: Consider time, location, device
 8. **Social Signals**: Incorporate shares, follows, comments
 
----
-
-## References
-
-- [ML.NET Documentation](https://docs.microsoft.com/en-us/dotnet/machine-learning/)
-- [Matrix Factorization](https://developers.google.com/machine-learning/recommendation/collaborative/matrix)
-- [Content-Based Filtering](https://en.wikipedia.org/wiki/Recommender_system#Content-based_filtering)
-
----
-
-## Best Practices
-
-1. **Retrain Regularly**: Daily training keeps models fresh
-2. **Monitor Metrics**: Check RMSE and R² in logs
-3. **Handle Cold Start**: Always provide fallback recommendations
-4. **Explain Recommendations**: Show users why campaigns are recommended
-5. **Respect Privacy**: Don't expose donation amounts in explanations
-6. **Test with Real Users**: A/B test different algorithms
-7. **Optimize Performance**: Cache predictions for popular users
-
----
-
-##  Support
-
-For questions or issues with the ML recommendation system, please contact the development team or refer to the main project documentation.
-
----
-
-**Created:** December 2024  
-**Version:** 1.0  
-**ML.NET Version:** 4.0.0  
-**.NET Version:** 9.0
