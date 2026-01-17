@@ -235,7 +235,7 @@ namespace AtharPlatform.Services
 
         public async Task<PaymentOutPutDto> CreatePaymentAsync(CreatePaymentDto model)
         {
-            // 1️⃣ تأكد وجود الدونور
+            //  تأكد وجود الدونور
             var donorExists = await _unit.Donors.ExistsAsync(model.DonorId);
             if (!donorExists)
                 throw new Exception("Donor does not exist");
@@ -243,7 +243,7 @@ namespace AtharPlatform.Services
             string merchantOrderId = Guid.NewGuid().ToString();
             int amountCents = (int)(model.Amount * 100);
 
-            // 2️⃣ إنشاء Donation وحفظه أولًا عشان يتولد Id
+            // إنشاء Donation وحفظه أولًا عشان يتولد Id
             var donation = new Donation
             {
                 DonorId = model.DonorId,
@@ -258,9 +258,8 @@ namespace AtharPlatform.Services
             };
 
             await _unit.PaymentDonations.AddAsync(donation);
-            await _unit.SaveAsync(); // لازم عشان الـ Id يتولد
-
-            // 3️⃣ إنشاء CampaignDonation و CharityDonation باستخدام donation.Id
+            await _unit.SaveAsync(); 
+            //  إنشاء CampaignDonation و CharityDonation باستخدام donation.Id
             if (model.CampaignId > 0)
             {
                 var campaignExists = await _unit.Campaigns.GetAsync(model.CampaignId);
@@ -284,7 +283,7 @@ namespace AtharPlatform.Services
 
             await _unit.SaveAsync(); // حفظ كل شيء
 
-            // 4️⃣ إنشاء طلب الدفع لدى Paymob
+        
             string token = await GetAuthToken();
             int orderId = await CreateOrder(token, amountCents, merchantOrderId);
 
@@ -292,7 +291,7 @@ namespace AtharPlatform.Services
             await _unit.PaymentDonations.UpdateAsync(donation);
             await _unit.SaveAsync();
 
-            // 5️⃣ إنشاء Payment Key للحصول على رابط الدفع
+            //  إنشاء Payment Key للحصول على رابط الدفع
             string paymentKey = await CreatePaymentKey(token, orderId, amountCents, model.DonorEmail);
 
             string paymentUrl = $"https://accept.paymob.com/api/acceptance/iframes/{_settings.IFrameId}?payment_token={paymentKey}";
@@ -326,11 +325,11 @@ namespace AtharPlatform.Services
         // =================== Webhook Handling ===================
         public async Task HandleWebHookAsync(Dictionary<string, string> data)
         {
-            // 1️⃣ اطبع كل البيانات أولًا لتعرف المفاتيح الصح
+            
             foreach (var kv in data)
                 Console.WriteLine($"{kv.Key}: {kv.Value}");
 
-            // 2️⃣ استخدم TryGetValue لتجنب KeyNotFoundException
+            
             if (!data.TryGetValue("merchant_order_id", out string merchantOrderId))
                 if (!data.TryGetValue("order_merchant_order_id", out merchantOrderId))
                     return; // المفتاح غير موجود، نوقف التنفيذ أو نعمل logging
@@ -342,7 +341,6 @@ namespace AtharPlatform.Services
 
             bool success = successStr.ToLower() == "true";
 
-            // 3️⃣ جلب الدوناشن المرتبطة بالطلب
             var donation = await _unit.PaymentDonations.GetWithExpressionAsync(d => d.MerchantOrderId == merchantOrderId);
             if (donation == null) return;
 
@@ -350,14 +348,12 @@ namespace AtharPlatform.Services
             donation.DonationStatus = success ? TransactionStatusEnum.SUCCESSED : TransactionStatusEnum.FAILED;
             await _unit.PaymentDonations.UpdateAsync(donation);
 
-            // 4️⃣ لو العملية فشلت، نحفظ فقط
             if (!success)
             {
                 await _unit.SaveAsync();
                 return;
             }
 
-            // 5️⃣ تحديث مبلغ الحملة
             var campaignDonation = await _unit.PaymentCampaignDonations.GetWithExpressionAsync(cd => cd.DonationId == donation.Id);
             if (campaignDonation != null)
             {
@@ -376,7 +372,6 @@ namespace AtharPlatform.Services
                 }
             }
 
-            // 6️⃣ نحفظ كل التغييرات
             await _unit.SaveAsync();
         }
 
